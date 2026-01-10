@@ -300,7 +300,7 @@ class AdController extends Controller
 
     public function updateAdProfileStatus(Request $request, Ad $ad)
     {
-        
+
         $currentStatus = $ad->adController->status ?? null;
 
         // 3. Status Guard: Only allow changes if current status is active or inactive
@@ -521,31 +521,38 @@ class AdController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
-        // 1. Start the query with eager loading
+
+        // 1. Start Query
         $query = Ad::with(['adsDetails', 'adCreator', 'adController'])->latest();
 
         $status = strtolower($request->status);
-        // 2. Filter by Category and Gender using a single whereHas for performance
-        // We check if either variable has a valid value
+
+        // 2. Apply Filters
         if ($status && $status !== 'all') {
             $query->whereHas('adController', function ($q) use ($status) {
-                if ($status == 'APPROVED' || $status == 'approved') {
-                    // Use whereIn when checking against multiple possible values
+                if ($status == 'approved') {
                     $q->whereIn('status', ['active', 'inactive']);
                 } else {
-                    // Optional: Handle other statuses if needed
                     $q->where('status', $status);
                 }
             });
         }
 
-        // 3. Execute and return
-        $ads = $query->get();
+        // 3. Paginate
+        // Laravel will automatically detect 'page' from the POST body or Query String
+        $perPage = 15;
+        $paginatedAds = $query->paginate($perPage);
 
+        // 4. Return formatted response
         return response()->json([
             'status' => true,
-            'count' => $ads->count(),
-            'data' => $ads,
+            'count' => $paginatedAds->total(),
+            'data' => $paginatedAds->items(), // Returns current page items
+            'pagination' => [
+                'current_page' => $paginatedAds->currentPage(),
+                'last_page' => $paginatedAds->lastPage(),
+                'has_more' => $paginatedAds->hasMorePages(),
+            ],
         ], 200);
     }
 
@@ -565,6 +572,30 @@ class AdController extends Controller
     }
     // all the ads created by Users
 
+    // public function myAds(Request $request)
+    // {
+    //     $user = Auth::user();
+
+    //     // 1. Check if user is authenticated
+    //     if (! $user) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Unauthorized',
+    //         ], 401); // 401 is more appropriate for "Unauthenticated"
+    //     }
+
+    //     // 2. Query ads belonging to the user
+    //     // Replace 'user_id' with whatever your foreign key column is named
+    //     $ads = Ad::with(['adsDetails', 'adCreator', 'adController'])
+    //         ->where('user_id', $user->id)
+    //         ->latest()
+    //         ->get();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'data' => $ads,
+    //     ], 200);
+    // }
     public function myAds(Request $request)
     {
         $user = Auth::user();
@@ -574,19 +605,29 @@ class AdController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized',
-            ], 401); // 401 is more appropriate for "Unauthenticated"
+            ], 401);
         }
 
-        // 2. Query ads belonging to the user
-        // Replace 'user_id' with whatever your foreign key column is named
+        // 2. Use paginate() instead of get()
+        // You can set the number of items per page (e.g., 10 or 15)
+        $perPage = $request->query('per_page', 10);
+
         $ads = Ad::with(['adsDetails', 'adCreator', 'adController'])
             ->where('user_id', $user->id)
             ->latest()
-            ->get();
+            ->paginate($perPage);
 
+        // Laravel's Paginate object already puts the items inside a 'data' key
+        // when converted to JSON, along with meta information like total, current_page, etc.
         return response()->json([
             'status' => true,
-            'data' => $ads,
+            'data' => $ads->items(), // Returns just the array of ads for your Flutter list
+            'meta' => [
+                'current_page' => $ads->currentPage(),
+                'last_page' => $ads->lastPage(),
+                'total' => $ads->total(),
+                'has_more' => $ads->hasMorePages(),
+            ],
         ], 200);
     }
 }

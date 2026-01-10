@@ -50,25 +50,36 @@ class AuthController extends Controller
 
     public function getProfiles(Request $request)
     {
+        // 1. Use paginate(perPage) instead of get()
+        // This automatically reads the ?page parameter from the request
+        $perPage = 15;
+        $paginatedUsers = User::with('appUserProfile')
+            ->latest() // Optional: Show newest users first
+            ->paginate($perPage);
 
-        $users = User::with('appUserProfile')->get();
-
-        $flattenedUsers = $users->map(function ($user) {
-            // Convert user to array
+        // 2. Use the through() method on the paginator to flatten data
+        // This preserves the pagination meta-data (total, current_page, etc.)
+        $paginatedUsers->getCollection()->transform(function ($user) {
             $userData = $user->toArray();
 
-            // Pull the full_name from the relation and add it to top level
+            // Flatten the full_name to the top level
             $userData['full_name'] = $user->appUserProfile->full_name ?? null;
 
-            // Remove the nested relationship object
+            // Clean up the relationship key
             unset($userData['app_user_profile']);
 
             return $userData;
         });
 
         return response()->json([
-            'message' => 'Profile retrieved successfully.',
-            'user' => $flattenedUsers,
+            'message' => 'Profiles retrieved successfully.',
+            'users' => $paginatedUsers->items(), // The actual user list for Flutter
+            'pagination' => [
+                'total' => $paginatedUsers->total(),
+                'current_page' => $paginatedUsers->currentPage(),
+                'last_page' => $paginatedUsers->lastPage(),
+                'has_more' => $paginatedUsers->hasMorePages(),
+            ],
         ]);
     }
 
