@@ -300,15 +300,7 @@ class AdController extends Controller
 
     public function updateAdProfileStatus(Request $request, Ad $ad)
     {
-        $user = Auth::user();
-
-        // 1. Authorization
-        if ($ad->user_id !== $user->id) {
-            return response()->json(['status' => false, 'message' => 'Unauthorized'], 403);
-        }
-
-        // 2. Fetch the current status from the relationship
-        // Assuming adController holds the status field
+        
         $currentStatus = $ad->adController->status ?? null;
 
         // 3. Status Guard: Only allow changes if current status is active or inactive
