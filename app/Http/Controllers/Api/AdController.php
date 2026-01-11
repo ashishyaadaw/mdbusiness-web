@@ -7,7 +7,7 @@ use App\Models\Ads\Ad;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File; // Changed from Storage to File
+use Illuminate\Support\Facades\File; 
 use Illuminate\Support\Facades\Validator;
 
 class AdController extends Controller
