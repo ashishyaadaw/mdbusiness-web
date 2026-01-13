@@ -66,7 +66,7 @@ class AuthController extends Controller
             $userData['full_name'] = $user->appUserProfile->full_name ?? null;
 
             // Clean up the relationship key
-            unset($userData['app_user_profile']);
+            unset($userData['app_user_profile']); 
 
             return $userData;
         });
@@ -309,7 +309,7 @@ class AuthController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            \Log::error('Failed to send OTP: '.$e->getMessage());
+            // \Log::error('Failed to send OTP: '.$e->getMessage());
 
             return response()->json(['message' => 'Failed to send OTP.'], 500);
         }
