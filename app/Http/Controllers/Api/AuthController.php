@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\Login;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CheckerAppLoginRequest;
 use App\Models\User;
 use App\Models\UserServiceKey;
+use App\Services\AuthService;
 use App\Services\PhoneVerificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,10 +18,12 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
     protected $verificationService;
+    protected $authService;
 
-    public function __construct(PhoneVerificationService $verificationService)
+    public function __construct(PhoneVerificationService $verificationService, AuthService $authService)
     {
         $this->verificationService = $verificationService;
+        $this->authService = $authService;
     }
 
     private const OTP_COOLDOWN_SECONDS = 60;
@@ -122,6 +126,70 @@ class AuthController extends Controller
 
             return $this->sendOTP($user->id);
         }
+
+        // ==========================================
+        // FLOW B: VERIFY OTP (OTP provided)
+        // ==========================================
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // 1. Check validity
+        if (! $user->remember_token || ! Hash::check($request->otp, $user->remember_token)) {
+            return response()->json(['message' => 'Invalid OTP'], 401);
+        }
+
+        // 2. Check expiration
+        if (Carbon::parse($user->updated_at)->addMinutes(self::OTP_EXPIRE_MINUTES)->isPast()) {
+            $user->remember_token = null;
+            $user->save();
+
+            return response()->json(['message' => 'OTP has expired.'], 401);
+        }
+
+        // 3. Success: Clear OTP
+
+        if ($request->filled('full_name')) {
+
+            $user->appUserProfile()->update([
+                'full_name' => $request->full_name ?? 'Member',
+            ]);
+        }
+
+        $user->remember_token = null;
+        $user->save();
+
+        // 4. Update FCM if provided
+        if ($request->filled('fcm_key')) {
+            UserServiceKey::updateOrCreate(
+                ['user_id' => $user->id],
+                ['fcm_key' => $request->fcm_key]
+            );
+        }
+
+        // 5. Generate Token
+        $token = $user->createToken('auth_token')->plainTextToken;
+        $user->load('appUserProfile');
+
+        return response()->json([
+            'message' => 'Login successful',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'is_new_user' => $user->wasRecentlyCreated,
+        ]);
+    }
+    public function checkerAppLogin(CheckerAppLoginRequest $request)
+    {
+        $user = User::where("phone", $request->phone)->first();
+
+    if (!$request->filled("otp")) {
+        $user = $this->authService->findOrCreateUser($request->phone, $request->full_name);
+        return $this->checkerAppLoginOtp($user->id);
+    }
+
+        
 
         // ==========================================
         // FLOW B: VERIFY OTP (OTP provided)
@@ -296,6 +364,38 @@ class AuthController extends Controller
         }
 
         $otp = random_int(1000, 9999);
+        $user->remember_token = Hash::make($otp);
+        $user->updated_at = Carbon::now();
+        $user->save();
+
+        try {
+            $otp = $this->verificationService->sendSmsApi($user->phone, $otp, $user->username);
+
+            return response()->json([
+                'message' => 'OTP sent successfully.',
+                // 'debug_otp' => $otp, // Comment out for production
+            ], 200);
+
+        } catch (\Exception $e) {
+            // \Log::error('Failed to send OTP: '.$e->getMessage());
+
+            return response()->json(['message' => 'Failed to send OTP.'], 500);
+        }
+    }
+    private function checkerAppLoginOtp($userId)
+    {
+        $user = User::find($userId);
+
+        if ($user->remember_token && Carbon::parse($user->updated_at)->addSeconds(self::OTP_COOLDOWN_SECONDS)->isFuture()) {
+            $secondsLeft = Carbon::parse($user->updated_at)->addSeconds(self::OTP_COOLDOWN_SECONDS)->diffInSeconds(Carbon::now());
+
+            return response()->json([
+                'message' => 'Please wait before requesting a new OTP.',
+                'resend_in' => $secondsLeft,
+            ], 429);
+        }
+
+        $otp = random_int(100000, 999999);
         $user->remember_token = Hash::make($otp);
         $user->updated_at = Carbon::now();
         $user->save();

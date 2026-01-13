@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes for authentication
 Route::post('/login/smart', [AuthController::class, 'smartLogin']);
+Route::post('/admin/login', [AuthController::class, 'checkerAppLogin']);
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
