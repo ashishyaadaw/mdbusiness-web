@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ads\Ad;
+use Auth;
+use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File; 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+
 class AdController extends Controller
 {
     public function index()
@@ -477,39 +478,77 @@ class AdController extends Controller
         return response()->json(['status' => true, 'message' => 'Ad deleted successfully'], 200);
     }
 
-    public function getAdsByCategory($category, $gender = '')
+    public function getAdsByCategory(Request $request, $category, $gender = '')
     {
         // 1. Start the query with eager loading
         $query = Ad::with(['adsDetails', 'adCreator', 'adController'])->latest();
 
-        // 2. Filter by Category and Gender using a single whereHas for performance
-        // We check if either variable has a valid value
+        // 2. Filter by Category and Gender
         if (($category && strtolower($category) !== 'all') || ! empty($gender)) {
             $query->whereHas('adsDetails', function ($q) use ($category, $gender) {
-
-                // Apply category filter if it's not 'all'
                 if ($category && strtolower($category) !== 'all') {
                     $q->where('category', $category);
                 }
-
-                // Apply gender filter only if a value is provided
                 if (! empty($gender)) {
                     $q->where('gender', $gender);
                 }
             });
         }
-        $query->whereHas('adController', function ($q) {
-            $q->whereIn('status', ['active']);
-        });
-        // 3. Execute and return
-        $ads = $query->get();
 
+        // 3. Only show active ads
+        $query->whereHas('adController', function ($q) {
+            $q->where('status', 'active');
+        });
+
+        // 4. Use paginate instead of get()
+        // Default to 10 items per page to match your Flutter logic
+        $perPage = $request->input('per_page', 10);
+        $ads = $query->paginate($perPage);
+
+        // 5. Return paginated response
         return response()->json([
             'status' => true,
-            'count' => $ads->count(),
-            'data' => $ads,
+            'count' => $ads->count(), // Items in current page
+            'total' => $ads->total(), // Total items in database
+            'current_page' => $ads->currentPage(),
+            'last_page' => $ads->lastPage(),
+            'data' => $ads->items(), // The actual list of ads
         ], 200);
     }
+
+    // public function getAdsByCategory($category, $gender = '')
+    // {
+    //     // 1. Start the query with eager loading
+    //     $query = Ad::with(['adsDetails', 'adCreator', 'adController'])->latest();
+
+    //     // 2. Filter by Category and Gender using a single whereHas for performance
+    //     // We check if either variable has a valid value
+    //     if (($category && strtolower($category) !== 'all') || ! empty($gender)) {
+    //         $query->whereHas('adsDetails', function ($q) use ($category, $gender) {
+
+    //             // Apply category filter if it's not 'all'
+    //             if ($category && strtolower($category) !== 'all') {
+    //                 $q->where('category', $category);
+    //             }
+
+    //             // Apply gender filter only if a value is provided
+    //             if (! empty($gender)) {
+    //                 $q->where('gender', $gender);
+    //             }
+    //         });
+    //     }
+    //     $query->whereHas('adController', function ($q) {
+    //         $q->whereIn('status', ['active']);
+    //     });
+    //     // 3. Execute and return
+    //     $ads = $query->get();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'count' => $ads->count(),
+    //         'data' => $ads,
+    //     ], 200);
+    // }
 
     public function getAdsProfiles(Request $request)
     {

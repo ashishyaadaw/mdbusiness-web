@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
     protected $verificationService;
+
     protected $authService;
 
     public function __construct(PhoneVerificationService $verificationService, AuthService $authService)
@@ -52,6 +53,28 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function userExists(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|digits:10',
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if ($user) {
+            return response()->json([
+                'exists' => true,
+                'user' => $user,
+                'message' => 'User found.',
+            ], 200);
+        }
+
+        return response()->json([
+            'exists' => false,
+            'message' => 'User does not exist. Please provide name.',
+        ], 200); // We return 200 because the "check" was successful
+    }
+
     public function getProfiles(Request $request)
     {
         // 1. Use paginate(perPage) instead of get()
@@ -70,7 +93,7 @@ class AuthController extends Controller
             $userData['full_name'] = $user->appUserProfile->full_name ?? null;
 
             // Clean up the relationship key
-            unset($userData['app_user_profile']); 
+            unset($userData['app_user_profile']);
 
             return $userData;
         });
@@ -124,7 +147,7 @@ class AuthController extends Controller
                 ]);
             }
 
-            return $this->sendOTP($user->id);
+            return $this->sendOTPWithName($user->id);
         }
 
         // ==========================================
@@ -180,16 +203,16 @@ class AuthController extends Controller
             'is_new_user' => $user->wasRecentlyCreated,
         ]);
     }
+
     public function checkerAppLogin(CheckerAppLoginRequest $request)
     {
-        $user = User::where("phone", $request->phone)->first();
+        $user = User::where('phone', $request->phone)->first();
 
-    if (!$request->filled("otp")) {
-        $user = $this->authService->findOrCreateUser($request->phone, $request->full_name);
-        return $this->checkerAppLoginOtp($user->id);
-    }
+        if (! $request->filled('otp')) {
+            $user = $this->authService->findOrCreateUser($request->phone, $request->full_name);
 
-        
+            return $this->checkerAppLoginOtp($user->id);
+        }
 
         // ==========================================
         // FLOW B: VERIFY OTP (OTP provided)
@@ -382,6 +405,54 @@ class AuthController extends Controller
             return response()->json(['message' => 'Failed to send OTP.'], 500);
         }
     }
+
+    private function sendOTPWithName($userId)
+    {
+        // 1. Find user or fail early to avoid null pointer exceptions
+        $user = User::findOrFail($userId);
+        $user->load('appUserProfile');
+
+        // 2. Cooldown Logic: Use a more readable check
+        $lastUpdate = Carbon::parse($user->updated_at);
+        $expiryTime = $lastUpdate->addSeconds(self::OTP_COOLDOWN_SECONDS);
+
+        if ($expiryTime->isFuture()) {
+            return response()->json([
+                'message' => 'Please wait before requesting a new OTP.',
+                'resend_in' => now()->diffInSeconds($expiryTime),
+            ], 429);
+        }
+
+        // 3. Generate and Store
+        // NOTE: Avoid using 'remember_token'. Better to use a dedicated 'otp' column
+        // or a separate 'verifications' table.
+        $otp = (string) random_int(1000, 9999);
+
+        $user->forceFill([
+            'remember_token' => Hash::make($otp), // See security note below
+            'updated_at' => now(),
+        ])->save();
+
+        // 4. Send with Error Handling
+        try {
+            $fullName = $user->appUserProfile->full_name ?? $user->username ?? 'User';
+
+            $this->verificationService->sendSmsApi($user->phone, $otp, $fullName);
+
+            return response()->json([
+                'message' => 'OTP sent successfully.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Always log errors so you can debug production issues
+            \Log::error("OTP failure for user {$userId}: ".$e->getMessage());
+
+            return response()->json([
+                'message' => 'Failed to send OTP. Please try again later.',
+            ], 500);
+        }
+    }
+
     private function checkerAppLoginOtp($userId)
     {
         $user = User::find($userId);
