@@ -105,3 +105,4 @@ Route::middleware(['auth:sanctum', 'role:admin,staff'])->prefix('staff')->group(
     Route::get('/reports', [StaffController::class, 'index']);
     Route::put('/verify-user/{user}', [StaffController::class, 'verifyUser']);
 });
+

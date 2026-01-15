@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\MatrimonialProfileStatusChange;
 use App\Http\Controllers\Controller;
 use App\Models\Ads\Ad;
-use Auth;
-use DB;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
@@ -332,6 +334,8 @@ class AdController extends Controller
                 );
             });
 
+            $this->sendStatusChangeAlert($ad->user_id, $request->status);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Ad status updated successfully',
@@ -345,6 +349,22 @@ class AdController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    protected function sendStatusChangeAlert($userId, $status)
+    {
+        $user = User::find($userId);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        event(new MatrimonialProfileStatusChange($user, $status));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile status changed and notification queued.',
+        ]);
     }
 
     public function deleteAd(Ad $ad)

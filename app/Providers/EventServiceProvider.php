@@ -3,9 +3,14 @@
 namespace App\Providers;
 
 use App\Events\Login;
+use App\Events\MatrimonialProfileStatusChange;
+use App\Events\NewMatrimonialProfileAdded;
 use App\Events\OtpGenerated;
 use App\Events\UserProfileViewed;
 use App\Listeners\SendLoginAlert;
+use App\Listeners\SendMatrimonialProfileApprovedAlert;
+use App\Listeners\SendNewMatrimonialProfileAddedAlert;
+use App\Listeners\SendOtpNotification;
 use App\Listeners\UpdateProfileViewCount;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -30,6 +35,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         OtpGenerated::class => [
             SendOtpNotification::class,
+        ],
+        MatrimonialProfileStatusChange::class => [
+            SendMatrimonialProfileApprovedAlert::class,
+        ],
+        NewMatrimonialProfileAdded::class => [
+            SendNewMatrimonialProfileAddedAlert::class,
         ],
     ];
 

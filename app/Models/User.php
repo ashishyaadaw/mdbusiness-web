@@ -51,6 +51,18 @@ class User extends Authenticatable
         return $this->userServiceKey?->fcm_key;
     }
 
+    public function getFullName()
+    {
+        // The '?->' operator safely returns null if appUserProfile doesn't exist
+        return $this->appUserProfile?->full_name;
+    }
+
+    public function getPreferredLang()
+    {
+        // The '?->' operator safely returns null if appUserProfile doesn't exist
+        return $this->appUserProfile?->preferred_lang;
+    }
+
     // Transactions
     public function transactions()
     {
