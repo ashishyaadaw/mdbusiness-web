@@ -11,6 +11,7 @@ use App\Services\AuthService;
 use App\Services\PhoneVerificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -21,8 +22,10 @@ class AuthController extends Controller
 
     protected $authService;
 
-    public function __construct(PhoneVerificationService $verificationService, AuthService $authService)
-    {
+    public function __construct(
+        PhoneVerificationService $verificationService,
+        AuthService $authService,
+    ) {
         $this->verificationService = $verificationService;
         $this->authService = $authService;
     }
@@ -40,17 +43,20 @@ class AuthController extends Controller
         $user = $request->user();
 
         // CHECK: If user is not logged in, return JSON error immediately
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
         // Ensure the profile relationship is loaded
         $user->load('appUserProfile');
 
-        return response()->json([
-            'message' => 'Profile retrieved successfully.',
-            'user' => $user,
-        ], 200);
+        return response()->json(
+            [
+                'message' => 'Profile retrieved successfully.',
+                'user' => $user,
+            ],
+            200,
+        );
     }
 
     public function userExists(Request $request)
@@ -62,17 +68,23 @@ class AuthController extends Controller
         $user = User::where('phone', $request->phone)->first();
 
         if ($user) {
-            return response()->json([
-                'exists' => true,
-                'user' => $user,
-                'message' => 'User found.',
-            ], 200);
+            return response()->json(
+                [
+                    'exists' => true,
+                    'user' => $user,
+                    'message' => 'User found.',
+                ],
+                200,
+            );
         }
 
-        return response()->json([
-            'exists' => false,
-            'message' => 'User does not exist. Please provide name.',
-        ], 200); // We return 200 because the "check" was successful
+        return response()->json(
+            [
+                'exists' => false,
+                'message' => 'User does not exist. Please provide name.',
+            ],
+            200,
+        ); // We return 200 because the "check" was successful
     }
 
     public function getProfiles(Request $request)
@@ -130,10 +142,9 @@ class AuthController extends Controller
         // ==========================================
         // FLOW A: REQUEST OTP (No OTP provided)
         // ==========================================
-        if (! $request->filled('otp')) {
-
+        if (!$request->filled('otp')) {
             // If user does not exist, Auto-Register them
-            if (! $user) {
+            if (!$user) {
                 $username = $this->generateUniqueUsername();
 
                 $user = User::create([
@@ -154,17 +165,24 @@ class AuthController extends Controller
         // FLOW B: VERIFY OTP (OTP provided)
         // ==========================================
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
         // 1. Check validity
-        if (! $user->remember_token || ! Hash::check($request->otp, $user->remember_token)) {
+        if (
+            !$user->remember_token ||
+            !Hash::check($request->otp, $user->remember_token)
+        ) {
             return response()->json(['message' => 'Invalid OTP'], 401);
         }
 
         // 2. Check expiration
-        if (Carbon::parse($user->updated_at)->addMinutes(self::OTP_EXPIRE_MINUTES)->isPast()) {
+        if (
+            Carbon::parse($user->updated_at)
+                ->addMinutes(self::OTP_EXPIRE_MINUTES)
+                ->isPast()
+        ) {
             $user->remember_token = null;
             $user->save();
 
@@ -174,7 +192,6 @@ class AuthController extends Controller
         // 3. Success: Clear OTP
 
         if ($request->filled('full_name')) {
-
             $user->appUserProfile()->update([
                 'full_name' => $request->full_name ?? 'Member',
             ]);
@@ -187,7 +204,7 @@ class AuthController extends Controller
         if ($request->filled('fcm_key')) {
             UserServiceKey::updateOrCreate(
                 ['user_id' => $user->id],
-                ['fcm_key' => $request->fcm_key]
+                ['fcm_key' => $request->fcm_key],
             );
         }
 
@@ -208,8 +225,11 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
 
-        if (! $request->filled('otp')) {
-            $user = $this->authService->findOrCreateUser($request->phone, $request->full_name);
+        if (!$request->filled('otp')) {
+            $user = $this->authService->findOrCreateUser(
+                $request->phone,
+                $request->full_name,
+            );
 
             return $this->checkerAppLoginOtp($user->id);
         }
@@ -218,17 +238,24 @@ class AuthController extends Controller
         // FLOW B: VERIFY OTP (OTP provided)
         // ==========================================
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
         // 1. Check validity
-        if (! $user->remember_token || ! Hash::check($request->otp, $user->remember_token)) {
+        if (
+            !$user->remember_token ||
+            !Hash::check($request->otp, $user->remember_token)
+        ) {
             return response()->json(['message' => 'Invalid OTP'], 401);
         }
 
         // 2. Check expiration
-        if (Carbon::parse($user->updated_at)->addMinutes(self::OTP_EXPIRE_MINUTES)->isPast()) {
+        if (
+            Carbon::parse($user->updated_at)
+                ->addMinutes(self::OTP_EXPIRE_MINUTES)
+                ->isPast()
+        ) {
             $user->remember_token = null;
             $user->save();
 
@@ -238,7 +265,6 @@ class AuthController extends Controller
         // 3. Success: Clear OTP
 
         if ($request->filled('full_name')) {
-
             $user->appUserProfile()->update([
                 'full_name' => $request->full_name ?? 'Member',
             ]);
@@ -251,7 +277,7 @@ class AuthController extends Controller
         if ($request->filled('fcm_key')) {
             UserServiceKey::updateOrCreate(
                 ['user_id' => $user->id],
-                ['fcm_key' => $request->fcm_key]
+                ['fcm_key' => $request->fcm_key],
             );
         }
 
@@ -298,12 +324,15 @@ class AuthController extends Controller
         $user->load('appUserProfile');
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Registration successful',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user,
-        ], 201);
+        return response()->json(
+            [
+                'message' => 'Registration successful',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user,
+            ],
+            201,
+        );
     }
 
     /**
@@ -311,49 +340,63 @@ class AuthController extends Controller
      */
     public function updateProfile(Request $request)
     {
+        // 1. Ensure the user is authenticated (though middleware is preferred)
         $user = $request->user();
-
-        // ADDED: Explicit check. If $user is null, return 401 JSON instead of redirecting or crashing.
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        // Validate the request data
-        $validator = Validator::make($request->all(), [
+        // 2. Use validated() data to ensure only allowed fields are processed
+        $validatedData = $request->validate([
             'full_name' => 'nullable|string|max:255',
+            'preferred_lang' => 'nullable|string|in:en,hi|max:255',
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         try {
-            // 1. Update basic User table fields
-            if ($request->has('email')) {
-                $user->email = $request->email;
-                $user->save();
-            }
+            // Wrap in a transaction to ensure data integrity across two tables
+            return DB::transaction(function () use ($user, $validatedData) {
+                // 3. Update Email on the main User model if provided
+                if (!empty($validatedData['email'])) {
+                    $user->update(['email' => $validatedData['email']]);
+                }
 
-            // 2. Update or Create the AppUserProfile
-            $user->appUserProfile()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'full_name' => $request->input('full_name', $user->appUserProfile->full_name ?? null),
-                ]
-            );
+                // 4. Update or Create Profile using the correct 2-argument syntax
+                // Only update fields that were actually passed in the request
+                $profileData = array_filter(
+                    [
+                        'full_name' => $validatedData['full_name'] ?? null,
+                        'preferred_lang' =>
+                            $validatedData['preferred_lang'] ?? null,
+                    ],
+                    fn($value) => !is_null($value),
+                );
 
-            $user->load('appUserProfile');
+                if (!empty($profileData)) {
+                    $user
+                        ->appUserProfile()
+                        ->updateOrCreate(
+                            ['user_id' => $user->id],
+                            $profileData,
+                        );
+                }
 
-            return response()->json([
-                'message' => 'Profile updated successfully.',
-                'user' => $user,
-            ], 200);
-
+                return response()->json(
+                    [
+                        'message' => 'Profile updated successfully.',
+                        'user' => $user->load('appUserProfile'),
+                    ],
+                    200,
+                );
+            });
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to update profile.',
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(
+                [
+                    'message' => 'Failed to update profile.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 
@@ -364,8 +407,8 @@ class AuthController extends Controller
         $username = null;
         do {
             $randomNumber = random_int(100000000, 999999999);
-            $generatedUsername = 'MDM'.$randomNumber;
-            if (! User::where('username', $generatedUsername)->exists()) {
+            $generatedUsername = 'MDM' . $randomNumber;
+            if (!User::where('username', $generatedUsername)->exists()) {
                 $username = $generatedUsername;
             }
         } while ($username === null);
@@ -377,13 +420,23 @@ class AuthController extends Controller
     {
         $user = User::find($userId);
 
-        if ($user->remember_token && Carbon::parse($user->updated_at)->addSeconds(self::OTP_COOLDOWN_SECONDS)->isFuture()) {
-            $secondsLeft = Carbon::parse($user->updated_at)->addSeconds(self::OTP_COOLDOWN_SECONDS)->diffInSeconds(Carbon::now());
+        if (
+            $user->remember_token &&
+            Carbon::parse($user->updated_at)
+                ->addSeconds(self::OTP_COOLDOWN_SECONDS)
+                ->isFuture()
+        ) {
+            $secondsLeft = Carbon::parse($user->updated_at)
+                ->addSeconds(self::OTP_COOLDOWN_SECONDS)
+                ->diffInSeconds(Carbon::now());
 
-            return response()->json([
-                'message' => 'Please wait before requesting a new OTP.',
-                'resend_in' => $secondsLeft,
-            ], 429);
+            return response()->json(
+                [
+                    'message' => 'Please wait before requesting a new OTP.',
+                    'resend_in' => $secondsLeft,
+                ],
+                429,
+            );
         }
 
         $otp = random_int(1000, 9999);
@@ -392,13 +445,19 @@ class AuthController extends Controller
         $user->save();
 
         try {
-            $otp = $this->verificationService->sendSmsApi($user->phone, $otp, $user->username);
+            $otp = $this->verificationService->sendSmsApi(
+                $user->phone,
+                $otp,
+                $user->username,
+            );
 
-            return response()->json([
-                'message' => 'OTP sent successfully.',
-                // 'debug_otp' => $otp, // Comment out for production
-            ], 200);
-
+            return response()->json(
+                [
+                    'message' => 'OTP sent successfully.',
+                    // 'debug_otp' => $otp, // Comment out for production
+                ],
+                200,
+            );
         } catch (\Exception $e) {
             // \Log::error('Failed to send OTP: '.$e->getMessage());
 
@@ -417,10 +476,13 @@ class AuthController extends Controller
         $expiryTime = $lastUpdate->addSeconds(self::OTP_COOLDOWN_SECONDS);
 
         if ($expiryTime->isFuture()) {
-            return response()->json([
-                'message' => 'Please wait before requesting a new OTP.',
-                'resend_in' => now()->diffInSeconds($expiryTime),
-            ], 429);
+            return response()->json(
+                [
+                    'message' => 'Please wait before requesting a new OTP.',
+                    'resend_in' => now()->diffInSeconds($expiryTime),
+                ],
+                429,
+            );
         }
 
         // 3. Generate and Store
@@ -428,28 +490,40 @@ class AuthController extends Controller
         // or a separate 'verifications' table.
         $otp = (string) random_int(1000, 9999);
 
-        $user->forceFill([
-            'remember_token' => Hash::make($otp), // See security note below
-            'updated_at' => now(),
-        ])->save();
+        $user
+            ->forceFill([
+                'remember_token' => Hash::make($otp), // See security note below
+                'updated_at' => now(),
+            ])
+            ->save();
 
         // 4. Send with Error Handling
         try {
-            $fullName = $user->appUserProfile->full_name ?? $user->username ?? 'User';
+            $fullName =
+                $user->appUserProfile->full_name ?? ($user->username ?? 'User');
 
-            $this->verificationService->sendSmsApi($user->phone, $otp, $fullName);
+            $this->verificationService->sendSmsApi(
+                $user->phone,
+                $otp,
+                $fullName,
+            );
 
-            return response()->json([
-                'message' => 'OTP sent successfully.',
-            ], 200);
-
+            return response()->json(
+                [
+                    'message' => 'OTP sent successfully.',
+                ],
+                200,
+            );
         } catch (\Exception $e) {
             // Always log errors so you can debug production issues
-            \Log::error("OTP failure for user {$userId}: ".$e->getMessage());
+            // \Log::error("OTP failure for user {$userId}: " . $e->getMessage());
 
-            return response()->json([
-                'message' => 'Failed to send OTP. Please try again later.',
-            ], 500);
+            return response()->json(
+                [
+                    'message' => 'Failed to send OTP. Please try again later.',
+                ],
+                500,
+            );
         }
     }
 
@@ -457,13 +531,23 @@ class AuthController extends Controller
     {
         $user = User::find($userId);
 
-        if ($user->remember_token && Carbon::parse($user->updated_at)->addSeconds(self::OTP_COOLDOWN_SECONDS)->isFuture()) {
-            $secondsLeft = Carbon::parse($user->updated_at)->addSeconds(self::OTP_COOLDOWN_SECONDS)->diffInSeconds(Carbon::now());
+        if (
+            $user->remember_token &&
+            Carbon::parse($user->updated_at)
+                ->addSeconds(self::OTP_COOLDOWN_SECONDS)
+                ->isFuture()
+        ) {
+            $secondsLeft = Carbon::parse($user->updated_at)
+                ->addSeconds(self::OTP_COOLDOWN_SECONDS)
+                ->diffInSeconds(Carbon::now());
 
-            return response()->json([
-                'message' => 'Please wait before requesting a new OTP.',
-                'resend_in' => $secondsLeft,
-            ], 429);
+            return response()->json(
+                [
+                    'message' => 'Please wait before requesting a new OTP.',
+                    'resend_in' => $secondsLeft,
+                ],
+                429,
+            );
         }
 
         $otp = random_int(100000, 999999);
@@ -472,13 +556,19 @@ class AuthController extends Controller
         $user->save();
 
         try {
-            $otp = $this->verificationService->sendSmsApi($user->phone, $otp, $user->username);
+            $otp = $this->verificationService->sendSmsApi(
+                $user->phone,
+                $otp,
+                $user->username,
+            );
 
-            return response()->json([
-                'message' => 'OTP sent successfully.',
-                // 'debug_otp' => $otp, // Comment out for production
-            ], 200);
-
+            return response()->json(
+                [
+                    'message' => 'OTP sent successfully.',
+                    // 'debug_otp' => $otp, // Comment out for production
+                ],
+                200,
+            );
         } catch (\Exception $e) {
             // \Log::error('Failed to send OTP: '.$e->getMessage());
 
