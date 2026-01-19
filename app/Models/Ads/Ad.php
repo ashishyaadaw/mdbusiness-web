@@ -11,10 +11,7 @@ class Ad extends Model
 
     protected $fillable = ['user_id', 'title', 'type', 'payload'];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     // Accessor: Automatically generates the full URL for the image
     public function getPayloadAttribute($value)
@@ -40,5 +37,9 @@ class Ad extends Model
     public function adController()
     {
         return $this->hasOne(AdController::class);
+    }
+    public function adFeatured()
+    {
+        return $this->hasOne(AdFeatured::class);
     }
 }

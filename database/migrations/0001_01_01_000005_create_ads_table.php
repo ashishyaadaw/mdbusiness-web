@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,7 +23,8 @@ return new class extends Migration
             $table->id();
 
             // Best Practice: Explicitly define the table name in constrained()
-            $table->foreignId('ad_id')
+            $table
+                ->foreignId('ad_id')
                 ->unique() // Enforces One-to-One relationship
                 ->constrained('ads') // Assumes the parent table is named 'ads'
                 ->onDelete('cascade');
@@ -34,8 +34,9 @@ return new class extends Migration
         });
 
         Schema::create('ad_creators', function (Blueprint $table) {
-            $table->id();   // Link to the main Ad
-            $table->foreignId('ad_id')
+            $table->id(); // Link to the main Ad
+            $table
+                ->foreignId('ad_id')
                 ->unique() // Enforces One-to-One relationship
                 ->constrained('ads') // Assumes the parent table is named 'ads'
                 ->onDelete('cascade');
@@ -49,13 +50,37 @@ return new class extends Migration
 
         Schema::create('ad_controllers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ad_id')
+            $table
+                ->foreignId('ad_id')
                 ->unique() // Enforces One-to-One relationship
                 ->constrained('ads') // Assumes the parent table is named 'ads'
                 ->onDelete('cascade');
             $table->boolean('is_premium')->default(false);
-            $table->enum('status', ['active', 'inactive', 'pending', 'hold', 'block', 'rejected'])->default('pending');
+            $table
+                ->enum('status', [
+                    'active',
+                    'inactive',
+                    'pending',
+                    'hold',
+                    'block',
+                    'rejected',
+                ])
+                ->default('pending');
             $table->dateTime('valid_until')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('ad_featureds', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('ad_id')->constrained()->onDelete('cascade');
+            $table->string('full_name');
+            $table->date('dob');
+            $table->string('occupation');
+            $table->string('category');
+            $table->string('location')->nullable();
+            $table->json('json_data')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('profile_photo')->nullable();
             $table->timestamps();
         });
     }
@@ -65,6 +90,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('ad_featureds');
         Schema::dropIfExists('ad_controllers');
         Schema::dropIfExists('ad_creators');
         Schema::dropIfExists('ad_details');

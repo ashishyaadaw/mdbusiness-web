@@ -79,6 +79,10 @@ Route::prefix('v2')->group(function () {
         AdController::class,
         'getAdsByCategory',
     ]);
+    Route::get('featueredAds/{category}/profiles/{gender?}', [
+        AdController::class,
+        'getfeatueredAdsByCategory',
+    ]);
 });
 
 // --- ADMIN ROUTES ---
