@@ -1,76 +1,50 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PageController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-// 1. The Landing Page (Welcome)
+// --- Main Pages ---
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.home');
+})->name('home');
+
+Route::view('/about', 'pages.about')->name('about');
+
+// --- Services ---
+// --- Services & Sub-topics ---
+Route::prefix('services')->group(function () {
+    Route::view('/', 'pages.services.index')->name('services');
+
+    // Updated & New Service Routes
+    Route::view('/web-development', 'pages.services.web-dev')->name('services.web-dev');
+    Route::view('/mobile-app-development', 'pages.services.app-dev')->name('services.app-dev');
+    Route::view('/ecommerce-solutions', 'pages.services.e-com')->name('services.e-com');
+    Route::view('/ui-ux-design', 'pages.services.ui-ux')->name('services.ui-ux');
+    
+    Route::view('/digital-marketing', 'pages.services.marketing')->name('services.marketing');
+    Route::view('/seo-optimization', 'pages.services.seo')->name('services.seo');
 });
 
-// 2. The Dashboard Route (Protected by 'auth' middleware)
-// This is where users go after logging in.
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// 3. Authentication Routes
-// Note: If you installed Laravel Breeze, these are usually handled by:
-// require __DIR__.'/auth.php';
-//
-// If you haven't installed an auth package yet, use these placeholders
-// so the "Login" and "Register" buttons appear on your landing page.
-
-if (! Route::has('login')) {
-    Route::get('/login', function () {
-        return view('auth.login'); // You need to create resources/views/auth/login.blade.php
-    })->name('login');
-}
-
-if (! Route::has('register')) {
-    Route::get('/register', function () {
-        return view('auth.register'); // You need to create resources/views/auth/register.blade.php
-    })->name('register');
-}
-
-// Optional: Profile routes if you are building the edit profile section
-Route::middleware('auth')->group(function () {
-    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// --- Digital Solutions (Submenu items) ---
+Route::prefix('solutions')->group(function () {
+    Route::view('/proptech', 'pages.solutions.proptech')->name('solutions.proptech');
+    Route::view('/artificial-intelligence', 'pages.solutions.ai')->name('solutions.ai');
+    Route::view('/business-automation', 'pages.solutions.automation')->name('solutions.automation');
 });
 
-// Add these to routes/web.php to prevent 405 Method Not Allowed errors during UI testing
-Route::post('/login', function () {
-    return redirect('/dashboard');
-})->name('login.submit');
+// --- Resources & Blog ---
+Route::view('/blog', 'pages.blog')->name('blog');
+Route::view('/case-studies', 'pages.case-studies')->name('case-studies');
 
-Route::post('/register', function () {
-    return redirect('/dashboard');
-})->name('register.submit');
+// --- Legal ---
+Route::prefix('legal')->group(function () {
+    Route::view('/privacy-policy', 'pages.legal.privacy')->name('privacy');
+    Route::view('/terms-of-service', 'pages.legal.terms')->name('terms');
+    Route::view('/refund-policy', 'pages.legal.refund')->name('refund');
+    Route::view('/shipping-policy', 'pages.legal.shipping')->name('shipping');
+});
 
-// Terms and Conditions
-Route::get('/terms-and-conditions', function () {
-    return view('legal.terms_n_conditions');
-})->name('pages.terms');
-
-Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
-Route::get('/child-safety-policy', [PageController::class, 'childSafety'])->name('childsafety');
-Route::get('/request-account-deletion', [PageController::class, 'deletion'])->name('deletion');
-
-// Authentication Actions
-Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// --- Actions ---
+Route::view('/contact', 'pages.contact')->name('contact');
+Route::post('/contact-submit', [ContactController::class, 'submit'])->name('contact.submit');
+Route::view('/get-started', 'pages.get-started')->name('get-started');
