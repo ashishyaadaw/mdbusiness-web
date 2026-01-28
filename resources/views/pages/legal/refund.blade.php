@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>Refund & Cancellation Policy | Websamsya</x-slot>
+    <x-slot:title>Refund & Cancellation Policy | mdbusiness</x-slot>
 
     <section class="bg-[#145589] py-16 text-white relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-[#145589] to-[#7f03d3] opacity-90"></div>
@@ -16,7 +16,7 @@
 
             <div class="flex justify-between items-center mb-10 border-b border-gray-100 pb-6">
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#fd7319]">Entity: One Advertisers /
-                    Websamsya</span>
+                    mdbusiness</span>
                 <p class="text-sm text-gray-400 font-bold">Effective Date: {{ date('F d, Y') }}</p>
             </div>
 
@@ -24,7 +24,7 @@
 
                 <section>
                     <h2 class="text-2xl font-black text-[#145589] mb-4">1. Nature of Services</h2>
-                    <p>Websamsya provides highly customized digital services, including software development
+                    <p>mdbusiness provides highly customized digital services, including software development
                         (Flutter/Laravel) and advertising placements. Due to the bespoke nature of these services and the
                         immediate allocation of engineering and creative resources, our policy is <strong>inclined toward
                             non-refundability</strong> once project execution begins.</p>
@@ -76,8 +76,8 @@
                 <div class="mt-12 p-8 bg-gray-50 rounded-3xl text-center">
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Questions regarding your bill?
                     </p>
-                    <a href="mailto:billing@websamsya.com"
-                        class="text-[#7f03d3] font-black text-lg hover:underline">billing@websamsya.com</a>
+                    <a href="mailto:billing@mdbusiness.com"
+                        class="text-[#7f03d3] font-black text-lg hover:underline">billing@mdbusiness.com</a>
                 </div>
             </div>
         </div>

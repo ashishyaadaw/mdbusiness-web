@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>About Our Vision | Websamsya</x-slot>
+    <x-slot:title>About Our Vision | mdbusiness</x-slot>
 
     <section class="relative py-24 md:py-32 overflow-hidden bg-[#145589]">
         <div class="absolute inset-0 bg-gradient-to-br from-[#145589] via-[#145589] to-[#7f03d3] opacity-90"></div>
@@ -16,7 +16,7 @@
                     Realities.</span>
             </h1>
             <p class="text-blue-100 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-light">
-                Websamsya is more than a development agency. We are a team of architects, dreamers, and engineers dedicated
+                mdbusiness is more than a development agency. We are a team of architects, dreamers, and engineers dedicated
                 to transforming your biggest "Samsya" (problems) into scalable digital legacies.
             </p>
         </div>
@@ -77,8 +77,8 @@
     <section class="py-24 bg-gray-50">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black text-[#145589]">Why Choose Websamsya?</h2>
-                <p class="text-gray-500 mt-4 font-medium uppercase tracking-widest text-sm">The Websamsya Advantage</p>
+                <h2 class="text-3xl md:text-5xl font-black text-[#145589]">Why Choose mdbusiness?</h2>
+                <p class="text-gray-500 mt-4 font-medium uppercase tracking-widest text-sm">The mdbusiness Advantage</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-10">

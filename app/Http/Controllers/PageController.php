@@ -2,33 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use Request;
-
 class PageController extends Controller
-{   public function index(Request $request) {
-    $selectedState = $request->get('state', 'Uttar Pradesh');
-    
-    // Fetch cities based on the selected state
-    $cities = City::where('state_name', $selectedState)->get(); 
+{
+    public function index()
+    {
+        return view('pages.home', [
+            'showSearch' => true, // Set to false to hide it
+            'title' => 'Home',
+        ]);
+    }
 
-    return view('your-view', [
-        'activeState' => $selectedState,
-        'cities' => $cities,
-        'activeCity' => $request->get('city', $cities->first()->name ?? '')
-    ]);
-}
     public function privacy()
     {
-        return view('legal.privacy');
+        return view('pages.legal.privacy', [
+            'showSearch' => false,
+            'title' => 'Privacy',
+        ]);
+    }
+
+    public function refund()
+    {
+        return view('pages.legal.refund', [
+            'showSearch' => false,
+            'title' => 'Refund',
+        ]);
+    }
+
+    public function terms()
+    {
+        return view('pages.legal.terms', [
+            'showSearch' => false,
+            'title' => 'Terms',
+        ]);
     }
 
     public function childSafety()
     {
-        return view('legal.child_safety');
+        return view('pages.legal.child_safety', [
+            'showSearch' => false,
+            'title' => 'Child Safety',
+        ]);
     }
 
     public function deletion()
     {
-        return view('legal.request_deletion');
+        return view('pages.legal.request_deletion', [
+            'showSearch' => false,
+            'title' => 'Request Deletion',
+        ]);
     }
 }

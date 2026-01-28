@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>Enterprise Web Development | Websamsya</x-slot>
+    <x-slot:title>Enterprise Web Development | mdbusiness</x-slot>
 
     <section class="relative bg-[#145589] py-24 md:py-32 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-[#145589] via-[#145589] to-[#7f03d3] opacity-95"></div>
@@ -64,7 +64,7 @@
 
                 <div class="bg-gray-50 p-10 rounded-[3rem] border border-gray-100 shadow-2xl relative">
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#fd7319]/10 rounded-full blur-3xl"></div>
-                    <h3 class="text-2xl font-black text-[#145589] mb-8">The Websamsya Stack</h3>
+                    <h3 class="text-2xl font-black text-[#145589] mb-8">The mdbusiness Stack</h3>
                     <div class="flex flex-wrap gap-3">
                         @foreach (['Laravel 11', 'Vue.js', 'PostgreSQL', 'AWS', 'Redis', 'Docker', 'Inertia.js'] as $tag)
                             <span

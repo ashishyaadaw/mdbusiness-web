@@ -13,7 +13,7 @@ class PromoAdsController extends Controller
         $ad = PromoAd::where('ad_id', $ad_id)
             ->where('is_active', true)
             ->first();
-        if (!$ad) {
+        if (! $ad) {
             return response()->json(['message' => 'Ad not found'], 404);
         }
 
@@ -28,6 +28,7 @@ class PromoAdsController extends Controller
             'targetUrl' => $ad->target_url,
         ]);
     }
+
     // 1. CREATE (Store)
     public function store(Request $request)
     {

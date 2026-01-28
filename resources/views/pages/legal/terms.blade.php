@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>Terms of Service | Websamsya</x-slot>
+    <x-slot:title>Terms of Service | mdbusiness</x-slot>
 
     <section class="bg-[#145589] py-16 text-white relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-[#145589] to-[#7f03d3] opacity-95"></div>
@@ -21,7 +21,7 @@
                         Advertisers</span>
                     <p class="text-sm text-gray-400 font-bold mt-1">Version 2.1 • Last Updated: {{ date('F d, Y') }}</p>
                 </div>
-                <a href="mailto:legal@websamsya.com"
+                <a href="mailto:legal@mdbusiness.com"
                     class="text-xs font-bold text-[#7f03d3] flex items-center gap-2 hover:underline">
                     <ion-icon name="mail-outline"></ion-icon> Request PDF Version
                 </a>
@@ -32,7 +32,7 @@
                 <section>
                     <h2 class="text-2xl font-black text-[#145589] mb-4">1. Acceptance & Unit Identity</h2>
                     <p>
-                        By engaging with <strong>Websamsya</strong>, a unit of <strong>One Advertisers</strong>, you
+                        By engaging with <strong>mdbusiness</strong>, a unit of <strong>One Advertisers</strong>, you
                         acknowledge that you have read, understood, and agreed to be bound by these Terms of Service. These
                         terms govern all software development (Flutter, Laravel), digital advertising, and technical
                         consultancy provided by us.
@@ -60,13 +60,13 @@
                             the client) is transferred to the Client only upon <strong>100% completion of all
                                 payments</strong>."</p>
                     </div>
-                    <p>Websamsya retains ownership of pre-existing proprietary modules, "boilerplate" code, and internal
+                    <p>mdbusiness retains ownership of pre-existing proprietary modules, "boilerplate" code, and internal
                         libraries used to accelerate development.</p>
                 </section>
 
                 <section>
                     <h2 class="text-2xl font-black text-[#145589] mb-4">4. Third-Party Dependencies</h2>
-                    <p>Websamsya is not liable for service interruptions, pricing changes, or policy updates from
+                    <p>mdbusiness is not liable for service interruptions, pricing changes, or policy updates from
                         third-party providers including, but not limited to, <strong>AWS, Google Cloud, Apple App Store,
                             Google Play Store,</strong> or specific API providers (e.g., WhatsApp Business API, Payment
                         Gateways).</p>
@@ -74,15 +74,17 @@
 
                 <section>
                     <h2 class="text-2xl font-black text-[#145589] mb-4">5. Confidentiality & NDA</h2>
-                    <p>We treat your business logic as a "Trade Secret." Websamsya and One Advertisers agree not to disclose
+                    <p>We treat your business logic as a "Trade Secret." mdbusiness and One Advertisers agree not to
+                        disclose
                         any sensitive business data provided during the development of your software. Clients likewise agree
-                        not to disclose Websamsya's internal pricing structures or development methodologies to third
+                        not to disclose mdbusiness's internal pricing structures or development methodologies to third
                         parties.</p>
                 </section>
 
                 <section>
                     <h2 class="text-2xl font-black text-[#145589] mb-4">6. Limitation of Liability</h2>
-                    <p>In accordance with the <strong>Information Technology Act, 2000</strong>, Websamsya's total liability
+                    <p>In accordance with the <strong>Information Technology Act, 2000</strong>, mdbusiness's total
+                        liability
                         for any claim arising out of our services shall not exceed the total amount paid by the client for
                         the specific project phase in question.</p>
                 </section>
@@ -91,6 +93,77 @@
                     <h2 class="text-2xl font-black text-[#145589] mb-4">7. Governing Law & Jurisdiction</h2>
                     <p>These terms are governed by the laws of the Republic of India. All disputes are subject to the
                         exclusive jurisdiction of the courts in <strong>Deoria, Uttar Pradesh</strong>.</p>
+                </section>
+                <section>
+                    <h2 class="text-2xl font-black text-[#145589] mb-4">8. Child Safety & Age Requirements</h2>
+                    <p>
+                        In compliance with the <strong>Google Play Developer Program Policy</strong> and global data
+                        protection laws,
+                        <strong>mdbusiness</strong> maintains a strict Child Safety protocol:
+                    </p>
+                    <ul class="list-disc ml-6 space-y-3 mt-4 text-left">
+                        <li>
+                            <strong>Minimum Age:</strong> Our services are intended for users aged <strong>18 and
+                                above</strong>.
+                            By using this app, you represent that you have reached the age of majority in your jurisdiction.
+                        </li>
+                        <li>
+                            <strong>Parental Consent:</strong> If you are under 18, you may only use our platform under the
+                            direct supervision of a parent or legal guardian who agrees to be bound by these Terms.
+                        </li>
+                        <li>
+                            <strong>Data Collection:</strong> We do not knowingly collect "Personally Identifiable
+                            Information" (PII)
+                            from children under 13 (or under 18 in India per DPDP Act). If we discover such data has been
+                            collected
+                            without verified parental consent, it will be <strong>purged immediately</strong> from our
+                            servers.
+                        </li>
+                        <li>
+                            <strong>Zero Tolerance:</strong> Any user-generated content (UGC) that depicts, encourages, or
+                            facilitates
+                            child sexual abuse or exploitation is prohibited and will result in an <strong>immediate
+                                permanent ban</strong>
+                            and a report to the appropriate law enforcement authorities (NCMEC/Cyber Cell).
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h2 class="text-2xl font-black text-[#145589] mb-4">9. Account Deletion & Data Empowerment</h2>
+                    <p>
+                        In accordance with <strong>Google Play’s User Data Policy</strong> and India’s
+                        <strong>DPDP Act 2023</strong>, we provide a transparent process for account termination.
+                    </p>
+                    <ul class="list-disc ml-6 space-y-3 mt-4 text-left text-sm">
+                        <li>
+                            <strong>How to Request:</strong> Users can initiate deletion via in-app settings or the
+                            <a href="{{ route('deletion') }}" class="text-[#7f03d3] font-bold hover:underline">Web Deletion
+                                Portal</a>
+                            using their registered <strong>Email or Phone Number</strong>.
+                        </li>
+                        <li>
+                            <strong>Reason for Deletion:</strong> We collect the reason for deletion to improve our services
+                            and
+                            ensure compliance with data safety audits.
+                        </li>
+                        <li>
+                            <strong>Timeline:</strong> Once verified, mdbusiness will purge all personal data within
+                            <strong>30 days</strong>, unless retention is legally mandated for tax or fraud audits.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-black text-[#145589] mb-4">10. User-Generated Content & Conduct</h2>
+                    <p>
+                        If our platform allows you to post business listings, reviews, or comments, you agree to:
+                    </p>
+                    <ul class="list-disc ml-6 space-y-2 mt-4 text-left">
+                        <li>Not post content that is harmful to minors or promotes illegal activities.</li>
+                        <li>Not post "Obscene" or "Pornographic" material as defined under the IT Act, 2000.</li>
+                        <li>Acknowledge that mdbusiness utilizes <strong>automated and manual moderation</strong> to remove
+                            objectionable content within 24 hours of a report.</li>
+                    </ul>
                 </section>
 
                 <div
@@ -101,7 +174,7 @@
                             Enterprise-level "Samsya" solving.</p>
                     </div>
                     <div class="w-full md:w-auto">
-                        <a href="mailto:info@websamsya.com"
+                        <a href="mailto:info@mdbusiness.com"
                             class="inline-block px-8 py-4 bg-[#fd7319] hover:bg-white hover:text-[#145589] rounded-xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl whitespace-nowrap">
                             Contact Billing
                         </a>

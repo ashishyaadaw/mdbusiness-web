@@ -11,7 +11,7 @@
                     We Turn Complex Problems Into <span class="text-[#7f03d3]">Digital Masterpieces.</span>
                 </h2>
                 <p class="text-gray-600 text-lg mb-8 leading-relaxed">
-                    At <span class="font-bold text-[#145589]">Websamsya</span>, we don't just write code; we architect
+                    At <span class="font-bold text-[#145589]">mdbusiness</span>, we don't just write code; we architect
                     growth. Based on the pillars of innovation and precision, we help businesses navigate the digital
                     landscape through custom software, AI-driven automation, and human-centric design.
                 </p>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>E-commerce Engineering | Websamsya</x-slot>
+    <x-slot:title>E-commerce Engineering | mdbusiness</x-slot>
 
     <section class="relative bg-[#145589] py-24 md:py-32 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-[#145589] via-[#145589] to-[#7f03d3] opacity-95"></div>

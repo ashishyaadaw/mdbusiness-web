@@ -2,7 +2,6 @@
 
 namespace App\Models\Ads;
 
-use App\Models\Ads\Ad;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,6 +19,7 @@ class AdFeatured extends Model
         'bio',
         'profile_photo',
     ];
+
     public function ad()
     {
         return $this->belongsTo(Ad::class);

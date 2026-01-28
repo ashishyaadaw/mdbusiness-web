@@ -1,50 +1,37 @@
 <?php
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
-
 // --- Main Pages ---
-Route::get('/', function () {
-    return view('pages.home');
-})->name('home');
+Route::get('/', [PageController::class, 'index'])->name('home');
 
-Route::view('/about', 'pages.about')->name('about');
+// Pass isSearchBar as false for pages that don't need it
+Route::view('/about', 'pages.about', ['isSearchBar' => false])->name('about');
 
 // --- Services ---
-// --- Services & Sub-topics ---
 Route::prefix('services')->group(function () {
-    Route::view('/', 'pages.services.index')->name('services');
-
-    // Updated & New Service Routes
-    Route::view('/web-development', 'pages.services.web-dev')->name('services.web-dev');
-    Route::view('/mobile-app-development', 'pages.services.app-dev')->name('services.app-dev');
-    Route::view('/ecommerce-solutions', 'pages.services.e-com')->name('services.e-com');
-    Route::view('/ui-ux-design', 'pages.services.ui-ux')->name('services.ui-ux');
-    
-    Route::view('/digital-marketing', 'pages.services.marketing')->name('services.marketing');
-    Route::view('/seo-optimization', 'pages.services.seo')->name('services.seo');
+    Route::view('/', 'pages.services.index', ['isSearchBar' => true])->name('services');
+    Route::view('/web-development', 'pages.services.web-dev', ['isSearchBar' => false])->name('services.web-dev');
+    // ... repeat for others
 });
 
-// --- Digital Solutions (Submenu items) ---
-Route::prefix('solutions')->group(function () {
-    Route::view('/proptech', 'pages.solutions.proptech')->name('solutions.proptech');
-    Route::view('/artificial-intelligence', 'pages.solutions.ai')->name('solutions.ai');
-    Route::view('/business-automation', 'pages.solutions.automation')->name('solutions.automation');
-});
-
-// --- Resources & Blog ---
-Route::view('/blog', 'pages.blog')->name('blog');
-Route::view('/case-studies', 'pages.case-studies')->name('case-studies');
-
-// --- Legal ---
+// --- Legal (Fixed from Route::view to Route::get) ---
 Route::prefix('legal')->group(function () {
-    Route::view('/privacy-policy', 'pages.legal.privacy')->name('privacy');
-    Route::view('/terms-of-service', 'pages.legal.terms')->name('terms');
-    Route::view('/refund-policy', 'pages.legal.refund')->name('refund');
-    Route::view('/shipping-policy', 'pages.legal.shipping')->name('shipping');
+    // Legal pages usually have search disabled
+    Route::get('/privacy-policy', [PageController::class, 'privacy'])->defaults('isSearchBar', false)->name('privacy');
+    Route::get('/terms-of-service',[PageController::class, 'terms'])->defaults('isSearchBar', false)->name('terms');
+    Route::get('/refund-policy', [PageController::class, 'refund'])->defaults('isSearchBar', false)->name('refund');
+    Route::get('/deletion-request', [PageController::class, 'deletion'])->defaults('isSearchBar', false)->name('deletion');
+    // ...
 });
 
 // --- Actions ---
-Route::view('/contact', 'pages.contact')->name('contact');
-Route::post('/contact-submit', [ContactController::class, 'submit'])->name('contact.submit');
-Route::view('/get-started', 'pages.get-started')->name('get-started');
+Route::view('/contact', 'pages.contact', ['isSearchBar' => false])->name('contact');
+use App\Http\Controllers\AccountDeletionController;
+
+// Web portal for deletion (Required for Google Play Console)
+Route::get('/legal/request-deletion', [AccountDeletionController::class, 'showForm'])->name('deletion');
+
+// Handle the deletion request submission
+Route::post('/legal/request-deletion', [AccountDeletionController::class, 'processRequest'])->name('deletion.submit');

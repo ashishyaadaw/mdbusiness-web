@@ -21,8 +21,8 @@ class ContactController extends Controller
         // 2. Send Email logic
         // For now, we'll just return a JSON response for your jQuery AJAX
         try {
-            // Mail::to('info@websamsya.com')->send(new \App\Mail\ContactMail($validated));
-            Mail::to('websamsya@gmail.com')->send(new ContactMail($validated));
+            // Mail::to('info@mdbusiness.com')->send(new \App\Mail\ContactMail($validated));
+            Mail::to('mdbusiness@gmail.com')->send(new ContactMail($validated));
 
             return response()->json([
                 'success' => true,

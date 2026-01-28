@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>PropTech & Real Estate Solutions | Websamsya</x-slot>
+    <x-slot:title>PropTech & Real Estate Solutions | mdbusiness</x-slot>
 
     <main class="bg-white text-gray-900">
         <section class="relative bg-[#145589] py-24 md:py-32 overflow-hidden">
@@ -19,7 +19,7 @@
                                 Property.</span>
                         </h1>
                         <p class="mt-8 text-blue-100 text-lg leading-relaxed max-w-xl font-medium">
-                            At Websamsya, we engineer custom digital ecosystems for real estate developers and property
+                            At mdbusiness, we engineer custom digital ecosystems for real estate developers and property
                             managers to solve complex operational "Samsyas."
                         </p>
                         <div class="mt-10 flex flex-wrap gap-4 justify-center md:justify-start">
@@ -143,7 +143,7 @@
                         <div class="bg-white/5 backdrop-blur-xl p-12 rounded-[3rem] border border-white/10 shadow-2xl">
                             <ion-icon name="quote" class="text-[#fd7319] text-5xl mb-6 opacity-40"></ion-icon>
                             <p class="text-xl italic text-blue-50 leading-relaxed font-light">
-                                "Websamsya's platform reduced our lead response time by 60% and unified our multi-city
+                                "mdbusiness's platform reduced our lead response time by 60% and unified our multi-city
                                 operations into a single, high-performance dashboard."
                             </p>
                             <div class="mt-10 flex items-center gap-5">

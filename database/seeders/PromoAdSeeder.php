@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\PromoAd;
@@ -36,8 +37,7 @@ class PromoAdSeeder extends Seeder
             'ad_id' => 'feed_native_1',
             'type' => 'native',
             'title' => 'New Adventure Gear',
-            'body' =>
-                'Explore our latest collection of durable hiking boots and backpacks.',
+            'body' => 'Explore our latest collection of durable hiking boots and backpacks.',
             'images' => ['https://picsum.photos/id/43/600/300'],
             'action_text' => 'Shop Now',
             'target_url' => 'https://example.com/gear',

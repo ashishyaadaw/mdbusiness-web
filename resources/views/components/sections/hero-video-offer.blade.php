@@ -20,7 +20,7 @@
                 Solve. Scale. Succeed.
             </h2>
             <h1 class="text-6xl md:text-8xl font-black leading-tight mb-4 tracking-tighter">
-                WEBSAMSYA <br class="hidden md:block"> <span
+                mdbusiness <br class="hidden md:block"> <span
                     class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">DIGITAL</span>
             </h1>
             <p class="text-lg md:text-2xl font-medium uppercase tracking-[0.2em] max-w-3xl mx-auto">

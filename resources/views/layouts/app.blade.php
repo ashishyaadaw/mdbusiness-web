@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Websamsya' }} | Transforming businesses</title>
+    <title>{{ $title ?? 'mdbusiness' }} | Transforming businesses</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,24 +18,28 @@
     </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
+    {{-- <link rel="stylesheet" href="{{ asset('css/style.css') }}" /> --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 </head>
 
-<body class="font-['Poppins'] bg-gray-100 flex justify-center">
+<body class="font-['Poppins'] bg-gray-100 flex-1 justify-center ">
 
-    <div class="w-full  min-h-screen bg-white shadow-2xl relative overflow-x-hidden">
+    <x-navigation.navbar :isSearchBar="$showSearch ?? true" />
+    <main
+        class="max-w-7xl mx-auto flex flex-col justify-center border bg-white transition-all duration-300 ease-in-out border-b border-gray-100 px-4 py-3 ">
 
-        <x-navigation.navbar />
 
-        <main>
-            @yield('content')
-        </main>
+        @yield('content')
 
+
+    </main>
+    <div
+        class="max-w-7xl mx-auto flex flex-col justify-center border bg-white transition-all duration-300 ease-in-out border-b border-gray-100  py-3 ">
         <x-navigation.footer />
-
     </div>
+
+
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

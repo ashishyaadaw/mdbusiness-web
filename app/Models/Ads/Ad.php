@@ -38,6 +38,7 @@ class Ad extends Model
     {
         return $this->hasOne(AdController::class);
     }
+
     public function adFeatured()
     {
         return $this->hasOne(AdFeatured::class);

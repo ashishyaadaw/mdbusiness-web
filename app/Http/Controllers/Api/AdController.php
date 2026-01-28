@@ -29,10 +29,8 @@ class AdController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'type' => 'required|in:image,text',
-            'payload' =>
-                $request->type == 'text' ? 'required|string' : 'nullable',
-            'image' =>
-                $request->type == 'image'
+            'payload' => $request->type == 'text' ? 'required|string' : 'nullable',
+            'image' => $request->type == 'image'
                     ? 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
                     : 'nullable',
         ]);
@@ -50,13 +48,13 @@ class AdController extends Controller
         if ($request->type === 'image' && $request->hasFile('image')) {
             $file = $request->file('image');
             // Create a unique filename
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = time().'_'.$file->getClientOriginalName();
 
             // Define the path: public/uploads/ads
             $destinationPath = public_path('uploads/ads');
 
             // Ensure directory exists (optional, but good practice)
-            if (!File::exists($destinationPath)) {
+            if (! File::exists($destinationPath)) {
                 File::makeDirectory($destinationPath, 0755, true);
             }
 
@@ -64,7 +62,7 @@ class AdController extends Controller
             $file->move($destinationPath, $filename);
 
             // Store relative path in DB (e.g., "uploads/ads/123_image.jpg")
-            $payloadData = 'uploads/ads/' . $filename;
+            $payloadData = 'uploads/ads/'.$filename;
         } else {
             $payloadData = $request->payload;
         }
@@ -230,8 +228,7 @@ class AdController extends Controller
                 $ad->adCreator()->updateOrCreate(
                     ['ad_id' => $ad->id], // match criteria
                     [
-                        'name' =>
-                            $request->username ?? ($user->name ?? 'Admin'),
+                        'name' => $request->username ?? ($user->name ?? 'Admin'),
                         'contact' => $request->contact,
                         'alternate_contact' => $request->alternate_contact,
                         'whatsapp' => $request->whatsapp,
@@ -303,7 +300,7 @@ class AdController extends Controller
         // 3. Status Guard: Only allow changes if current status is active or inactive
         $allowedCurrentStatuses = ['active', 'inactive'];
 
-        if (!in_array($currentStatus, $allowedCurrentStatuses)) {
+        if (! in_array($currentStatus, $allowedCurrentStatuses)) {
             return response()->json(
                 [
                     'status' => false,
@@ -370,7 +367,7 @@ class AdController extends Controller
             'hold',
         ];
 
-        if (!in_array($currentStatus, $allowedCurrentStatuses)) {
+        if (! in_array($currentStatus, $allowedCurrentStatuses)) {
             return response()->json(
                 [
                     'status' => false,
@@ -382,8 +379,7 @@ class AdController extends Controller
 
         // 4. Validation for the New Status
         $validator = Validator::make($request->all(), [
-            'status' =>
-                'required|string|in:active,inactive,hold,pending,rejected,block',
+            'status' => 'required|string|in:active,inactive,hold,pending,rejected,block',
         ]);
 
         if ($validator->fails()) {
@@ -429,7 +425,7 @@ class AdController extends Controller
     {
         $user = User::find($userId);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
@@ -472,8 +468,7 @@ class AdController extends Controller
             return response()->json(
                 [
                     'status' => true,
-                    'message' =>
-                        'Ad and all associated data deleted successfully',
+                    'message' => 'Ad and all associated data deleted successfully',
                 ],
                 200,
             );
@@ -492,7 +487,7 @@ class AdController extends Controller
     public function show($id)
     {
         $ad = Ad::find($id);
-        if (!$ad) {
+        if (! $ad) {
             return response()->json(
                 ['status' => false, 'message' => 'Ad not found'],
                 404,
@@ -505,7 +500,7 @@ class AdController extends Controller
     public function update(Request $request, $id)
     {
         $ad = Ad::find($id);
-        if (!$ad) {
+        if (! $ad) {
             return response()->json(
                 ['status' => false, 'message' => 'Ad not found'],
                 404,
@@ -543,15 +538,15 @@ class AdController extends Controller
 
             // 2. Upload New Image
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = time().'_'.$file->getClientOriginalName();
             $destinationPath = public_path('uploads/ads');
 
-            if (!File::exists($destinationPath)) {
+            if (! File::exists($destinationPath)) {
                 File::makeDirectory($destinationPath, 0755, true);
             }
 
             $file->move($destinationPath, $filename);
-            $ad->payload = 'uploads/ads/' . $filename;
+            $ad->payload = 'uploads/ads/'.$filename;
         }
         // Update Text
         elseif ($ad->type === 'text' && $request->has('payload')) {
@@ -577,7 +572,7 @@ class AdController extends Controller
     public function destroy($id)
     {
         $ad = Ad::find($id);
-        if (!$ad) {
+        if (! $ad) {
             return response()->json(
                 ['status' => false, 'message' => 'Ad not found'],
                 404,
@@ -611,7 +606,7 @@ class AdController extends Controller
         ])->latest();
 
         // 2. Filter by Category and Gender
-        if (($category && strtolower($category) !== 'all') || !empty($gender)) {
+        if (($category && strtolower($category) !== 'all') || ! empty($gender)) {
             $query->whereHas('adsDetails', function ($q) use (
                 $category,
                 $gender,
@@ -619,7 +614,7 @@ class AdController extends Controller
                 if ($category && strtolower($category) !== 'all') {
                     $q->where('category', $category);
                 }
-                if (!empty($gender)) {
+                if (! empty($gender)) {
                     $q->where('gender', $gender);
                 }
             });
@@ -648,6 +643,7 @@ class AdController extends Controller
             200,
         );
     }
+
     public function getfeatueredAdsByCategory(
         Request $request,
         $category,
@@ -662,7 +658,7 @@ class AdController extends Controller
         ])->latest();
 
         // 2. Filter by Category and Gender
-        if (($category && strtolower($category) !== 'all') || !empty($gender)) {
+        if (($category && strtolower($category) !== 'all') || ! empty($gender)) {
             $query->whereHas('adsDetails', function ($q) use (
                 $category,
                 $gender,
@@ -670,7 +666,7 @@ class AdController extends Controller
                 if ($category && strtolower($category) !== 'all') {
                     $q->where('category', $category);
                 }
-                if (!empty($gender)) {
+                if (! empty($gender)) {
                     $q->where('gender', $gender);
                 }
             });
@@ -841,7 +837,7 @@ class AdController extends Controller
         $user = Auth::user();
 
         // 1. Check if user is authenticated
-        if (!$user) {
+        if (! $user) {
             return response()->json(
                 [
                     'status' => false,

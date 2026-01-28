@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>Contact Our Architects | Websamsya</x-slot>
+    <x-slot:title>Contact Our Architects | mdbusiness</x-slot>
 
     <section class="relative bg-[#145589] py-24 md:py-32 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-[#145589] via-[#145589] to-[#7f03d3] opacity-95"></div>
@@ -32,8 +32,8 @@
                         </div>
                         <h3 class="text-xl font-black text-[#145589] mb-2 uppercase tracking-tighter">Email Us</h3>
                         <p class="text-gray-500 text-sm mb-4 font-medium leading-relaxed">Technical & general inquiries.</p>
-                        <a href="mailto:info@websamsya.com"
-                            class="text-[#7f03d3] font-black text-lg hover:underline">info@websamsya.com</a>
+                        <a href="mailto:info@mdbusiness.com"
+                            class="text-[#7f03d3] font-black text-lg hover:underline">info@mdbusiness.com</a>
                     </div>
 
                     <div
@@ -83,7 +83,7 @@
                                     Address</label>
                                 <input type="email" name="email" required
                                     class="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#7f03d3] outline-none transition-all shadow-sm"
-                                    placeholder="john@websamsya.com">
+                                    placeholder="john@mdbusiness.com">
                             </div>
                         </div>
 
@@ -166,7 +166,7 @@
 
                     btn.prop('disabled', true).html(
                         '<ion-icon name="sync" class="animate-spin text-xl"></ion-icon> <span>Syncing Data...</span>'
-                        );
+                    );
 
                     $.ajax({
                         url: "{{ route('contact.submit') }}",
@@ -181,7 +181,7 @@
                             alert("Sync Error: " + xhr.responseJSON.message);
                             btn.prop('disabled', false).html(
                                 '<span>Initialize Transformation</span> <ion-icon name="send-outline" class="text-lg"></ion-icon>'
-                                );
+                            );
                         }
                     });
                 });

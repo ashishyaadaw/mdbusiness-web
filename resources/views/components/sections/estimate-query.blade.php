@@ -41,7 +41,7 @@
                     <div>
                         <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2 ml-1">Work
                             Email</label>
-                        <input type="email" name="email" required placeholder="john@websamsya.com"
+                        <input type="email" name="email" required placeholder="john@mdbusiness.com"
                             class="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-[#7f03d3] focus:bg-white outline-none transition-all shadow-sm">
                     </div>
                 </div>

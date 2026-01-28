@@ -43,7 +43,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         // CHECK: If user is not logged in, return JSON error immediately
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
@@ -142,9 +142,9 @@ class AuthController extends Controller
         // ==========================================
         // FLOW A: REQUEST OTP (No OTP provided)
         // ==========================================
-        if (!$request->filled('otp')) {
+        if (! $request->filled('otp')) {
             // If user does not exist, Auto-Register them
-            if (!$user) {
+            if (! $user) {
                 $username = $this->generateUniqueUsername();
 
                 $user = User::create([
@@ -165,14 +165,14 @@ class AuthController extends Controller
         // FLOW B: VERIFY OTP (OTP provided)
         // ==========================================
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
         // 1. Check validity
         if (
-            !$user->remember_token ||
-            !Hash::check($request->otp, $user->remember_token)
+            ! $user->remember_token ||
+            ! Hash::check($request->otp, $user->remember_token)
         ) {
             return response()->json(['message' => 'Invalid OTP'], 401);
         }
@@ -225,7 +225,7 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
 
-        if (!$request->filled('otp')) {
+        if (! $request->filled('otp')) {
             $user = $this->authService->findOrCreateUser(
                 $request->phone,
                 $request->full_name,
@@ -238,14 +238,14 @@ class AuthController extends Controller
         // FLOW B: VERIFY OTP (OTP provided)
         // ==========================================
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
         // 1. Check validity
         if (
-            !$user->remember_token ||
-            !Hash::check($request->otp, $user->remember_token)
+            ! $user->remember_token ||
+            ! Hash::check($request->otp, $user->remember_token)
         ) {
             return response()->json(['message' => 'Invalid OTP'], 401);
         }
@@ -342,7 +342,7 @@ class AuthController extends Controller
     {
         // 1. Ensure the user is authenticated (though middleware is preferred)
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
@@ -350,14 +350,14 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'full_name' => 'nullable|string|max:255',
             'preferred_lang' => 'nullable|string|in:en,hi|max:255',
-            'email' => 'nullable|email|unique:users,email,' . $user->id,
+            'email' => 'nullable|email|unique:users,email,'.$user->id,
         ]);
 
         try {
             // Wrap in a transaction to ensure data integrity across two tables
             return DB::transaction(function () use ($user, $validatedData) {
                 // 3. Update Email on the main User model if provided
-                if (!empty($validatedData['email'])) {
+                if (! empty($validatedData['email'])) {
                     $user->update(['email' => $validatedData['email']]);
                 }
 
@@ -366,13 +366,12 @@ class AuthController extends Controller
                 $profileData = array_filter(
                     [
                         'full_name' => $validatedData['full_name'] ?? null,
-                        'preferred_lang' =>
-                            $validatedData['preferred_lang'] ?? null,
+                        'preferred_lang' => $validatedData['preferred_lang'] ?? null,
                     ],
-                    fn($value) => !is_null($value),
+                    fn ($value) => ! is_null($value),
                 );
 
-                if (!empty($profileData)) {
+                if (! empty($profileData)) {
                     $user
                         ->appUserProfile()
                         ->updateOrCreate(
@@ -407,8 +406,8 @@ class AuthController extends Controller
         $username = null;
         do {
             $randomNumber = random_int(100000000, 999999999);
-            $generatedUsername = 'MDM' . $randomNumber;
-            if (!User::where('username', $generatedUsername)->exists()) {
+            $generatedUsername = 'MDM'.$randomNumber;
+            if (! User::where('username', $generatedUsername)->exists()) {
                 $username = $generatedUsername;
             }
         } while ($username === null);

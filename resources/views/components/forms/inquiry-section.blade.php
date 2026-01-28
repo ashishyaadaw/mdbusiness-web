@@ -75,7 +75,7 @@
                             <label
                                 class="block text-xs font-black uppercase tracking-widest text-[#145589] mb-2 ml-1">Work
                                 Email</label>
-                            <input type="email" placeholder="ashish@websamsya.com"
+                            <input type="email" placeholder="ashish@mdbusiness.com"
                                 class="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-white/50 focus:bg-white focus:ring-2 focus:ring-[#7f03d3] focus:border-transparent outline-none transition-all shadow-sm"
                                 required>
                         </div>

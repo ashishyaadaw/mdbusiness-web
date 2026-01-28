@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>Custom AI & Machine Learning Solutions | Websamsya</x-slot>
+    <x-slot:title>Custom AI & Machine Learning Solutions | mdbusiness</x-slot>
 
     <main class="bg-[#040712] text-white overflow-hidden">
         <section class="relative py-24 lg:py-40 overflow-hidden">

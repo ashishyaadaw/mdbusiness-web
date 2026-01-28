@@ -22,7 +22,7 @@
         ],
     ];
 @endphp
-<div class="space-y-6 p-4  max-w-xl mx-auto bg-white rounded-2xl">
+<div class="flex-1 w-full max-w-7xl mx-auto gap-3 py-4 bg-white">
     @foreach ($pageSections as $section)
         <section>
             <div class="flex justify-between items-center mb-4">

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-slot:title>Custom Web Development | Websamsya</x-slot>
+    <x-slot:title>Custom Web Development | mdbusiness</x-slot>
 
     <section class="relative bg-[#145589] py-24 md:py-32 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-[#145589] via-[#145589] to-[#7f03d3] opacity-90"></div>
@@ -124,7 +124,7 @@
     <section id="lifecycle" class="py-24 bg-gray-50 border-y border-gray-100 overflow-hidden">
         <div class="container mx-auto px-6">
             <div class="text-center max-w-3xl mx-auto mb-20">
-                <h2 class="text-3xl md:text-5xl font-black text-[#145589] mb-4">The Websamsya Lifecycle</h2>
+                <h2 class="text-3xl md:text-5xl font-black text-[#145589] mb-4">The mdbusiness Lifecycle</h2>
                 <p class="text-gray-500 font-medium uppercase tracking-[0.2em] text-xs">From Samsya to Solution</p>
                 <div class="h-1.5 w-24 bg-gradient-to-r from-[#fd7319] to-[#7f03d3] mx-auto mt-6 rounded-full"></div>
             </div>
