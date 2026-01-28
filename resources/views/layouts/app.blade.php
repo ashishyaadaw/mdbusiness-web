@@ -25,7 +25,7 @@
 
 <body class="font-['Poppins'] bg-gray-100 flex justify-center">
 
-    <div class="w-full max-w-[480px] min-h-screen bg-white shadow-2xl relative overflow-x-hidden">
+    <div class="w-full  min-h-screen bg-white shadow-2xl relative overflow-x-hidden">
 
         <x-navigation.navbar />
 
