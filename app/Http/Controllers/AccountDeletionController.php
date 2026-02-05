@@ -12,9 +12,9 @@ class AccountDeletionController extends Controller
      */
     public function showForm()
     {
-        return view('pages.deletion', [
+        return view('pages.legal.request_deletion', [
             'isSearchBar' => false,
-            'isNavbar' => true
+            'isNavbar' => true,
         ]);
     }
 
@@ -25,8 +25,8 @@ class AccountDeletionController extends Controller
     {
         // 1. Validate the input (Ensuring Email OR Phone is provided)
         $request->validate([
-            'email'  => 'required_without:phone|nullable|email',
-            'phone'  => 'required_without:email|nullable|string|min:10',
+            'email' => 'required_without:phone|nullable|email',
+            'phone' => 'required_without:email|nullable|string|min:10',
             'reason' => 'required|string',
         ]);
 
@@ -34,7 +34,7 @@ class AccountDeletionController extends Controller
 
         // 2. Logic to notify admin or mark user for deletion
         // Note: Google requires actual data erasure within 30 days.
-        
+
         // Example: Send email to your legal/admin team
         /*
         Mail::raw("Account Deletion Request Received:\n\n" .
@@ -46,6 +46,6 @@ class AccountDeletionController extends Controller
         */
 
         // 3. Redirect with success message
-        return redirect()->back()->with('success', 'Your deletion request for ' . $identifier . ' has been received. Data will be purged within 30 days.');
+        return redirect()->back()->with('success', 'Your deletion request for '.$identifier.' has been received. Data will be purged within 30 days.');
     }
 }

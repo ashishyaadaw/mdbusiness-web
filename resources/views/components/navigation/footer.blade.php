@@ -15,11 +15,11 @@
                 </p>
             </div>
             <div class="flex flex-wrap gap-4">
-                <a href="/list-your-business"
+                <a href="{{ route('advertise.business.listing') }}"
                     class="px-8 py-4 bg-[#fd7319] text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#ff8533] transition-all shadow-lg shadow-[#fd7319]/30">
                     Free Listing / Add Business
                 </a>
-                <a href="/advertise"
+                <a href="{{ route('advertise.business.withus') }}"
                     class="px-8 py-4 bg-white text-blue-600 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-50 transition-all border border-blue-200 shadow-sm">
                     Advertise with Us
                 </a>
@@ -30,12 +30,18 @@
             <div>
                 <h4 class="text-slate-900 font-black uppercase tracking-widest text-xs mb-8">Popular Categories</h4>
                 <ul class="grid grid-cols-1 gap-4 text-sm font-semibold">
-                    <li><a href="/b2b" class="hover:text-blue-600 transition-colors">B2B Wholesalers</a></li>
-                    <li><a href="/doctors" class="hover:text-blue-600 transition-colors">Doctors & Clinics</a></li>
-                    <li><a href="/real-estate" class="hover:text-blue-600 transition-colors">Real Estate Agents</a></li>
-                    <li><a href="/repairs" class="hover:text-blue-600 transition-colors">Home Repairs & Services</a>
+                    <li><a href="{{ route('services.show', ['category' => 'b2b']) }}"
+                            class="hover:text-blue-600 transition-colors">B2B
+                            Wholesalers</a></li>
+                    <li><a href="{{ route('services.show', ['category' => 'doctors']) }}"
+                            class="hover:text-blue-600 transition-colors">Doctors & Clinics</a></li>
+                    <li><a href="{{ route('services.show', ['category' => 'resl-estate']) }}"
+                            class="hover:text-blue-600 transition-colors">Real Estate Agents</a></li>
+                    <li><a href="{{ route('services.show', ['category' => 'repair']) }}"
+                            class="hover:text-blue-600 transition-colors">Home Repairs & Services</a>
                     </li>
-                    <li><a href="/wedding" class="hover:text-blue-600 transition-colors">Wedding Photographers</a></li>
+                    <li><a href="{{ route('services.show', ['category' => 'wedding']) }}"
+                            class="hover:text-blue-600 transition-colors">Wedding Photographers</a></li>
                 </ul>
             </div>
 
@@ -54,9 +60,9 @@
             <div>
                 <h4 class="text-slate-900 font-black uppercase tracking-widest text-xs mb-8">Resources</h4>
                 <ul class="space-y-4 text-sm font-semibold">
-                    <li><a href="{{ route('privacy') }}" class="hover:text-blue-600 transition-colors">Privacy
+                    <li><a href="{{ route('legal.privacy') }}" class="hover:text-blue-600 transition-colors">Privacy
                             Policy</a></li>
-                    <li><a href="{{ route('terms') }}" class="hover:text-blue-600 transition-colors">Terms of
+                    <li><a href="{{ route('legal.terms') }}" class="hover:text-blue-600 transition-colors">Terms of
                             Service</a></li>
                     <li><a href="/help" class="hover:text-blue-600 transition-colors">Customer Care</a></li>
                     <li><a href="/feedback" class="hover:text-blue-600 transition-colors">Submit Feedback</a></li>
@@ -68,9 +74,9 @@
                 <ul class="space-y-5 text-sm font-semibold">
                     <li class="flex items-center gap-4">
                         <ion-icon name="call-outline" class="text-xl text-[#fd7319]"></ion-icon>
-                        <a href="tel:+910000000000"
-                            class="hover:text-blue-700 transition-colors text-lg font-bold text-slate-900">+91 00000
-                            00000</a>
+                        <a href="tel:+91859 107 2162  "
+                            class="hover:text-blue-700 transition-colors text-lg font-bold text-slate-900">+91 859 107
+                            2162</a>
                     </li>
                     <li class="flex items-center gap-4">
                         <ion-icon name="mail-unread-outline" class="text-xl text-[#fd7319]"></ion-icon>
@@ -84,9 +90,11 @@
                         <a href="#"
                             class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-[#e4405f] hover:text-white transition-all"><ion-icon
                                 name="logo-instagram"></ion-icon></a>
-                        <a href="#"
-                            class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-slate-900 hover:text-white transition-all"><ion-icon
-                                name="logo-x"></ion-icon></a>
+                        <a href="https://wa.me/+918591072162?text=Hello!%20I%20am%20interested%20in%20your%20services."
+                            target="_blank"
+                            class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 hover:bg-slate-900 hover:text-white transition-all">
+                            <ion-icon name="logo-whatsapp"></ion-icon>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -100,7 +108,7 @@
 
             <div class="flex items-center gap-4 opacity-60 hover:opacity-100 transition-opacity">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">A Venture Of:</span>
-                <img src="/assets/icon/oneadvertisers-logo.png" class="h-5 w-auto" alt="One Advertisers" />
+                <img src="/assets/icon/oneadvertisers.png" class="h-5 w-auto" alt="One Advertisers" />
             </div>
         </div>
     </div>

@@ -13,7 +13,8 @@
             <p class="text-gray-500 mb-8 text-sm">Please select your primary identification method to initiate the permanent
                 removal of your account data.</p>
 
-            <form action="{{ route('deletion.submit') }}" method="POST" class="space-y-6 text-left" x-data="{ method: 'email' }">
+            <form action="{{ route('legal.deletion.submit') }}" method="POST" class="space-y-6 text-left"
+                x-data="{ method: 'email' }">
                 @csrf
                 <input type="hidden" name="subject" value="Account Deletion Request">
 
@@ -47,7 +48,7 @@
                     x-transition:enter-start="opacity-0 transform -translate-y-2">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Phone
                         Number</label>
-                    <input type="tel" name="phone" :required="method === 'phone'" placeholder="+91 00000 00000"
+                    <input type="tel" name="phone" :required="method === 'phone'" placeholder="+91 859 107 2162"
                         class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all placeholder:text-gray-300">
                 </div>
 

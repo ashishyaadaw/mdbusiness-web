@@ -46,7 +46,7 @@
                         <p class="text-gray-500 text-sm mb-4 font-medium leading-relaxed">Fastest response for project
                             quotes.</p>
                         <a href="https://wa.me/910000000000" class="text-green-600 font-black text-lg hover:underline">+91
-                            00000 00000</a>
+                            859 107 2162 </a>
                     </div>
 
                     <div

@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'mdbusiness' }} | Transforming businesses</title>
+    <title>{{ $title ?? 'mdbusiness' }} | MD Business</title>
+    <link rel="icon" type="image/png" href="/assets/favicon-32x32.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +26,7 @@
 
 <body class="font-['Poppins'] bg-gray-100 flex-1 justify-center ">
 
-    <x-navigation.navbar :isSearchBar="$showSearch ?? true" />
+    <x-navigation.navbar :isSearchBar="$isSearchBar ?? true" />
     <main
         class="max-w-7xl mx-auto flex flex-col justify-center border bg-white transition-all duration-300 ease-in-out border-b border-gray-100 px-4 py-3 ">
 
@@ -46,6 +47,15 @@
     <script src="{{ asset('js/nav.js') }}"></script>
     <script src="{{ asset('js/hero.js') }}"></script>
     @stack('script')
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            lucide.createIcons();
+        });
+    </script>
 
 </body>
 

@@ -9,7 +9,9 @@
             <div class="flex items-center">
                 <h1 class="text-2xl font-bold tracking-tight">
                     {{-- <span class="text-blue-600">MD</span><span class="text-orange-500">Business</span> --}}
-                    <img src="/assets/icon/mdbusiness.png" class="h-10 lg:h-14" alt="Logo" />
+                    <a href="/">
+                        <img src="/assets/icon/mdbusiness.png" class="h-10 lg:h-14" alt="Logo" />
+                    </a>
                 </h1>
             </div>
 

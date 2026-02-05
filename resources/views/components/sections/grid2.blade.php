@@ -12,7 +12,7 @@
         'rent_hire' => [
             'title' => 'Rent & Hire',
             'items' => [
-                ['name' => 'Hire Vehicles', 'image' => 'cars.jpg', 'url' => '/rent/vehicles'],
+                ['name' => 'Hire Vehicles', 'image' => 'coming-soon.avif', 'url' => '/rent/vehicles'],
                 ['name' => 'Rent Clothes', 'image' => 'clothes.jpg', 'url' => '/rent/clothes'],
                 ['name' => 'Rent Furniture', 'image' => 'furniture.jpg', 'url' => '/rent/furniture'],
                 ['name' => 'Rent Appliance', 'image' => 'appliances.jpg', 'url' => '/rent/appliances'],

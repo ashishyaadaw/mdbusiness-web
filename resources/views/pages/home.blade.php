@@ -1,11 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.app', [
+    'title' => 'Home',
+    'isSearchBar' => true,
+    'bodyClass' => 'bg-slate-50',
+    'activeMenu' => 'services',
+])
 
 @section('content')
-    <x-slot:title>Home | mdbusiness</x-slot>
-
     <x-sections.hero />
-    <x-sections.hero-grid />
-    <x-sections.classified-grid />
+    <x-sections.services-grid />
+    {{-- <x-sections.foreign-jobs /> --}}
+    <x-sections.near-by-jobs />
     <x-sections.medium-grid />
-    {{-- <x-sections.grid2 /> --}}
 @endsection

@@ -137,7 +137,8 @@
                     <ul class="list-disc ml-6 space-y-3 mt-4 text-left text-sm">
                         <li>
                             <strong>How to Request:</strong> Users can initiate deletion via in-app settings or the
-                            <a href="{{ route('deletion') }}" class="text-[#7f03d3] font-bold hover:underline">Web Deletion
+                            <a href="{{ route('legal.deletion') }}" class="text-[#7f03d3] font-bold hover:underline">Web
+                                Deletion
                                 Portal</a>
                             using their registered <strong>Email or Phone Number</strong>.
                         </li>
