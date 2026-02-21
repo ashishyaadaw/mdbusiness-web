@@ -2,7 +2,7 @@
     $partners = [
         ['name' => 'MD Education', 'logo' => 'mdeducation.webp'],
         ['name' => 'One Advertisers', 'logo' => 'oneadvertisers.png'],
-        ['name' => 'MD Matrimony', 'logo' => 'mdmatrimony.png'],
+        ['name' => 'MD Matrimony', 'logo' => 'mdbusiness.png'],
         ['name' => 'MD Business', 'logo' => 'logo4.png'], // Placeholder for your other brand
         ['name' => 'mdbusiness Tech', 'logo' => 'logo5.png'],
         ['name' => 'Global Recruitment', 'logo' => 'logo6.png'],
