@@ -11,6 +11,7 @@ class AdvertiseController extends Controller
             'isNavbar' => true,
         ]);
     }
+
     public function businessWithUs()
     {
         return view('pages.advertise.business.withus', [
