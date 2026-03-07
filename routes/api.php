@@ -142,3 +142,4 @@ Route::middleware(['auth:sanctum', 'role:admin,staff'])
             'verifyUser',
         ]);
     });
+         
