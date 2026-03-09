@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\Admin\ReligionDataController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MatterController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PhoneVerificationController;
 use App\Http\Controllers\Api\PromoAdsController;
@@ -75,10 +76,22 @@ Route::prefix('v2')->group(function () {
     // Route::apiResource('ads', AdController::class);
     // Route::post('ads', [AdController::class, 'createNewAds']);
     Route::get('ads', [AdController::class, 'getAds']);
-    Route::get('ads/{category}/profiles/{gender?}', [
+
+    Route::get('ads/{category}/profiles/{menuId?}', [
         AdController::class,
         'getAdsByCategory',
     ]);
+
+    // For Matters
+    Route::get('matters', [MatterController::class, 'getMatters']);
+
+    Route::get('matters/{category}/profiles/{menuId?}', [
+        MatterController::class,
+        'getMattersByCategory',
+    ]);
+
+
+
     Route::get('featueredAds/{category}/profiles/{gender?}', [
         AdController::class,
         'getfeatueredAdsByCategory',

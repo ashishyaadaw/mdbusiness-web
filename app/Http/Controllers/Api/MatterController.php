@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\MatrimonialProfileStatusChange;
 use App\Http\Controllers\Controller;
-use App\Models\Ads\Ad;
+use App\Models\Matters\Matter;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
-class AdController extends Controller
+class MatterController extends Controller
 {
     public function index()
     {
         // Move with() before get()
-        $ads = Ad::with('adsDetails', 'adCreator', 'adController')
+        $ads = Matter::with('matterDetails', 'matterController')
             ->latest()
             ->get();
 
@@ -67,14 +67,14 @@ class AdController extends Controller
             $payloadData = $request->payload;
         }
 
-        $ad = Ad::create([
+        $ad = Matter::create([
             'title' => $request->title,
             'type' => $request->type,
             'payload' => $payloadData,
         ]);
 
         $ad->adCreator()->create([
-            'name' => $request->username ?? 'Admin',
+            'name' => $request->username ?? 'Mattermin',
             'contact' => $request->contact ?? null,
             'alternate_contact' => $request->alternate_contact ?? null,
             'whatsapp' => $request->whatsapp ?? null,
@@ -97,14 +97,14 @@ class AdController extends Controller
         return response()->json(
             [
                 'status' => true,
-                'message' => 'Ad created successfully',
+                'message' => 'Matter created successfully',
                 'data' => $ad,
             ],
             201,
         );
     }
 
-    public function createNewAds(Request $request)
+    public function createNewMatters(Request $request)
     {
         $user = Auth::user();
 
@@ -130,7 +130,7 @@ class AdController extends Controller
         try {
             // 2. Use a Transaction to ensure all or nothing is saved
             $ad = DB::transaction(function () use ($request, $user) {
-                $ad = Ad::create([
+                $ad = Matter::create([
                     'user_id' => $user->id,
                     'title' => $request->title,
                     'type' => $request->type,
@@ -138,7 +138,7 @@ class AdController extends Controller
                 ]);
 
                 $ad->adCreator()->create([
-                    'name' => $request->name ?? ($user->username ?? 'Admin'),
+                    'name' => $request->name ?? ($user->username ?? 'Mattermin'),
                     'contact' => $request->contact,
                     'alternate_contact' => $request->alternate_contact,
                     'whatsapp' => $request->whatsapp,
@@ -162,7 +162,7 @@ class AdController extends Controller
             return response()->json(
                 [
                     'status' => true,
-                    'message' => 'Ad created successfully',
+                    'message' => 'Matter created successfully',
                     'data' => $ad->load(
                         'adCreator',
                         'adsDetails',
@@ -184,7 +184,7 @@ class AdController extends Controller
         }
     }
 
-    public function updateAd(Request $request, Ad $ad)
+    public function updateMatter(Request $request, Matter $ad)
     {
         $user = Auth::user();
 
@@ -217,18 +217,18 @@ class AdController extends Controller
         try {
             // 3. Use a Transaction
             DB::transaction(function () use ($request, $ad, $user) {
-                // Update the main Ad record
+                // Update the main Matter record
                 $ad->update([
                     'title' => $request->title,
                     // 'type' => $request->type,
                     'payload' => $request->payload,
                 ]);
 
-                // Update or Create AdCreator (using updateOrCreate handles cases where the record might be missing)
+                // Update or Create MatterCreator (using updateOrCreate handles cases where the record might be missing)
                 $ad->adCreator()->updateOrCreate(
                     ['ad_id' => $ad->id], // match criteria
                     [
-                        'name' => $request->username ?? ($user->name ?? 'Admin'),
+                        'name' => $request->username ?? ($user->name ?? 'Mattermin'),
                         'contact' => $request->contact,
                         'alternate_contact' => $request->alternate_contact,
                         'whatsapp' => $request->whatsapp,
@@ -236,7 +236,7 @@ class AdController extends Controller
                     ],
                 );
 
-                // Update or Create AdsDetails
+                // Update or Create MattersDetails
                 // $ad->adsDetails()->updateOrCreate(
                 //     ['ad_id' => $ad->id],
                 //     [
@@ -245,7 +245,7 @@ class AdController extends Controller
                 //     ]
                 // );
 
-                // Update or Create AdController
+                // Update or Create MatterController
                 $ad->adController()->updateOrCreate(
                     ['ad_id' => $ad->id],
                     [
@@ -260,7 +260,7 @@ class AdController extends Controller
             return response()->json(
                 [
                     'status' => true,
-                    'message' => 'Ad updated successfully',
+                    'message' => 'Matter updated successfully',
                     'data' => $ad->load(
                         'adCreator',
                         'adsDetails',
@@ -281,7 +281,7 @@ class AdController extends Controller
         }
     }
 
-    public function changeAdStatus(Request $request, Ad $ad)
+    public function changeMatterStatus(Request $request, Matter $ad)
     {
         $user = Auth::user();
 
@@ -335,7 +335,7 @@ class AdController extends Controller
             return response()->json(
                 [
                     'status' => true,
-                    'message' => 'Ad status updated successfully',
+                    'message' => 'Matter status updated successfully',
                     'data' => $ad->load('adController'),
                 ],
                 200,
@@ -352,7 +352,7 @@ class AdController extends Controller
         }
     }
 
-    public function updateAdProfileStatus(Request $request, Ad $ad)
+    public function updateMatterProfileStatus(Request $request, Matter $ad)
     {
         $currentStatus = $ad->adController->status ?? null;
 
@@ -404,7 +404,7 @@ class AdController extends Controller
             return response()->json(
                 [
                     'status' => true,
-                    'message' => 'Ad status updated successfully',
+                    'message' => 'Matter status updated successfully',
                     'data' => $ad->load('adController'),
                 ],
                 200,
@@ -437,7 +437,7 @@ class AdController extends Controller
         ]);
     }
 
-    public function deleteAd(Ad $ad)
+    public function deleteMatter(Matter $ad)
     {
         $user = Auth::user();
 
@@ -461,14 +461,14 @@ class AdController extends Controller
                 $ad->adsDetails()->delete();
                 $ad->adController()->delete();
 
-                // Finally, delete the main Ad record
+                // Finally, delete the main Matter record
                 $ad->delete();
             });
 
             return response()->json(
                 [
                     'status' => true,
-                    'message' => 'Ad and all associated data deleted successfully',
+                    'message' => 'Matter and all associated data deleted successfully',
                 ],
                 200,
             );
@@ -486,10 +486,10 @@ class AdController extends Controller
 
     public function show($id)
     {
-        $ad = Ad::find($id);
+        $ad = Matter::find($id);
         if (! $ad) {
             return response()->json(
-                ['status' => false, 'message' => 'Ad not found'],
+                ['status' => false, 'message' => 'Matter not found'],
                 404,
             );
         }
@@ -499,10 +499,10 @@ class AdController extends Controller
 
     public function update(Request $request, $id)
     {
-        $ad = Ad::find($id);
+        $ad = Matter::find($id);
         if (! $ad) {
             return response()->json(
-                ['status' => false, 'message' => 'Ad not found'],
+                ['status' => false, 'message' => 'Matter not found'],
                 404,
             );
         }
@@ -562,7 +562,7 @@ class AdController extends Controller
         return response()->json(
             [
                 'status' => true,
-                'message' => 'Ad updated successfully',
+                'message' => 'Matter updated successfully',
                 'data' => $ad,
             ],
             200,
@@ -571,10 +571,10 @@ class AdController extends Controller
 
     public function destroy($id)
     {
-        $ad = Ad::find($id);
+        $ad = Matter::find($id);
         if (! $ad) {
             return response()->json(
-                ['status' => false, 'message' => 'Ad not found'],
+                ['status' => false, 'message' => 'Matter not found'],
                 404,
             );
         }
@@ -591,23 +591,22 @@ class AdController extends Controller
         $ad->delete();
 
         return response()->json(
-            ['status' => true, 'message' => 'Ad deleted successfully'],
+            ['status' => true, 'message' => 'Matter deleted successfully'],
             200,
         );
     }
 
-    public function getAdsByCategory(Request $request, $category, $menuId = '')
+    public function getMattersByCategory(Request $request, $category, $menuId = '')
     {
         // 1. Start the query with eager loading
-        $query = Ad::with([
-            'adsDetails',
-            'adCreator',
-            'adController',
+        $query = Matter::with([
+            'matterDetails',
+            'matterController',
         ])->latest();
 
         // 2. Filter by Category and Screen ID
         if (($category && strtolower($category) !== 'all') || ! empty($menuId)) {
-            $query->whereHas('adsDetails', function ($q) use (
+            $query->whereHas('matterDetails', function ($q) use (
                 $category,
                 $menuId,
             ) {
@@ -615,13 +614,13 @@ class AdController extends Controller
                     $q->where('category', $category);
                 }
                 // if (! empty($menuId)) {
-                //     $q->where('ad_id', $menuId);
+                //     $q->where('matter_id', $menuId);
                 // }
             });
         }
 
         // 3. Only show active ads
-        $query->whereHas('adController', function ($q) {
+        $query->whereHas('matter  Controller', function ($q) {
             $q->where('status', 'active');
         });
 
@@ -644,13 +643,13 @@ class AdController extends Controller
         );
     }
 
-    public function getfeatueredAdsByCategory(
+    public function getfeatueredMattersByCategory(
         Request $request,
         $category,
         $gender = '',
     ) {
         // 1. Start the query with eager loading
-        $query = Ad::with([
+        $query = Matter::with([
             'adsDetails',
             'adCreator',
             'adController',
@@ -700,10 +699,10 @@ class AdController extends Controller
         );
     }
 
-    // public function getAdsByCategory($category, $gender = '')
+    // public function getMattersByCategory($category, $gender = '')
     // {
     //     // 1. Start the query with eager loading
-    //     $query = Ad::with(['adsDetails', 'adCreator', 'adController'])->latest();
+    //     $query = Matter::with(['adsDetails', 'adCreator', 'adController'])->latest();
 
     //     // 2. Filter by Category and Gender using a single whereHas for performance
     //     // We check if either variable has a valid value
@@ -734,7 +733,7 @@ class AdController extends Controller
     //     ], 200);
     // }
 
-    public function getAdsProfiles(Request $request)
+    public function getMattersProfiles(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'status' => 'nullable|string|max:255',
@@ -748,7 +747,7 @@ class AdController extends Controller
         }
 
         // 1. Start Query
-        $query = Ad::with([
+        $query = Matter::with([
             'adsDetails',
             'adCreator',
             'adController',
@@ -770,34 +769,33 @@ class AdController extends Controller
         // 3. Paginate
         // Laravel will automatically detect 'page' from the POST body or Query String
         $perPage = 15;
-        $paginatedAds = $query->paginate($perPage);
+        $paginatedMatters = $query->paginate($perPage);
 
         // 4. Return formatted response
         return response()->json(
             [
                 'status' => true,
-                'count' => $paginatedAds->total(),
-                'data' => $paginatedAds->items(), // Returns current page items
+                'count' => $paginatedMatters->total(),
+                'data' => $paginatedMatters->items(), // Returns current page items
                 'pagination' => [
-                    'current_page' => $paginatedAds->currentPage(),
-                    'last_page' => $paginatedAds->lastPage(),
-                    'has_more' => $paginatedAds->hasMorePages(),
+                    'current_page' => $paginatedMatters->currentPage(),
+                    'last_page' => $paginatedMatters->lastPage(),
+                    'has_more' => $paginatedMatters->hasMorePages(),
                 ],
             ],
             200,
         );
     }
 
-    public function getAds(Request $request)
+    public function getMatters(Request $request)
     {
         // Start the query builder
-        $query = Ad::with([
-            'adsDetails',
-            'adCreator',
-            'adController',
+        $query = Matter::with([
+            'matterDetails',
+            'matterController',
         ])->latest();
 
-        $query->whereHas('adController', function ($q) {
+        $query->whereHas('matterController', function ($q) {
             $q->whereIn('status', ['active']);
         });
 
@@ -806,9 +804,10 @@ class AdController extends Controller
 
         return response()->json(['status' => true, 'data' => $ads], 200);
     }
+    
     // all the ads created by Users
 
-    // public function myAds(Request $request)
+    // public function myMatters(Request $request)
     // {
     //     $user = Auth::user();
 
@@ -822,7 +821,7 @@ class AdController extends Controller
 
     //     // 2. Query ads belonging to the user
     //     // Replace 'user_id' with whatever your foreign key column is named
-    //     $ads = Ad::with(['adsDetails', 'adCreator', 'adController'])
+    //     $ads = Matter::with(['adsDetails', 'adCreator', 'adController'])
     //         ->where('user_id', $user->id)
     //         ->latest()
     //         ->get();
@@ -832,7 +831,7 @@ class AdController extends Controller
     //         'data' => $ads,
     //     ], 200);
     // }
-    public function myAds(Request $request)
+    public function myMatters(Request $request)
     {
         $user = Auth::user();
 
@@ -851,7 +850,7 @@ class AdController extends Controller
         // You can set the number of items per page (e.g., 10 or 15)
         $perPage = $request->query('per_page', 10);
 
-        $ads = Ad::with(['adsDetails', 'adCreator', 'adController'])
+        $ads = Matter::with(['adsDetails', 'adCreator', 'adController'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate($perPage);
