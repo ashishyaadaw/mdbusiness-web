@@ -9,7 +9,7 @@ class Matter extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','menu_id', 'title', 'type', 'payload'];
+    protected $fillable = ['user_id', 'menu_id', 'title', 'type', 'payload'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
@@ -29,11 +29,8 @@ class Matter extends Model
         return $this->hasOne(MatterDetail::class);
     }
 
-
     public function matterController()
     {
-        return $this->hasOne(MatterControllerModel::class);
+        return $this->hasOne(MatterController::class);
     }
-
-
 }

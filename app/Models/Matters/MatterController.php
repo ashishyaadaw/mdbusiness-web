@@ -5,9 +5,19 @@ namespace App\Models\Matters;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MatterControllerModel extends Model
+class MatterController extends Model
 {
     use HasFactory;
+
+    protected static function booted()
+    {
+        static::creating(function ($matterController) {
+            // If valid_until isn't manually set, default to 10 days from now
+            if (empty($matterController->valid_until)) {
+                $matterController->valid_until = now()->addDays(10);
+            }
+        });
+    }
 
     protected $fillable = [
         'matter_id',

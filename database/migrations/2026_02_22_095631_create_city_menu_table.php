@@ -10,15 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('city_menu', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('city_id')->constrained()->onDelete('cascade');
-        $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-        $table->foreignId('menu_category_id')->constrained()->onDelete('cascade');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('city_menu', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('city_id')->constrained()->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

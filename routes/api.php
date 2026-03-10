@@ -90,12 +90,22 @@ Route::prefix('v2')->group(function () {
         'getMattersByCategory',
     ]);
 
-
-
     Route::get('featueredAds/{category}/profiles/{gender?}', [
         AdController::class,
         'getfeatueredAdsByCategory',
     ]);
+});
+
+Route::prefix('matters')->group(function () {
+
+    // For Matters
+    Route::get('all-matters', [MatterController::class, 'getMatters']);
+
+    Route::get('{menuId}/{cityId}/all-matters', [
+        MatterController::class,
+        'getMattersByMenuAndCity',
+    ]);
+
 });
 
 // --- ADMIN ROUTES ---
@@ -155,4 +165,3 @@ Route::middleware(['auth:sanctum', 'role:admin,staff'])
             'verifyUser',
         ]);
     });
-         

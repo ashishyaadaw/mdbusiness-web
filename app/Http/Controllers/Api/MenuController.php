@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuResource;
+use App\Models\City;
+use App\Models\Flag;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -73,5 +75,24 @@ class MenuController extends Controller
         $menu->delete();
 
         return response()->json(['message' => 'Menu deleted successfully'], 200);
+    }
+
+    // 1. Get menus for a specific city
+    public function getMenus(City $city)
+    {
+      
+    
+        // 2. Check if the city is active
+        if (! $city->is_active) {
+            return response()->json(['message' => 'This specific city is inactive.'], 403);
+        }
+
+        // 3. Return the menus with eager loading (to prevent N+1 query issues)
+        return MenuResource::collection($city->menus()->get());
+    }
+
+    public function getMenuCategories(City $city)
+    {
+        return MenuResource::collection($city->menus);
     }
 }

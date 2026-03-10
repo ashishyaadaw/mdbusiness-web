@@ -609,7 +609,6 @@ class AdController extends Controller
         if (($category && strtolower($category) !== 'all') || ! empty($menuId)) {
             $query->whereHas('adsDetails', function ($q) use (
                 $category,
-                $menuId,
             ) {
                 if ($category && strtolower($category) !== 'all') {
                     $q->where('category', $category);

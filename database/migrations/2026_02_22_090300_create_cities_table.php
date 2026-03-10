@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menu_categories', function (Blueprint $table) {
+        Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->boolean('is_active')->default(true);
+            $table->string('state_code', 5)->nullable();
+            $table->string('country_code', 3)->default('US');
             $table->timestamps();
         });
     }

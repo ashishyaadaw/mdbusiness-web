@@ -83,21 +83,20 @@ class CityController extends Controller
         return response()->json(['message' => 'City deleted'], 200);
     }
 
+    // 1. Get menus for a specific city
+    public function getMenus(City $city)
+    {
+        return MenuResource::collection($city->menus);
+    }
 
-// 1. Get menus for a specific city
-public function getMenus(City $city)
-{
-    return MenuResource::collection($city->menus);
-}
+    // 2. Link a menu to a city (Pivot Assignment)
+    public function attachMenu(Request $request, City $city)
+    {
+        $request->validate(['menu_id' => 'required|exists:menus,id']);
 
-// 2. Link a menu to a city (Pivot Assignment)
-public function attachMenu(Request $request, City $city)
-{
-    $request->validate(['menu_id' => 'required|exists:menus,id']);
-    
-    // syncWithoutDetaching prevents duplicate entries
-    $city->menus()->syncWithoutDetaching([$request->menu_id]);
+        // syncWithoutDetaching prevents duplicate entries
+        $city->menus()->syncWithoutDetaching([$request->menu_id]);
 
-    return response()->json(['message' => 'Menu linked to city successfully']);
-}
+        return response()->json(['message' => 'Menu linked to city successfully']);
+    }
 }

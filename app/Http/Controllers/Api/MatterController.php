@@ -596,7 +596,7 @@ class MatterController extends Controller
         );
     }
 
-    public function getMattersByCategory(Request $request, $category, $menuId = '')
+    public function getMattersByMenuAndCity(Request $request, $menuId, $cityId)
     {
         // 1. Start the query with eager loading
         $query = Matter::with([
@@ -605,22 +605,22 @@ class MatterController extends Controller
         ])->latest();
 
         // 2. Filter by Category and Screen ID
-        if (($category && strtolower($category) !== 'all') || ! empty($menuId)) {
+        if (($menuId && strtolower($menuId) !== 'all') || ! empty($cityId)) {
             $query->whereHas('matterDetails', function ($q) use (
-                $category,
-                $menuId,
+                $menuId
+
             ) {
-                if ($category && strtolower($category) !== 'all') {
-                    $q->where('category', $category);
+                if ($menuId && strtolower($menuId) !== 'all') {
+                    $q->where('menu_id', $menuId);
                 }
-                // if (! empty($menuId)) {
-                //     $q->where('matter_id', $menuId);
+                // if (! empty($cityId)) {
+                //     $q->where('city_id', $cityId);
                 // }
             });
         }
 
         // 3. Only show active ads
-        $query->whereHas('matter  Controller', function ($q) {
+        $query->whereHas('matterController', function ($q) {
             $q->where('status', 'active');
         });
 
@@ -804,7 +804,7 @@ class MatterController extends Controller
 
         return response()->json(['status' => true, 'data' => $ads], 200);
     }
-    
+
     // all the ads created by Users
 
     // public function myMatters(Request $request)

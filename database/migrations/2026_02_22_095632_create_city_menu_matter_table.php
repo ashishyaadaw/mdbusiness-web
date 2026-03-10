@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cities', function (Blueprint $table) {
+        Schema::create('city_menu_matter', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('state_code', 5)->nullable();
-            $table->string('country_code', 3)->default('US');
-            $table->boolean('is_active')->default(true);
+            $table->foreignId('city_id')->constrained('cities')->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
+            $table->foreignId('matter_id')->constrained('matters')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cities');
+        Schema::dropIfExists('city_menu_matter');
     }
 };

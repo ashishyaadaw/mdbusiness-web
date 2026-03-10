@@ -13,8 +13,9 @@ class Menu extends Model
     {
         return $this->belongsTo(City::class);
     }
+
     public function cities()
-{
-    return $this->belongsToMany(City::class);
-}
+    {
+        return $this->belongsToMany(City::class);
+    }
 }
