@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MenuResource extends JsonResource
+class MatterResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,7 @@ class MenuResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'menu_category_id' => $this->menu_category_id ,
-            'icon' => $this->icon,
-            'status' => $this->status ?? 'active',
+            'payload' => $this->payload,
             'type' => $this->type,
             // 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];

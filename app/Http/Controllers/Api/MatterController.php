@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\MatrimonialProfileStatusChange;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MatterResource;
+use App\Models\City;
 use App\Models\Matters\Matter;
+use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -596,51 +599,39 @@ class MatterController extends Controller
         );
     }
 
-    public function getMattersByMenuAndCity(Request $request, $menuId, $cityId)
+    public function getMattersByMenuAndCity(Request $request, Menu $menu, City $city)
     {
-        // 1. Start the query with eager loading
-        $query = Matter::with([
-            'matterDetails',
-            'matterController',
-        ])->latest();
-
-        // 2. Filter by Category and Screen ID
-        if (($menuId && strtolower($menuId) !== 'all') || ! empty($cityId)) {
-            $query->whereHas('matterDetails', function ($q) use (
-                $menuId
-
-            ) {
-                if ($menuId && strtolower($menuId) !== 'all') {
-                    $q->where('menu_id', $menuId);
-                }
-                // if (! empty($cityId)) {
-                //     $q->where('city_id', $cityId);
-                // }
-            });
+        // 1. Check if the city is active (reuse your existing logic)
+        if (! $city->isActiveInFlags()) {
+            return response()->json(['message' => 'This specific city is inactive.'], 403);
         }
 
-        // 3. Only show active ads
-        $query->whereHas('matterController', function ($q) {
-            $q->where('status', 'active');
-        });
+        // 2. Build the query
+        $query = Matter::with(['matterDetails', 'matterController'])
+            // Filter via the new pivot table 'city_menu_matter'
+            ->whereHas('cityMenuMatters', function ($q) use ($menu, $city) {
+                $q->where('menu_id', $menu->id)
+                    ->where('city_id', $city->id);
+            })
+            // Only show active controllers
+            ->whereHas('matterController', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->latest();
 
-        // 4. Use paginate instead of get()
-        // Default to 10 items per page to match your Flutter logic
+        // 3. Handle Pagination
         $perPage = $request->input('per_page', 10);
-        $ads = $query->paginate($perPage);
+        $matters = $query->paginate($perPage);
 
-        // 5. Return paginated response
-        return response()->json(
-            [
-                'status' => true,
-                'count' => $ads->count(), // Items in current page
-                'total' => $ads->total(), // Total items in database
-                'current_page' => $ads->currentPage(),
-                'last_page' => $ads->lastPage(),
-                'data' => $ads->items(), // The actual list of ads
-            ],
-            200,
-        );
+        // 4. Return standard response
+        return response()->json([
+            'status' => true,
+            'count' => $matters->count(),
+            'total' => $matters->total(),
+            'current_page' => $matters->currentPage(),
+            'last_page' => $matters->lastPage(),
+            'data' => MatterResource::collection($matters->items()),
+        ], 200);
     }
 
     public function getfeatueredMattersByCategory(
@@ -802,7 +793,7 @@ class MatterController extends Controller
         // Execute query
         $ads = $query->get();
 
-        return response()->json(['status' => true, 'data' => $ads], 200);
+        return MatterResource::collection($ads);
     }
 
     // all the ads created by Users

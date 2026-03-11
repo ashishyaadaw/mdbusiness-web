@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\Admin\ReligionDataController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\MatterController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PhoneVerificationController;
 use App\Http\Controllers\Api\PromoAdsController;
@@ -82,30 +81,10 @@ Route::prefix('v2')->group(function () {
         'getAdsByCategory',
     ]);
 
-    // For Matters
-    Route::get('matters', [MatterController::class, 'getMatters']);
-
-    Route::get('matters/{category}/profiles/{menuId?}', [
-        MatterController::class,
-        'getMattersByCategory',
-    ]);
-
     Route::get('featueredAds/{category}/profiles/{gender?}', [
         AdController::class,
         'getfeatueredAdsByCategory',
     ]);
-});
-
-Route::prefix('matters')->group(function () {
-
-    // For Matters
-    Route::get('all-matters', [MatterController::class, 'getMatters']);
-
-    Route::get('{menuId}/{cityId}/all-matters', [
-        MatterController::class,
-        'getMattersByMenuAndCity',
-    ]);
-
 });
 
 // --- ADMIN ROUTES ---

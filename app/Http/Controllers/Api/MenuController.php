@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MenuCategoryResource;
 use App\Http\Resources\MenuResource;
 use App\Models\City;
-use App\Models\Flag;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -80,19 +80,33 @@ class MenuController extends Controller
     // 1. Get menus for a specific city
     public function getMenus(City $city)
     {
-      
-    
         // 2. Check if the city is active
-        if (! $city->is_active) {
-            return response()->json(['message' => 'This specific city is inactive.'], 403);
+        if (! $city->isActiveInFlags()) {
+            return response()->json([
+                'message' => 'This specific city is inactive.',
+                'error_code' => 'CITY_INACTIVE',
+            ], 403);
         }
 
-        // 3. Return the menus with eager loading (to prevent N+1 query issues)
-        return MenuResource::collection($city->menus()->get());
+        // 3. Eager load menus and return as a collection
+        // Using load() on the existing model instance is cleaner than $city->menus()->get()
+        $city->load('menus');
+
+        return MenuResource::collection($city->menus);
     }
 
+    // 1. Get menus for a specific city
     public function getMenuCategories(City $city)
     {
-        return MenuResource::collection($city->menus);
+        // 2. Check if the city is active
+        if (! $city->isActiveInFlags()) {
+            return response()->json([
+                'message' => 'This specific city is inactive.',
+                'error_code' => 'CITY_INACTIVE',
+            ], 403);
+        }
+        $city->load('menuCategories');
+
+        return MenuCategoryResource::collection($city->menuCategories);
     }
 }
