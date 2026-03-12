@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Matters\Matter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -67,5 +68,10 @@ class User extends Authenticatable
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    public function matters()
+    {
+        return $this->hasMany(Matter::class, 'user_id');
     }
 }

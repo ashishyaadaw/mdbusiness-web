@@ -11,6 +11,7 @@ use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -794,6 +795,153 @@ class MatterController extends Controller
         $ads = $query->get();
 
         return MatterResource::collection($ads);
+    }
+
+    public function create(Request $request)
+    {
+        $user = Auth::user();
+
+        // 1. Improved Validation
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'type' => 'required|in:image,text',
+            'payload' => 'required|string',
+            'name' => 'required|string',
+            'is_premium' => 'nullable|boolean',
+            'valid_until' => 'nullable|date|after:today',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                ['status' => false, 'errors' => $validator->errors()],
+                422,
+            );
+        }
+
+        try {
+            // 2. Use a Transaction to ensure all or nothing is saved
+            $matter = DB::transaction(function () use ($request, $user) {
+                $matter = Matter::create([
+                    'user_id' => $user->id,
+                    'title' => $request->title,
+                    'type' => $request->type,
+                    'payload' => $request->payload,
+                ]);
+
+                $matter->matterDetails()->create([
+                    'phone' => $request->phone ?? null,
+                    'website' => $request->website ?? null,
+                ]);
+
+                $matter->matterController()->create([
+                    'is_premium' => $request->is_premium ?? false,
+                    'valid_until' => $request->valid_until ?? Date::now()->addDays(30), // Default to 30 days if not provided
+                    'status' => 'pending', // Default status
+                ]);
+
+                return $matter;
+            });
+
+            // 3. Load relationships and return
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Matter created successfully',
+                    'data' => $matter->load(
+                        'matterCreator',
+                        'matterDetails',
+                        'matterController',
+                    ),
+                ],
+                201,
+            );
+        } catch (\Exception $e) {
+            // Handle database errors
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Failed to create matter. Please try again.',
+                    'error' => $e->getMessage(), // Remove this in production
+                ],
+                500,
+            );
+        }
+    }
+
+    public function createWithCityAndMenu(Request $request, City $city, Menu $menu)
+    {
+        $user = Auth::user();
+
+        // 1. Improved Validation
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'type' => 'required|in:image,text',
+            'payload' => 'required|string',
+            'name' => 'required|string',
+            'is_premium' => 'nullable|boolean',
+            'valid_until' => 'nullable|date|after:today',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                ['status' => false, 'errors' => $validator->errors()],
+                422,
+            );
+        }
+
+        try {
+            // 2. Use a Transaction to ensure all or nothing is saved
+            $matter = DB::transaction(function () use ($request, $user, $menu, $city) {
+                $matter = Matter::create([
+                    'user_id' => $user->id,
+                    'title' => $request->title,
+                    'type' => $request->type,
+                    'payload' => $request->payload,
+                ]);
+
+                $matter->matterDetails()->create([
+                    'phone' => $request->phone ?? null,
+                    'website' => $request->website ?? null,
+                ]);
+
+                $matter->matterController()->create([
+                    'is_premium' => $request->is_premium ?? false,
+                    'valid_until' => $request->valid_until ?? Date::now()->addDays(30), // Default to 30 days if not provided
+                    'status' => 'pending', // Default status
+                ]);
+
+                $matter->cityMenuMatters()->create([
+                    'menu_id' => $menu->id,
+                    'city_id' => $city->id,
+                ]);
+
+                return $matter;
+            });
+
+            // 3. Load relationships and return
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Matter created successfully',
+                    'data' => $matter->load(
+                        'matterCreator',
+                        'matterDetails',
+                        'matterController',
+                    ),
+                ],
+                201,
+            );
+        } catch (\Exception $e) {
+            // Handle database errors
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Failed to create matter. Please try again.',
+                    'error' => $e->getMessage(), // Remove this in production
+                ],
+                500,
+            );
+        }
     }
 
     // all the ads created by Users

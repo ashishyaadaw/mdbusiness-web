@@ -9,3 +9,5 @@ Route::apiResource('menus', MenuController::class);
 Route::get('menus/{city}/all-menus', [MenuController::class, 'getMenus']);
 
 Route::get('menus/{city}/all-menu-categories', [MenuController::class, 'getMenuCategories']);
+
+Route::post('menus/category/{city}/create', [MenuController::class, 'addMenuCategory']);

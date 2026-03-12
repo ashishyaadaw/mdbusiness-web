@@ -11,16 +11,16 @@ class MatterDetail extends Model
 
     protected $fillable = [
         'matter_id',
-        'category',
-        'gender',
+        'phone',
+        'website',
     ];
 
-    protected $hidden = [
-        'id',
-        'matter_id',
-        'created_at',
-        'updated_at',
-    ];
+    // protected $hidden = [
+    //     'id',
+    //     'matter_id',
+    //     'created_at',
+    //     'updated_at',
+    // ];
 
     /**
      * Relationship to the parent Matter.
@@ -34,11 +34,11 @@ class MatterDetail extends Model
      * Scope to filter ads matching a specific user profile.
      * * Usage: AdDetail::matchesProfile($category, $religion, $caste)->get();
      */
-    public function scopeMatchesProfile($query, $category, $religion, $caste)
+    public function scopeMatchesProfile($query, $phone, $religion, $caste)
     {
-        return $query->where(function ($q) use ($category) {
-            $q->where('category', $category)
-                ->orWhereNull('category'); // Match specific OR All
+        return $query->where(function ($q) use ($phone) {
+            $q->where('phone', $phone)
+                ->orWhereNull('phone'); // Match specific OR All
         })
             ->where(function ($q) use ($religion) {
                 $q->where('religion', $religion)

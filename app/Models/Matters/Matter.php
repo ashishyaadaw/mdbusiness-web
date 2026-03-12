@@ -3,6 +3,7 @@
 namespace App\Models\Matters;
 
 use App\Models\CityMenuMatter;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,9 +11,9 @@ class Matter extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'menu_id', 'title', 'type', 'payload'];
+    protected $fillable = ['user_id',  'title', 'type', 'payload'];
 
-    protected $hidden = ['created_at', 'updated_at'];
+    // protected $hidden = ['created_at', 'updated_at'];
 
     // Accessor: Automatically generates the full URL for the image
     public function getPayloadAttribute($value)
@@ -23,6 +24,11 @@ class Matter extends Model
         }
 
         return $value;
+    }
+
+    public function matterCreator()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function matterDetails()

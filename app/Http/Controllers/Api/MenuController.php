@@ -7,7 +7,10 @@ use App\Http\Resources\MenuCategoryResource;
 use App\Http\Resources\MenuResource;
 use App\Models\City;
 use App\Models\Menu;
+use App\Models\MenuCategories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MenuController extends Controller
@@ -26,7 +29,7 @@ class MenuController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'icon' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
+            'menu_category_id' => 'required|exists:menu_categories,id',
             'type' => 'required|in:ad,actual',
         ]);
 
@@ -108,5 +111,62 @@ class MenuController extends Controller
         $city->load('menuCategories');
 
         return MenuCategoryResource::collection($city->menuCategories);
+    }
+
+    public function addMenuCategory(City $city, Request $request)
+    {
+        //  $user = Auth::user();
+
+        // 1. Improved Validation
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'icon' => 'required|string|max:255',
+            'desc' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                ['status' => false, 'errors' => $validator->errors()],
+                422,
+            );
+        }
+
+        try {
+            // 2. Use a Transaction to ensure all or nothing is saved
+            $menuCategory = DB::transaction(function () use ($request, $city) {
+                $menuCategory = MenuCategories::create([
+                    'name' => $request->title,
+                    'icon' => $request->icon,
+                    'desc' => $request->description,
+                ]);
+                
+                $menuCategory->cities()->attach($city->id); // Attach the city to the menu category
+
+                return $menuCategory;
+            });
+
+            // 3. Load relationships and return
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Menu category created successfully',
+                    'data' => $menuCategory->load(
+                        'menus',
+                        'cities',
+                    ),
+                ],
+                201,
+            );
+        } catch (\Exception $e) {
+            // Handle database errors
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Failed to create menu category. Please try again.',
+                    'error' => $e->getMessage(), // Remove this in production
+                ],
+                500,
+            );
+        }
     }
 }

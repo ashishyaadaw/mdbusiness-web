@@ -471,18 +471,18 @@ class AuthController extends Controller
         $user->load('appUserProfile');
 
         // 2. Cooldown Logic: Use a more readable check
-        $lastUpdate = Carbon::parse($user->updated_at);
-        $expiryTime = $lastUpdate->addSeconds(self::OTP_COOLDOWN_SECONDS);
+        // $lastUpdate = Carbon::parse($user->updated_at);
+        // $expiryTime = $lastUpdate->addSeconds(self::OTP_COOLDOWN_SECONDS);
 
-        if ($expiryTime->isFuture()) {
-            return response()->json(
-                [
-                    'message' => 'Please wait before requesting a new OTP.',
-                    'resend_in' => now()->diffInSeconds($expiryTime),
-                ],
-                429,
-            );
-        }
+        // if ($expiryTime->isFuture()) {
+        //     return response()->json(
+        //         [
+        //             'message' => 'Please wait before requesting a new OTP.',
+        //             'resend_in' => now()->diffInSeconds($expiryTime),
+        //         ],
+        //         429,
+        //     );
+        // }
 
         // 3. Generate and Store
         // NOTE: Avoid using 'remember_token'. Better to use a dedicated 'otp' column

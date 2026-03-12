@@ -30,6 +30,10 @@ return new class extends Migration
                 ->unique() // Enforces One-to-One relationship
                 ->constrained('matters') // Assumes the parent table is named 'matters'
                 ->onDelete('cascade');
+
+            $table->string('phone')->nullable(); // Stores the text content OR the image path
+            $table->string('website')->nullable(); // Stores the text content OR the image path
+            $table->timestamps();
         });
 
         Schema::create('matter_controllers', function (Blueprint $table) {
