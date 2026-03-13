@@ -634,6 +634,83 @@ class MatterController extends Controller
             'data' => MatterResource::collection($matters->items()),
         ], 200);
     }
+    public function getMattersByUser(Request $request, User $user)
+    {
+        // 1. Check if the user is active (reuse your existing logic)
+        // if (! $user->isActiveInFlags()) {
+        //     return response()->json(['message' => 'This specific user is inactive.'], 403);
+        // }
+
+        // 2. Build the query
+        $query = Matter::with(['matterDetails', 'matterController'])
+           ->where('user_id', $user->id)
+            // Only show active controllers
+            // ->whereHas('matterController', function ($q) {
+            //     $q->where('status', 'active');
+            // })
+            ->latest();
+
+        // 3. Handle Pagination
+        $perPage = $request->input('per_page', 10);
+        $matters = $query->paginate($perPage);
+
+        // 4. Return standard response
+        return response()->json([
+            'status' => true,
+            'count' => $matters->count(),
+            'total' => $matters->total(),
+            'current_page' => $matters->currentPage(),
+            'last_page' => $matters->lastPage(),
+            'data' => MatterResource::collection($matters->items()),
+        ], 200);
+    }
+    public function getMyMatters(Request $request, )
+    {
+        // 1. Check if the user is active (reuse your existing logic)
+        // if (! $user->isActiveInFlags()) {
+        //     return response()->json(['message' => 'This specific user is inactive.'], 403);
+        // }
+
+        $user = Auth::user();
+
+        // 2. Build the query
+        $query = Matter::with(['matterDetails', 'matterController'])
+           ->where('user_id', $user->id)
+            // Only show active controllers
+            // ->whereHas('matterController', function ($q) {
+            //     $q->where('status', 'active');
+            // })
+            ->latest();
+
+        // 3. Handle Pagination
+        $perPage = $request->input('per_page', 10);
+        $matters = $query->paginate($perPage);
+
+        // 4. Return standard response
+        return response()->json([
+            'status' => true,
+            'count' => $matters->count(),
+            'total' => $matters->total(),
+            'current_page' => $matters->currentPage(),
+            'last_page' => $matters->lastPage(),
+            'data' => MatterResource::collection($matters->items()),
+        ], 200);
+    }
+
+public function destroyMyMatter(Matter $matter)
+{
+    // Ensure the matter belongs to the authenticated user
+    if ($matter->user_id !== Auth::id()) {
+        return response()->json(['status' => false, 'message' => 'Unauthorized.'], 403);
+    }
+
+    $matter->delete();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Matter deleted successfully.'
+    ], 200);
+}
 
     public function getfeatueredMattersByCategory(
         Request $request,

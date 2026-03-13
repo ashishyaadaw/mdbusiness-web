@@ -17,4 +17,18 @@ Route::prefix('matters')->group(function () {
         'getMattersByMenuAndCity',
     ]);
 
+    Route::get('{user}/all-matters', [
+        MatterController::class,
+        'getMattersByUser',
+    ]);
+    Route::get('/my-matters', [
+        MatterController::class,
+        'getMyMatters',
+    ])->middleware('auth:sanctum');
+
+    Route::delete('/{matter}', [
+        MatterController::class,
+        'destroyMyMatter',
+    ])->middleware('auth:sanctum');
+
 });
