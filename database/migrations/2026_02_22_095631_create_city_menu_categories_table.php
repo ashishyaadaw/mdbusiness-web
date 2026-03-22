@@ -11,10 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
+
+
+        // Cities and Menu Category Relationship Table for finding Menu Category With 
+        // CityId >> MenuCategoryId 
+        // MenuCategoryId >> CityId
+        
         Schema::create('city_menu_categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('city_id')->constrained('cities')->onDelete('cascade');
             $table->foreignId('menu_categories_id')->constrained('menu_categories')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        // Cities and Menus Relationship Table for Menus with Particular 
+        // CityId >> MenuId
+        // MenuId >> CityId
+
+         Schema::create('city_menus', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('city_id')->constrained()->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,5 +42,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('city_menu_categories');
+        Schema::dropIfExists('city_menus');
     }
 };

@@ -105,7 +105,7 @@ class AuthController extends Controller
             $userData['full_name'] = $user->appUserProfile->full_name ?? null;
 
             // Clean up the relationship key
-            unset($userData['app_user_profile']);
+            unset($userData['user_profiles']);
 
             return $userData;
         });

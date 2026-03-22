@@ -13,10 +13,10 @@ class MatterResource extends JsonResource
      * @return array<string, mixed>
      */
     public function toArray($request): array
-    {   
+    {
         // In your model, status isn't in $fillable, but if it exists in DB:
         // Using a default of 'Pending' if status is null
-        $statusText = match($this->status) {
+        $statusText = match ($this->status) {
             1 => 'Active',
             0 => 'Inactive',
             default => 'Pending Review',
@@ -29,7 +29,7 @@ class MatterResource extends JsonResource
             'type' => $this->type,
             'payload' => $this->payload, // Accessor in Model handles asset() URL
             'status' => $statusText,
-            
+
             // Financial Details (from Flutter implementation)
             'pricing' => [
                 'base_amount' => $this->base_amount,
@@ -38,8 +38,8 @@ class MatterResource extends JsonResource
             ],
 
             'controller' => $this->whenLoaded('matterController'),
-            
+
             'created_at' => $this->created_at ? $this->created_at->format('d M Y') : null,
         ];
     }
-}   
+}

@@ -139,7 +139,7 @@ class MenuController extends Controller
                     'icon' => $request->icon,
                     'desc' => $request->description,
                 ]);
-                
+
                 $menuCategory->cities()->attach($city->id); // Attach the city to the menu category
 
                 return $menuCategory;

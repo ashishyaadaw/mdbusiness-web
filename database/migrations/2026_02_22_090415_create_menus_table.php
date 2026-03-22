@@ -11,6 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // For the Different Types of Menu Category
+        Schema::create('menu_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('icon')->nullable();
+            $table->string('desc')->nullable();
+            $table->timestamps();
+        });
+
+        // For the Menus Table
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_category_id')->constrained('menu_categories')->onDelete('cascade');
@@ -26,6 +36,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('menu_categories');
         Schema::dropIfExists('menus');
     }
 };

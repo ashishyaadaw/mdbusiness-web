@@ -15,10 +15,9 @@ class MenuCategories extends Model
         return $this->hasMany(Menu::class, 'menu_category_id');
     }
 
-
     public function cities()
     {
         return $this->belongsToMany(City::class, 'city_menu_categories')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 }

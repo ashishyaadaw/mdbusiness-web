@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\AdController;
-use App\Http\Controllers\Api\Admin\ReligionDataController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\NotificationController;
@@ -60,15 +59,7 @@ Route::post('/notify', [NotificationController::class, 'notify']);
 Route::middleware(['auth:sanctum', 'role:admin'])
     ->prefix('admin')
     ->group(function () {
-        // Religion Management (Moved from public v1)
-        Route::post('/religions', [
-            ReligionDataController::class,
-            'storeReligion',
-        ]);
-        Route::post('/religions/{religion}/castes', [
-            ReligionDataController::class,
-            'storeCaste',
-        ]);
+        
 
         // Add other admin-only tasks
         Route::get('/dashboard-stats', [AdminController::class, 'getStats']);

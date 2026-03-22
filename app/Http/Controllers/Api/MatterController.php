@@ -634,6 +634,7 @@ class MatterController extends Controller
             'data' => MatterResource::collection($matters->items()),
         ], 200);
     }
+
     public function getMattersByUser(Request $request, User $user)
     {
         // 1. Check if the user is active (reuse your existing logic)
@@ -643,7 +644,7 @@ class MatterController extends Controller
 
         // 2. Build the query
         $query = Matter::with(['matterDetails', 'matterController'])
-           ->where('user_id', $user->id)
+            ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {
             //     $q->where('status', 'active');
@@ -664,7 +665,8 @@ class MatterController extends Controller
             'data' => MatterResource::collection($matters->items()),
         ], 200);
     }
-    public function getMyMatters(Request $request, )
+
+    public function getMyMatters(Request $request)
     {
         // 1. Check if the user is active (reuse your existing logic)
         // if (! $user->isActiveInFlags()) {
@@ -675,7 +677,7 @@ class MatterController extends Controller
 
         // 2. Build the query
         $query = Matter::with(['matterDetails', 'matterController'])
-           ->where('user_id', $user->id)
+            ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {
             //     $q->where('status', 'active');
@@ -697,20 +699,20 @@ class MatterController extends Controller
         ], 200);
     }
 
-public function destroyMyMatter(Matter $matter)
-{
-    // Ensure the matter belongs to the authenticated user
-    if ($matter->user_id !== Auth::id()) {
-        return response()->json(['status' => false, 'message' => 'Unauthorized.'], 403);
+    public function destroyMyMatter(Matter $matter)
+    {
+        // Ensure the matter belongs to the authenticated user
+        if ($matter->user_id !== Auth::id()) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        $matter->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Matter deleted successfully.',
+        ], 200);
     }
-
-    $matter->delete();
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Matter deleted successfully.'
-    ], 200);
-}
 
     public function getfeatueredMattersByCategory(
         Request $request,

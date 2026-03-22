@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Web\AccountDeletionController;
 use App\Http\Controllers\Web\AdvertiseController;
 use App\Http\Controllers\Web\PageController;
