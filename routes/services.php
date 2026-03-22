@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\Web\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('services')->name('services.')->group(function () {

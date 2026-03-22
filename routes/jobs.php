@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\JobController;
+use App\Http\Controllers\Web\JobController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('jobs')->name('jobs.')->group(function () {

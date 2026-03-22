@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\AccountDeletionController;
-use App\Http\Controllers\AdvertiseController;
-use App\Http\Controllers\PageController;
+
+use App\Http\Controllers\Web\AccountDeletionController;
+use App\Http\Controllers\Web\AdvertiseController;
+use App\Http\Controllers\Web\PageController;
 use Illuminate\Support\Facades\Route;
 
 // Main Landing

@@ -53,39 +53,8 @@ Route::post('/otp/verify', [
 // Notify App User
 Route::post('/notify', [NotificationController::class, 'notify']);
 
-// Prefix routes with 'v1' for good versioning practice
-Route::prefix('v1')->group(function () {
-    // Get all religions
-    Route::get('/religions', [ReligionDataController::class, 'allReligions']);
-    Route::get('/religions/{religion}/castes', [
-        ReligionDataController::class,
-        'castesForReligion',
-    ]);
 
-    // ADMIN ONLY ROUTES
-    Route::post('/religions', [ReligionDataController::class, 'storeReligion']);
-    Route::post('/religions/{religion}/castes', [
-        ReligionDataController::class,
-        'storeCaste',
-    ]);
-});
 
-// Prefix routes with 'v1' for good versioning practice
-Route::prefix('v2')->group(function () {
-    // Route::apiResource('ads', AdController::class);
-    // Route::post('ads', [AdController::class, 'createNewAds']);
-    Route::get('ads', [AdController::class, 'getAds']);
-
-    Route::get('ads/{category}/profiles/{menuId?}', [
-        AdController::class,
-        'getAdsByCategory',
-    ]);
-
-    Route::get('featueredAds/{category}/profiles/{gender?}', [
-        AdController::class,
-        'getfeatueredAdsByCategory',
-    ]);
-});
 
 // --- ADMIN ROUTES ---
 Route::middleware(['auth:sanctum', 'role:admin'])
@@ -132,6 +101,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])
         Route::apiResource('ads', PromoAdsController::class);
     });
 
+    
 Route::get('/promoAds/{ad_id}', [PromoAdsController::class, 'show']);
 // --- STAFF ROUTES ---
 Route::middleware(['auth:sanctum', 'role:admin,staff'])
