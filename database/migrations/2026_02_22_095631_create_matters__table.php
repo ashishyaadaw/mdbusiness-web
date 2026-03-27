@@ -36,7 +36,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('matter_controllers', function (Blueprint $table) {
+        Schema::create('matter_controller', function (Blueprint $table) {
             $table->id();
             $table->foreignId('matter_id')
                 ->unique()
@@ -60,7 +60,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('matter_controllers');
+        Schema::dropIfExists('matter_controller');
         Schema::dropIfExists('matter_details');
         Schema::dropIfExists('matters');
     }

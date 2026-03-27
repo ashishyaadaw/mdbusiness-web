@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MatterDetail extends Model
 {
     use HasFactory;
+    protected $table = "matter_detail";
 
     protected $fillable = [
         'matter_id',

@@ -43,7 +43,7 @@ class City extends Model
     // Fixed: Your previous method pointed to Menu::class instead of MenuCategory::class
     public function menuCategories()
     {
-        return $this->belongsToMany(MenuCategories::class, 'city_menu_categories');
+        return $this->belongsToMany(MenuCategories::class, 'city_menu_category');
     }
 
     // Rename this method so it doesn't conflict with the attribute

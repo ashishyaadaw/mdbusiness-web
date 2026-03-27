@@ -16,6 +16,8 @@ class MenuCategoryResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->name,
+            'description' => $this->desc,
+            'icon' => $this->icon,
         ];
     }
 }

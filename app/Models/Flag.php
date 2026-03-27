@@ -24,7 +24,7 @@ class Flag extends Model
     protected $fillable = [
         'city',
         'menu',
-        'menu_categories',
+        'menu_category',
         'city_menu',
         'city_menu_matter',
         'matter',
@@ -39,7 +39,7 @@ class Flag extends Model
     protected $casts = [
         'city' => 'boolean',
         'menu' => 'boolean',
-        'menu_categories' => 'boolean',
+        'menu_category' => 'boolean',
         'city_menu' => 'boolean',
         'city_menu_matter' => 'boolean',
         'matter' => 'boolean',

@@ -29,7 +29,7 @@ class MenuController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'icon' => 'nullable|string',
-            'menu_category_id' => 'required|exists:menu_categories,id',
+            'menu_category_id' => 'required|exists:menu_category,id',
             'type' => 'required|in:ad,actual',
         ]);
 

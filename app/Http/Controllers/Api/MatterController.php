@@ -21,7 +21,7 @@ class MatterController extends Controller
     public function index()
     {
         // Move with() before get()
-        $ads = Matter::with('matterDetails', 'matterController')
+        $ads = Matter::with('matterDetail', 'matterController')
             ->latest()
             ->get();
 
@@ -608,11 +608,11 @@ class MatterController extends Controller
         }
 
         // 2. Build the query
-        $query = Matter::with(['matterDetails', 'matterController'])
+        $query = Matter::with(['matterDetail', 'matterController'])
             // Filter via the new pivot table 'city_menu_matter'
-            ->whereHas('cityMenuMatters', function ($q) use ($menu, $city) {
-                $q->where('menu_id', $menu->id)
-                    ->where('city_id', $city->id);
+            ->whereHas('cityMenuMatter', function ($q) use ($menu, $city) {
+                $q->where('city_menu_id', $menu->id)
+                    ->where('matter_id', $city->id);
             })
             // Only show active controllers
             ->whereHas('matterController', function ($q) {
@@ -643,7 +643,7 @@ class MatterController extends Controller
         // }
 
         // 2. Build the query
-        $query = Matter::with(['matterDetails', 'matterController'])
+        $query = Matter::with(['matterDetail', 'matterController'])
             ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {
@@ -676,7 +676,7 @@ class MatterController extends Controller
         $user = Auth::user();
 
         // 2. Build the query
-        $query = Matter::with(['matterDetails', 'matterController'])
+        $query = Matter::with(['matterDetail', 'matterController'])
             ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {
@@ -862,7 +862,7 @@ class MatterController extends Controller
     {
         // Start the query builder
         $query = Matter::with([
-            'matterDetails',
+            'matterDetail',
             'matterController',
         ])->latest();
 
@@ -907,7 +907,7 @@ class MatterController extends Controller
                     'payload' => $request->payload,
                 ]);
 
-                $matter->matterDetails()->create([
+                $matter->matterDetail()->create([
                     'phone' => $request->phone ?? null,
                     'website' => $request->website ?? null,
                 ]);
@@ -928,7 +928,7 @@ class MatterController extends Controller
                     'message' => 'Matter created successfully',
                     'data' => $matter->load(
                         'matterCreator',
-                        'matterDetails',
+                        'matterDetail',
                         'matterController',
                     ),
                 ],
@@ -978,7 +978,7 @@ class MatterController extends Controller
                     'payload' => $request->payload,
                 ]);
 
-                $matter->matterDetails()->create([
+                $matter->matterDetail()->create([
                     'phone' => $request->phone ?? null,
                     'website' => $request->website ?? null,
                 ]);
@@ -989,7 +989,7 @@ class MatterController extends Controller
                     'status' => 'pending', // Default status
                 ]);
 
-                $matter->cityMenuMatters()->create([
+                $matter->cityMenuMatter()->create([
                     'menu_id' => $menu->id,
                     'city_id' => $city->id,
                 ]);
@@ -1004,7 +1004,7 @@ class MatterController extends Controller
                     'message' => 'Matter created successfully',
                     'data' => $matter->load(
                         'matterCreator',
-                        'matterDetails',
+                        'matterDetail',
                         'matterController',
                     ),
                 ],

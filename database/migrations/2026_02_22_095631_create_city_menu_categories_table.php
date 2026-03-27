@@ -17,10 +17,10 @@ return new class extends Migration
         // CityId >> MenuCategoryId 
         // MenuCategoryId >> CityId
         
-        Schema::create('city_menu_categories', function (Blueprint $table) {
+        Schema::create('city_menu_category', function (Blueprint $table) {
             $table->id();
             $table->foreignId('city_id')->constrained('cities')->onDelete('cascade');
-            $table->foreignId('menu_categories_id')->constrained('menu_categories')->onDelete('cascade');
+            $table->foreignId('menu_categories_id')->constrained('menu_category')->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -41,7 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('city_menu_categories');
+        Schema::dropIfExists('city_menu_category');
         Schema::dropIfExists('city_menus');
     }
 };

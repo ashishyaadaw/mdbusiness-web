@@ -9,6 +9,8 @@ class MatterController extends Model
 {
     use HasFactory;
 
+    protected $table = "matter_controller";
+
     protected static function booted()
     {
         static::creating(function ($matterController) {

@@ -10,7 +10,7 @@ class MenuSeeder extends Seeder
 {
     public function run(): void
     {
-        $menu_categories = [
+        $menu_category = [
             ['name' => 'Dashboard'],
             ['name' => 'Teachers Jobs'],
             ['name' => 'Office Staffs Jobs'],
@@ -22,7 +22,7 @@ class MenuSeeder extends Seeder
             ['name' => 'Nurses Jobs'],
             ['name' => 'Caregivers Jobs'],
         ];
-        foreach ($menu_categories as $category) {
+        foreach ($menu_category as $category) {
             MenuCategory::updateOrCreate(
                 ['name' => $category['name']], // Prevents duplicate entries if you run it twice
                 $category

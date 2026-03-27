@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('city_menu_matters', function (Blueprint $table) {
+        Schema::create('city_menu_matter', function (Blueprint $table) {
             $table->id();
             $table->foreignId('city_menu_id')->constrained('city_menus')->onDelete('cascade');
             $table->foreignId('matter_id')->constrained('matters')->onDelete('cascade');
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('city_menu_matters');
+        Schema::dropIfExists('city_menu_matter');
     }
 };

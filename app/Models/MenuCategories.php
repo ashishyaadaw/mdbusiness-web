@@ -8,7 +8,7 @@ class MenuCategories extends Model
 {
     protected $fillable = ['name', 'icon', 'desc'];
 
-    protected $table = 'menu_categories';
+    protected $table = 'menu_category';
 
     public function menus()
     {
@@ -17,7 +17,7 @@ class MenuCategories extends Model
 
     public function cities()
     {
-        return $this->belongsToMany(City::class, 'city_menu_categories')
+        return $this->belongsToMany(City::class, 'city_menu_category')
             ->withTimestamps();
     }
 }

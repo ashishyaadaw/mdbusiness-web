@@ -31,7 +31,7 @@ class Matter extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function matterDetails()
+    public function matterDetail()
     {
         return $this->hasOne(MatterDetail::class);
     }
@@ -42,7 +42,7 @@ class Matter extends Model
     }
 
     // In App\Models\Matter.php
-    public function cityMenuMatters()
+    public function cityMenuMatter()
     {
         // This connects the Matter to the pivot table entries
         return $this->hasMany(CityMenuMatter::class, 'matter_id');

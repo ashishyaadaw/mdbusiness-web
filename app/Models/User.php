@@ -40,9 +40,9 @@ class User extends Authenticatable
         return $this->hasOne(UserServiceKey::class, 'user_id');
     }
 
-    public function appUserProfile()
+    public function userProfile()
     {
-        return $this->hasOne(AppUserProfile::class, 'user_id');
+        return $this->hasOne(UserProfile::class, 'user_id');
     }
     // In your User model
 
@@ -54,14 +54,14 @@ class User extends Authenticatable
 
     public function getFullName()
     {
-        // The '?->' operator safely returns null if appUserProfile doesn't exist
-        return $this->appUserProfile?->full_name;
+        // The '?->' operator safely returns null if userProfile doesn't exist
+        return $this->userProfile?->full_name;
     }
 
     public function getPreferredLang()
     {
-        // The '?->' operator safely returns null if appUserProfile doesn't exist
-        return $this->appUserProfile?->preferred_lang;
+        // The '?->' operator safely returns null if userProfile doesn't exist
+        return $this->userProfile?->preferred_lang;
     }
 
     // Transactions

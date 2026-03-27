@@ -21,7 +21,7 @@ class AuthService
                 'password' => Hash::make(Str::random(16)),
             ]);
 
-            $user->appUserProfile()->create([
+            $user->userProfile()->create([
                 'full_name' => $fullName ?? 'Member',
             ]);
         }
@@ -56,7 +56,7 @@ class AuthService
         // Update Profile
         if (! empty($data['full_name'])) {
             $user
-                ->appUserProfile()
+                ->userProfile()
                 ->update(['full_name' => $data['full_name']]);
         }
 

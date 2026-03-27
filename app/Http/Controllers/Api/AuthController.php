@@ -48,7 +48,7 @@ class AuthController extends Controller
         }
 
         // Ensure the profile relationship is loaded
-        $user->load('appUserProfile');
+        $user->load('userProfile');
 
         return response()->json(
             [
@@ -92,7 +92,7 @@ class AuthController extends Controller
         // 1. Use paginate(perPage) instead of get()
         // This automatically reads the ?page parameter from the request
         $perPage = 15;
-        $paginatedUsers = User::with('appUserProfile')
+        $paginatedUsers = User::with('userProfile')
             ->latest() // Optional: Show newest users first
             ->paginate($perPage);
 
@@ -102,7 +102,7 @@ class AuthController extends Controller
             $userData = $user->toArray();
 
             // Flatten the full_name to the top level
-            $userData['full_name'] = $user->appUserProfile->full_name ?? null;
+            $userData['full_name'] = $user->userProfile->full_name ?? null;
 
             // Clean up the relationship key
             unset($userData['user_profiles']);
@@ -153,7 +153,7 @@ class AuthController extends Controller
                     'password' => Hash::make(Str::random(16)),
                 ]);
 
-                $user->appUserProfile()->create([
+                $user->userProfile()->create([
                     'full_name' => $request->full_name ?? 'Member',
                 ]);
             }
@@ -192,7 +192,7 @@ class AuthController extends Controller
         // 3. Success: Clear OTP
 
         if ($request->filled('full_name')) {
-            $user->appUserProfile()->update([
+            $user->userProfile()->update([
                 'full_name' => $request->full_name ?? 'Member',
             ]);
         }
@@ -210,7 +210,7 @@ class AuthController extends Controller
 
         // 5. Generate Token
         $token = $user->createToken('auth_token')->plainTextToken;
-        $user->load('appUserProfile');
+        $user->load('userProfile');
 
         return response()->json([
             'message' => 'Login successful',
@@ -265,7 +265,7 @@ class AuthController extends Controller
         // 3. Success: Clear OTP
 
         if ($request->filled('full_name')) {
-            $user->appUserProfile()->update([
+            $user->userProfile()->update([
                 'full_name' => $request->full_name ?? 'Member',
             ]);
         }
@@ -283,7 +283,7 @@ class AuthController extends Controller
 
         // 5. Generate Token
         $token = $user->createToken('auth_token')->plainTextToken;
-        $user->load('appUserProfile');
+        $user->load('userProfile');
 
         return response()->json([
             'message' => 'Login successful',
@@ -317,11 +317,11 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->appUserProfile()->create([
+        $user->userProfile()->create([
             'full_name' => $request->name,
         ]);
 
-        $user->load('appUserProfile');
+        $user->load('userProfile');
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(
@@ -373,7 +373,7 @@ class AuthController extends Controller
 
                 if (! empty($profileData)) {
                     $user
-                        ->appUserProfile()
+                        ->userProfile()
                         ->updateOrCreate(
                             ['user_id' => $user->id],
                             $profileData,
@@ -383,7 +383,7 @@ class AuthController extends Controller
                 return response()->json(
                     [
                         'message' => 'Profile updated successfully.',
-                        'user' => $user->load('appUserProfile'),
+                        'user' => $user->load('userProfile'),
                     ],
                     200,
                 );
@@ -468,7 +468,7 @@ class AuthController extends Controller
     {
         // 1. Find user or fail early to avoid null pointer exceptions
         $user = User::findOrFail($userId);
-        $user->load('appUserProfile');
+        $user->load('userProfile');
 
         // 2. Cooldown Logic: Use a more readable check
         // $lastUpdate = Carbon::parse($user->updated_at);
@@ -499,7 +499,7 @@ class AuthController extends Controller
         // 4. Send with Error Handling
         try {
             $fullName =
-                $user->appUserProfile->full_name ?? ($user->username ?? 'User');
+                $user->userProfile->full_name ?? ($user->username ?? 'User');
 
             $this->verificationService->sendSmsApi(
                 $user->phone,

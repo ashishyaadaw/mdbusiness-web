@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CityMenuMatter extends Model
 {
-    protected $table = 'city_menu_matters';
+    protected $table = 'city_menu_matter';
 
     protected $fillable = ['id', 'menu_id', 'city_id', 'matter_id'];
 

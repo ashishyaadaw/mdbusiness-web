@@ -26,7 +26,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->appUserProfile()->create([
+        $user->userProfile()->create([
             'full_name' => $request->name,
         ]);
 
