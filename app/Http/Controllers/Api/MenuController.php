@@ -97,6 +97,23 @@ class MenuController extends Controller
 
         return MenuResource::collection($city->menus);
     }
+    public function getMenusByCategory(City $city, MenuCategories $menuCategories)
+    {
+        // 2. Check if the city is active
+        if (! $city->isActiveInFlags()) {
+            return response()->json([
+                'message' => 'This specific city is inactive.',
+                'error_code' => 'CITY_INACTIVE',
+            ], 403);
+        }
+
+        // 3. Eager load menus and return as a collection
+        // Using load() on the existing model instance is cleaner than $city->menus()->get()
+        // $city->load('menus');
+        $menuCategories->load('menus');
+
+        return MenuResource::collection($menuCategories->menus);
+    }
 
     // 1. Get menus for a specific city
     public function getMenuCategories(City $city)

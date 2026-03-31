@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CityMenu extends Model
 {
+    protected $table = 'city_menu';
     protected $fillable = ['title', 'icon', 'status', 'type'];
 
     // In Menu.php

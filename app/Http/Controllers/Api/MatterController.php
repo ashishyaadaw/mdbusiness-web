@@ -6,6 +6,7 @@ use App\Events\MatrimonialProfileStatusChange;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MatterResource;
 use App\Models\City;
+use App\Models\CityMenu;
 use App\Models\Matters\Matter;
 use App\Models\Menu;
 use App\Models\User;
@@ -989,9 +990,13 @@ class MatterController extends Controller
                     'status' => 'pending', // Default status
                 ]);
 
-                $matter->cityMenuMatter()->create([
+                $cityMenu = CityMenu::firstOrCreate([
                     'menu_id' => $menu->id,
                     'city_id' => $city->id,
+                ]);
+
+                $matter->cityMenuMatter()->create([
+                    'city_menu_id' => $cityMenu->id
                 ]);
 
                 return $matter;

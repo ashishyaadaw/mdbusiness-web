@@ -8,7 +8,7 @@ class CityMenuMatter extends Model
 {
     protected $table = 'city_menu_matter';
 
-    protected $fillable = ['id', 'menu_id', 'city_id', 'matter_id'];
+    protected $fillable = ['id', 'city_menu_id', 'matter_id'];
 
     // In Menu.php
     public function city()
