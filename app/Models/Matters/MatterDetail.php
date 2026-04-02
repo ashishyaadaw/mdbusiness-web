@@ -10,10 +10,14 @@ class MatterDetail extends Model
     use HasFactory;
     protected $table = "matter_detail";
 
-    protected $fillable = [
+   protected $fillable = [
         'matter_id',
+        'name',
         'phone',
+        'whatsapp',
+        'alternate_contact',
         'website',
+        'gstin',
     ];
 
     // protected $hidden = [

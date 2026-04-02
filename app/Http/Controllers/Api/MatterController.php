@@ -677,7 +677,7 @@ class MatterController extends Controller
         $user = Auth::user();
 
         // 2. Build the query
-        $query = Matter::with(['matterDetail', 'matterController'])
+        $query = Matter::with(['matterDetails', 'matterController'])
             ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {
@@ -908,7 +908,7 @@ class MatterController extends Controller
                     'payload' => $request->payload,
                 ]);
 
-                $matter->matterDetail()->create([
+                $matter->matterDetails()->create([
                     'phone' => $request->phone ?? null,
                     'website' => $request->website ?? null,
                 ]);
@@ -979,7 +979,7 @@ class MatterController extends Controller
                     'payload' => $request->payload,
                 ]);
 
-                $matter->matterDetail()->create([
+                $matter->matterDetails()->create([
                     'phone' => $request->phone ?? null,
                     'website' => $request->website ?? null,
                 ]);

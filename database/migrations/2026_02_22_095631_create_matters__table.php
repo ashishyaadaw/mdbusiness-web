@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,47 +11,58 @@ return new class extends Migration
      */
     public function up()
     {
+        // Core Ad Content
         Schema::create('matters', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
-            $table->enum('type', ['image', 'text']); // Categorizes the ad
-            $table->text('payload'); // Stores the text content OR the image path
+            $table->enum('type', ['image', 'text']);
+            $table->text('payload'); 
             $table->timestamps();
         });
 
+        // Contact & Metadata
         Schema::create('matter_details', function (Blueprint $table) {
             $table->id();
-
-            // Best Practice: Explicitly define the table name in constrained()
-            $table
-                ->foreignId('matter_id')
-                ->unique() // Enforces One-to-One relationship
-                ->constrained('matters') // Assumes the parent table is named 'matters'
-                ->onDelete('cascade');
-
-            $table->string('phone')->nullable(); // Stores the text content OR the image path
-            $table->string('website')->nullable(); // Stores the text content OR the image path
+            $table->foreignId('matter_id')->unique()->constrained('matters')->onDelete('cascade');
+            $table->string('name')->nullable(); // From Flutter _nameController
+            $table->string('phone')->nullable();
+            $table->string('whatsapp')->nullable(); // From Flutter _whatsappController
+            $table->string('alternate_contact')->nullable();
+            $table->string('website')->nullable();
+            $table->string('gstin')->nullable(); // Added for billing
             $table->timestamps();
         });
 
+        // NEW: Financial & Pricing Data
+        Schema::create('matter_pricing', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('matter_id')->unique()->constrained('matters')->onDelete('cascade');
+            
+            $table->integer('duration_days'); // e.g., 7, 30, 365
+            $table->decimal('base_amount', 12, 2); // Amount after discount
+            $table->decimal('discount_amount', 12, 2)->default(0.00); 
+            $table->decimal('processing_fee', 10, 2)->default(25.00);
+            $table->decimal('gst_amount', 12, 2);
+            $table->decimal('total_amount', 12, 2);
+            
+            $table->string('payment_status')->default('pending'); // pending, paid, failed
+            $table->string('transaction_id')->nullable();
+            $table->timestamps();
+        });
+
+        // Status & Visibility Control
         Schema::create('matter_controller', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('matter_id')
-                ->unique()
-                ->constrained('matters')
-                ->onDelete('cascade');
-
+            $table->foreignId('matter_id')->unique()->constrained('matters')->onDelete('cascade');
             $table->boolean('is_premium')->default(false);
             $table->enum('status', [
                 'active', 'inactive', 'pending', 'hold', 'block', 'rejected',
             ])->default('pending');
 
-            // Use nullable() if you plan to set this via the Model instead of the DB
             $table->timestamp('valid_until')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**
@@ -61,6 +71,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('matter_controller');
+        Schema::dropIfExists('matter_pricing');
         Schema::dropIfExists('matter_details');
         Schema::dropIfExists('matters');
     }

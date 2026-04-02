@@ -31,12 +31,28 @@ class Matter extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function matterDetail()
+    public function matterDetails()
     {
         return $this->hasOne(MatterDetail::class);
     }
 
     public function matterController()
+    {
+        return $this->hasOne(MatterController::class);
+    }
+
+    // Inside Matter.php
+    public function pricing()
+    {
+        return $this->hasOne(MatterPricing::class);
+    }
+
+    public function details()
+    {
+        return $this->hasOne(MatterDetail::class);
+    }
+
+    public function controller()
     {
         return $this->hasOne(MatterController::class);
     }
