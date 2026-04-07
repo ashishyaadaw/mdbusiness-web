@@ -18,7 +18,9 @@ class MenuController extends Controller
     // GET: api/menus
     public function index()
     {
-        $menus = Menu::all();
+        // $menus = Menu::all();
+        $menus = Menu::with('category')->get();
+
 
         return MenuResource::collection($menus);
     }
@@ -130,6 +132,33 @@ class MenuController extends Controller
         return MenuCategoryResource::collection($city->menuCategories);
     }
 
+
+        public function deleteMenuCategory(MenuCategories $menuCategories)
+    {
+        $menuCategories->delete();
+
+        return response()->json(['message' => 'Menu category deleted successfully'], 200);
+    }
+    public function updateMenuCategory(Request $request, MenuCategories $menuCategories)
+{
+    // 1. Validate the incoming data
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'icon'  => 'nullable|string',
+        'desc'  => 'nullable|string',
+        'type'  => 'nullable|string|in:actual,ad,promo,social,news',
+    ]);
+
+    // 2. Update the model instance
+    $menuCategories->update($validated);
+
+    // 3. Return the updated object and a success message
+    return response()->json([
+        'message' => 'Menu category updated successfully',
+        'data' => $menuCategories
+    ], 200);
+}
+
     public function addMenuCategory(City $city, Request $request)
     {
         //  $user = Auth::user();
@@ -167,10 +196,7 @@ class MenuController extends Controller
                 [
                     'status' => true,
                     'message' => 'Menu category created successfully',
-                    'data' => $menuCategory->load(
-                        'menus',
-                        'cities',
-                    ),
+                    'data' => $menuCategory,
                 ],
                 201,
             );

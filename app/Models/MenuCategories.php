@@ -10,6 +10,8 @@ class MenuCategories extends Model
 
     protected $table = 'menu_category';
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function menus()
     {
         return $this->hasMany(Menu::class, 'menu_category_id');

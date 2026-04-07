@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('whatsapp')->nullable(); // From Flutter _whatsappController
             $table->string('alternate_contact')->nullable();
             $table->string('website')->nullable();
+            $table->string('social_media')->nullable();
             $table->string('gstin')->nullable(); // Added for billing
             $table->timestamps();
         });

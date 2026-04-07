@@ -13,4 +13,8 @@ class Menu extends Model
     {
         return $this->belongsToMany(City::class, 'city_menu');
     }
+    public function category()
+    {
+        return $this->belongsTo(MenuCategories::class, 'menu_category_id');
+    }
 }

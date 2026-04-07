@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('cities')->default(null);
             $table->boolean('menus')->default(null);
             $table->boolean('menu_category')->default(null);
-            $table->boolean('city_menus')->default(null);
+            $table->boolean('city_menu')->default(null);
             $table->boolean('city_menu_matter')->default(null);
 
             $table->timestamps();

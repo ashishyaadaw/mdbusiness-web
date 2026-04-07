@@ -30,7 +30,7 @@ class MatterController extends Model
 
     protected $casts = [
         'is_premium' => 'boolean', // This automatically converts true/"true" to 1 and false/"false" to 0
-        'valid_until' => 'date',   // Good practice for your date field too
+        'valid_until' => 'timestamp',   // Good practice for your date field too
     ];
 
     protected $hidden = [

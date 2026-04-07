@@ -6,7 +6,13 @@ use App\Models\CityMenuMatter;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+/**
+ * @property int $id
+ * @property string $title
+ * @property string $type
+ * @property string $payload
+ * @property int $user_id
+ */
 class Matter extends Model
 {
     use HasFactory;
@@ -42,7 +48,7 @@ class Matter extends Model
     }
 
     // Inside Matter.php
-    public function pricing()
+    public function matterPricing()
     {
         return $this->hasOne(MatterPricing::class);
     }

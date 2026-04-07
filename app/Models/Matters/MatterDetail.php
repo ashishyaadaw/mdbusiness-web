@@ -20,12 +20,12 @@ class MatterDetail extends Model
         'gstin',
     ];
 
-    // protected $hidden = [
-    //     'id',
-    //     'matter_id',
-    //     'created_at',
-    //     'updated_at',
-    // ];
+    protected $hidden = [
+        'id',
+        'matter_id',
+        'created_at',
+        'updated_at',
+    ];
 
     /**
      * Relationship to the parent Matter.

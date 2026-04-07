@@ -22,11 +22,11 @@ class MatterController extends Controller
     public function index()
     {
         // Move with() before get()
-        $ads = Matter::with('matterDetail', 'matterController')
+        $matters = Matter::with('matterDetail', 'matterController')
             ->latest()
             ->get();
 
-        return response()->json(['status' => true, 'data' => $ads], 200);
+        return response()->json(['status' => true, 'data' => $matters], 200);
     }
 
     public function store(Request $request)
@@ -72,13 +72,13 @@ class MatterController extends Controller
             $payloadData = $request->payload;
         }
 
-        $ad = Matter::create([
+        $matters = Matter::create([
             'title' => $request->title,
             'type' => $request->type,
             'payload' => $payloadData,
         ]);
 
-        $ad->adCreator()->create([
+        $matters->adCreator()->create([
             'name' => $request->username ?? 'Mattermin',
             'contact' => $request->contact ?? null,
             'alternate_contact' => $request->alternate_contact ?? null,
@@ -86,24 +86,24 @@ class MatterController extends Controller
             'email' => $request->email ?? null,
         ]);
 
-        $ad->adsDetails()->create([
+        $matters->adsDetails()->create([
             'category' => $request->category ?? 'Other',
             'gender' => $request->gender ?? 'other',
         ]);
 
-        $ad->adController()->create([
+        $matters->adController()->create([
             'is_premium' => $request->is_premium ?? false,
             'valid_until' => $request->valid_until ?? null,
         ]);
 
         // Load the adCreator relationship
-        $ad->load('adCreator', 'adsDetails', 'adController');
+        $matters->load('adCreator', 'adsDetails', 'adController');
 
         return response()->json(
             [
                 'status' => true,
                 'message' => 'Matter created successfully',
-                'data' => $ad,
+                'data' => $matters,
             ],
             201,
         );
@@ -134,15 +134,15 @@ class MatterController extends Controller
 
         try {
             // 2. Use a Transaction to ensure all or nothing is saved
-            $ad = DB::transaction(function () use ($request, $user) {
-                $ad = Matter::create([
+            $matters = DB::transaction(function () use ($request, $user) {
+                $matters = Matter::create([
                     'user_id' => $user->id,
                     'title' => $request->title,
                     'type' => $request->type,
                     'payload' => $request->payload,
                 ]);
 
-                $ad->adCreator()->create([
+                $matters->adCreator()->create([
                     'name' => $request->name ?? ($user->username ?? 'Mattermin'),
                     'contact' => $request->contact,
                     'alternate_contact' => $request->alternate_contact,
@@ -150,17 +150,17 @@ class MatterController extends Controller
                     'email' => $request->email,
                 ]);
 
-                $ad->adsDetails()->create([
+                $matters->adsDetails()->create([
                     'category' => $request->category ?? 'Other',
                     'gender' => $request->gender ?? 'other',
                 ]);
 
-                $ad->adController()->create([
+                $matters->adController()->create([
                     'is_premium' => $request->is_premium ?? false,
                     'valid_until' => $request->valid_until,
                 ]);
 
-                return $ad;
+                return $matters;
             });
 
             // 3. Load relationships and return
@@ -168,7 +168,7 @@ class MatterController extends Controller
                 [
                     'status' => true,
                     'message' => 'Matter created successfully',
-                    'data' => $ad->load(
+                    'data' => $matters->load(
                         'adCreator',
                         'adsDetails',
                         'adController',
@@ -189,12 +189,12 @@ class MatterController extends Controller
         }
     }
 
-    public function updateMatter(Request $request, Matter $ad)
+    public function updateMatter(Request $request, Matter $matters)
     {
         $user = Auth::user();
 
         // 1. Authorization: Ensure the user owns this ad
-        if ($ad->user_id !== $user->id) {
+        if ($matters->user_id !== $user->id) {
             return response()->json(
                 ['status' => false, 'message' => 'Unauthorized'],
                 403,
@@ -221,17 +221,17 @@ class MatterController extends Controller
 
         try {
             // 3. Use a Transaction
-            DB::transaction(function () use ($request, $ad, $user) {
+            DB::transaction(function () use ($request, $matters, $user) {
                 // Update the main Matter record
-                $ad->update([
+                $matters->update([
                     'title' => $request->title,
                     // 'type' => $request->type,
                     'payload' => $request->payload,
                 ]);
 
                 // Update or Create MatterCreator (using updateOrCreate handles cases where the record might be missing)
-                $ad->adCreator()->updateOrCreate(
-                    ['ad_id' => $ad->id], // match criteria
+                $matters->adCreator()->updateOrCreate(
+                    ['ad_id' => $matters->id], // match criteria
                     [
                         'name' => $request->username ?? ($user->name ?? 'Mattermin'),
                         'contact' => $request->contact,
@@ -242,8 +242,8 @@ class MatterController extends Controller
                 );
 
                 // Update or Create MattersDetails
-                // $ad->adsDetails()->updateOrCreate(
-                //     ['ad_id' => $ad->id],
+                // $matters->adsDetails()->updateOrCreate(
+                //     ['ad_id' => $matters->id],
                 //     [
                 //         // 'category' => $request->category ?? 'Other',
                 //         // 'gender' => $request->gender ?? 'other',
@@ -251,8 +251,8 @@ class MatterController extends Controller
                 // );
 
                 // Update or Create MatterController
-                $ad->adController()->updateOrCreate(
-                    ['ad_id' => $ad->id],
+                $matters->adController()->updateOrCreate(
+                    ['ad_id' => $matters->id],
                     [
                         'status' => 'pending',
                         // 'is_premium' => $request->is_premium ?? false,
@@ -266,7 +266,7 @@ class MatterController extends Controller
                 [
                     'status' => true,
                     'message' => 'Matter updated successfully',
-                    'data' => $ad->load(
+                    'data' => $matters->load(
                         'adCreator',
                         'adsDetails',
                         'adController',
@@ -286,12 +286,12 @@ class MatterController extends Controller
         }
     }
 
-    public function changeMatterStatus(Request $request, Matter $ad)
+    public function changeMatterStatus(Request $request, Matter $matters)
     {
         $user = Auth::user();
 
         // 1. Authorization
-        if ($ad->user_id !== $user->id) {
+        if ($matters->user_id !== $user->id) {
             return response()->json(
                 ['status' => false, 'message' => 'Unauthorized'],
                 403,
@@ -300,7 +300,7 @@ class MatterController extends Controller
 
         // 2. Fetch the current status from the relationship
         // Assuming adController holds the status field
-        $currentStatus = $ad->adController->status ?? null;
+        $currentStatus = $matters->adController->status ?? null;
 
         // 3. Status Guard: Only allow changes if current status is active or inactive
         $allowedCurrentStatuses = ['active', 'inactive'];
@@ -328,9 +328,9 @@ class MatterController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($request, $ad) {
-                $ad->adController()->updateOrCreate(
-                    ['ad_id' => $ad->id],
+            DB::transaction(function () use ($request, $matters) {
+                $matters->adController()->updateOrCreate(
+                    ['ad_id' => $matters->id],
                     [
                         'status' => $request->status, // Use the validated request status
                     ],
@@ -341,7 +341,7 @@ class MatterController extends Controller
                 [
                     'status' => true,
                     'message' => 'Matter status updated successfully',
-                    'data' => $ad->load('adController'),
+                    'data' => $matters->load('adController'),
                 ],
                 200,
             );
@@ -357,9 +357,9 @@ class MatterController extends Controller
         }
     }
 
-    public function updateMatterProfileStatus(Request $request, Matter $ad)
+    public function updateMatterProfileStatus(Request $request, Matter $matters)
     {
-        $currentStatus = $ad->adController->status ?? null;
+        $currentStatus = $matters->adController->status ?? null;
 
         // 3. Status Guard: Only allow changes if current status is active or inactive
         $allowedCurrentStatuses = [
@@ -395,22 +395,22 @@ class MatterController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($request, $ad) {
-                $ad->adController()->updateOrCreate(
-                    ['ad_id' => $ad->id],
+            DB::transaction(function () use ($request, $matters) {
+                $matters->adController()->updateOrCreate(
+                    ['ad_id' => $matters->id],
                     [
                         'status' => $request->status, // Use the validated request status
                     ],
                 );
             });
 
-            $this->sendStatusChangeAlert($ad->user_id, $request->status);
+            $this->sendStatusChangeAlert($matters->user_id, $request->status);
 
             return response()->json(
                 [
                     'status' => true,
                     'message' => 'Matter status updated successfully',
-                    'data' => $ad->load('adController'),
+                    'data' => $matters->load('adController'),
                 ],
                 200,
             );
@@ -442,13 +442,13 @@ class MatterController extends Controller
         ]);
     }
 
-    public function deleteMatter(Matter $ad)
+    public function deleteMatter(Matter $matters)
     {
         $user = Auth::user();
 
         // 1. Authorization: Ensure the user owns this ad
         // (Alternatively, you can use Laravel Policies for this)
-        if ($ad->user_id !== $user->id) {
+        if ($matters->user_id !== $user->id) {
             return response()->json(
                 [
                     'status' => false,
@@ -460,14 +460,14 @@ class MatterController extends Controller
 
         try {
             // 2. Use a Transaction to ensure all related data is wiped
-            DB::transaction(function () use ($ad) {
+            DB::transaction(function () use ($matters) {
                 // Delete related records first (if not using cascade delete in migration)
-                $ad->adCreator()->delete();
-                $ad->adsDetails()->delete();
-                $ad->adController()->delete();
+                $matters->adCreator()->delete();
+                $matters->adsDetails()->delete();
+                $matters->adController()->delete();
 
                 // Finally, delete the main Matter record
-                $ad->delete();
+                $matters->delete();
             });
 
             return response()->json(
@@ -491,21 +491,21 @@ class MatterController extends Controller
 
     public function show($id)
     {
-        $ad = Matter::find($id);
-        if (! $ad) {
+        $matters = Matter::find($id);
+        if (! $matters) {
             return response()->json(
                 ['status' => false, 'message' => 'Matter not found'],
                 404,
             );
         }
 
-        return response()->json(['status' => true, 'data' => $ad], 200);
+        return response()->json(['status' => true, 'data' => $matters], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $ad = Matter::find($id);
-        if (! $ad) {
+        $matters = Matter::find($id);
+        if (! $matters) {
             return response()->json(
                 ['status' => false, 'message' => 'Matter not found'],
                 404,
@@ -515,7 +515,7 @@ class MatterController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'sometimes|string|max:255',
             'type' => 'sometimes|in:image,text',
-            'payload' => 'nullable|string',
+            'payload' => 'sometimes|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -528,14 +528,14 @@ class MatterController extends Controller
 
         // Logic to update Payload
         if ($request->has('type')) {
-            $ad->type = $request->type;
+            $matters->type = $request->type;
         }
 
         // Upload new Image
-        if ($ad->type === 'image' && $request->hasFile('image')) {
+        if ($matters->type === 'image' && $request->hasFile('image')) {
             // 1. Delete Old Image if exists
             // We use getRawOriginal to get the database path (uploads/ads/...), not the full URL
-            $oldImagePath = public_path($ad->getRawOriginal('payload'));
+            $oldImagePath = public_path($matters->getRawOriginal('payload'));
 
             if (File::exists($oldImagePath)) {
                 File::delete($oldImagePath);
@@ -551,24 +551,24 @@ class MatterController extends Controller
             }
 
             $file->move($destinationPath, $filename);
-            $ad->payload = 'uploads/ads/'.$filename;
+            $matters->forceFill(['payload' => 'uploads/ads/'.$filename]);
         }
         // Update Text
-        elseif ($ad->type === 'text' && $request->has('payload')) {
-            $ad->payload = $request->payload;
+        elseif ($matters->type === 'text' && $request->has('payload')) {
+            $matters->forceFill(['payload' => $request->payload]);
         }
 
         if ($request->has('title')) {
-            $ad->title = $request->title;
+            $matters->title = $request->title;
         }
 
-        $ad->save();
+        $matters->save();
 
         return response()->json(
             [
                 'status' => true,
                 'message' => 'Matter updated successfully',
-                'data' => $ad,
+                'data' => $matters,
             ],
             200,
         );
@@ -576,8 +576,8 @@ class MatterController extends Controller
 
     public function destroy($id)
     {
-        $ad = Matter::find($id);
-        if (! $ad) {
+        $matters = Matter::find($id);
+        if (! $matters) {
             return response()->json(
                 ['status' => false, 'message' => 'Matter not found'],
                 404,
@@ -585,15 +585,15 @@ class MatterController extends Controller
         }
 
         // Delete Image File from Public Folder
-        if ($ad->type === 'image') {
-            $imagePath = public_path($ad->getRawOriginal('payload'));
+        if ($matters->type === 'image') {
+            $imagePath = public_path($matters->getRawOriginal('payload'));
 
             if (File::exists($imagePath)) {
                 File::delete($imagePath);
             }
         }
 
-        $ad->delete();
+        $matters->delete();
 
         return response()->json(
             ['status' => true, 'message' => 'Matter deleted successfully'],
@@ -755,17 +755,17 @@ class MatterController extends Controller
         // 4. Use paginate instead of get()
         // Default to 10 items per page to match your Flutter logic
         $perPage = $request->input('per_page', 10);
-        $ads = $query->paginate($perPage);
+        $matters = $query->paginate($perPage);
 
         // 5. Return paginated response
         return response()->json(
             [
                 'status' => true,
-                'count' => $ads->count(), // Items in current page
-                'total' => $ads->total(), // Total items in database
-                'current_page' => $ads->currentPage(),
-                'last_page' => $ads->lastPage(),
-                'data' => $ads->items(), // The actual list of ads
+                'count' => $matters->count(), // Items in current page
+                'total' => $matters->total(), // Total items in database
+                'current_page' => $matters->currentPage(),
+                'last_page' => $matters->lastPage(),
+                'data' => $matters->items(), // The actual list of ads
             ],
             200,
         );
@@ -796,12 +796,12 @@ class MatterController extends Controller
     //         $q->whereIn('status', ['active']);
     //     });
     //     // 3. Execute and return
-    //     $ads = $query->get();
+    //     $matters = $query->get();
 
     //     return response()->json([
     //         'status' => true,
-    //         'count' => $ads->count(),
-    //         'data' => $ads,
+    //         'count' => $matters->count(),
+    //         'data' => $matters,
     //     ], 200);
     // }
 
@@ -872,9 +872,9 @@ class MatterController extends Controller
         });
 
         // Execute query
-        $ads = $query->get();
+        $matters = $query->get();
 
-        return MatterResource::collection($ads);
+        return MatterResource::collection($matters);
     }
 
     public function create(Request $request)
@@ -887,8 +887,19 @@ class MatterController extends Controller
             'type' => 'required|in:image,text',
             'payload' => 'required|string',
             'name' => 'required|string',
+            'category' => 'nullable|string',
+            'contact' => 'nullable|string',
+            'whatsapp' => 'nullable|string',
+            'alternate_contact' => 'nullable|string',
+            'gstin' => 'nullable|string',
+            'duration_days' => 'nullable|integer|min:1',
+            'base_amount' => 'nullable|numeric|min:0',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'processing_fee' => 'nullable|numeric|min:0',
+            'gst_amount' => 'nullable|numeric|min:0',
+            'total_amount' => 'nullable|numeric|min:0',
             'is_premium' => 'nullable|boolean',
-            'valid_until' => 'nullable|date|after:today',
+            // 'valid_until' => 'nullable|date|after:today',
         ]);
 
         if ($validator->fails()) {
@@ -913,9 +924,20 @@ class MatterController extends Controller
                     'website' => $request->website ?? null,
                 ]);
 
+                $matter->matterPricing()->create([
+                    'duration_days' => $request->duration_days ?? 1,
+                    'base_amount' => $request->base_amount ?? 0,
+                    'discount_amount' => $request->discount_amount ?? 0,
+                    'processing_fee' => $request->processing_fee ?? 0,
+                    'gst_amount' => $request->gst_amount ?? 0,
+                    'total_amount' => $request->total_amount ?? 0,
+                    'payment_status' => 'pending',
+                    'transaction_id' => $request->transaction_id ?? null,
+                ]);
+
                 $matter->matterController()->create([
                     'is_premium' => $request->is_premium ?? false,
-                    'valid_until' => $request->valid_until ?? Date::now()->addDays(30), // Default to 30 days if not provided
+                    'valid_until' => $request->valid_until ?? Date::now()->addDays($request->duration_days ?? 1), // Default to duration_days if not provided
                     'status' => 'pending', // Default status
                 ]);
 
@@ -930,6 +952,7 @@ class MatterController extends Controller
                     'data' => $matter->load(
                         'matterCreator',
                         'matterDetail',
+                        'matterPricing',
                         'matterController',
                     ),
                 ],
@@ -1044,14 +1067,14 @@ class MatterController extends Controller
 
     //     // 2. Query ads belonging to the user
     //     // Replace 'user_id' with whatever your foreign key column is named
-    //     $ads = Matter::with(['adsDetails', 'adCreator', 'adController'])
+    //     $matters = Matter::with(['adsDetails', 'adCreator', 'adController'])
     //         ->where('user_id', $user->id)
     //         ->latest()
     //         ->get();
 
     //     return response()->json([
     //         'status' => true,
-    //         'data' => $ads,
+    //         'data' => $matters,
     //     ], 200);
     // }
     public function myMatters(Request $request)
@@ -1073,7 +1096,7 @@ class MatterController extends Controller
         // You can set the number of items per page (e.g., 10 or 15)
         $perPage = $request->query('per_page', 10);
 
-        $ads = Matter::with(['adsDetails', 'adCreator', 'adController'])
+        $matters = Matter::with(['adsDetails', 'adCreator', 'adController'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate($perPage);
@@ -1083,12 +1106,12 @@ class MatterController extends Controller
         return response()->json(
             [
                 'status' => true,
-                'data' => $ads->items(), // Returns just the array of ads for your Flutter list
+                'data' => $matters->items(), // Returns just the array of ads for your Flutter list
                 'meta' => [
-                    'current_page' => $ads->currentPage(),
-                    'last_page' => $ads->lastPage(),
-                    'total' => $ads->total(),
-                    'has_more' => $ads->hasMorePages(),
+                    'current_page' => $matters->currentPage(),
+                    'last_page' => $matters->lastPage(),
+                    'total' => $matters->total(),
+                    'has_more' => $matters->hasMorePages(),
                 ],
             ],
             200,
