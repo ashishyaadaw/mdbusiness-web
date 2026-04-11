@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreignId('menu_category_id')->constrained('menu_category')->onDelete('cascade');
             $table->string('title');
             $table->string('icon')->nullable();
+            $table->string('desc')->nullable();
             $table->enum('type', ['ad', 'actual'])->default('actual');
             $table->timestamps();
         });

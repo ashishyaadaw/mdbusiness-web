@@ -16,7 +16,7 @@ class MenuResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'description' => $this->description,
+            'description' => $this->desc,
             'menu_category_id' => $this->menu_category_id,
              'category' => new MenuCategoryResource($this->whenLoaded('category')),
             'icon' => $this->icon,

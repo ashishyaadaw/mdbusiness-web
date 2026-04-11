@@ -20,4 +20,7 @@ class CityMenuMatter extends Model
     {
         return $this->belongsToMany(City::class);
     }
+    public function cityMenu() {
+    return $this->belongsTo(CityMenu::class);
+}
 }

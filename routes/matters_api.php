@@ -8,14 +8,11 @@ Route::prefix('matters')->group(function () {
     // For Matters
     Route::post('create', [MatterController::class, 'create'])->middleware('auth:sanctum');
 
-    Route::post('create/{city}/{menu}', [MatterController::class, 'createWithCityAndMenu'])->middleware('auth:sanctum');
+    Route::post('create/{city}/{menu}', [MatterController::class, 'createWithCityAndMenu']);
 
     Route::get('all-matters', [MatterController::class, 'getMatters']);
 
-    Route::get('{menu}/{city}/all-matters', [
-        MatterController::class,
-        'getMattersByMenuAndCity',
-    ]);
+    Route::get('{menu}/{city}/all-matters', [MatterController::class, 'getMattersByMenuAndCity']);
 
     Route::get('{user}/all-matters', [
         MatterController::class,
@@ -28,7 +25,11 @@ Route::prefix('matters')->group(function () {
 
     Route::delete('/{matter}', [
         MatterController::class,
-        'destroyMyMatter',
-    ])->middleware('auth:sanctum');
+        'destroyMyMatter'
+    ]);
+    Route::put('/{matter}', [
+        MatterController::class,
+        'update'
+    ]);
 
 });

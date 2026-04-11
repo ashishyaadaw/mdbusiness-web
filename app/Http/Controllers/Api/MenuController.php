@@ -30,7 +30,8 @@ class MenuController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'icon' => 'nullable|string',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string|url',
             'menu_category_id' => 'required|exists:menu_category,id',
             'type' => 'required|in:ad,actual',
         ]);
@@ -44,7 +45,7 @@ class MenuController extends Controller
         return response()->json([
             'message' => 'Menu created successfully',
             'data' => new MenuResource($menu),
-        ], 210);
+        ], 201);
     }
 
     // GET: api/menus/{id}
@@ -58,8 +59,10 @@ class MenuController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'sometimes|required|string|max:255',
-            'status' => 'sometimes|required|in:active,inactive',
-            'type' => 'sometimes|required|in:ad,actual',
+            'description' => 'sometimes|string',
+            'icon' => 'sometimes|string|url',
+            'menu_category_id' => 'sometimes|exists:menu_category,id',
+            'type' => 'sometimes|in:ad,actual',
         ]);
 
         if ($validator->fails()) {
@@ -166,7 +169,7 @@ class MenuController extends Controller
         // 1. Improved Validation
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'icon' => 'required|string|max:255',
+            'icon' => 'required|string|max:255|url',
             'desc' => 'required|string|max:255',
         ]);
 

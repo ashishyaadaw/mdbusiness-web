@@ -16,11 +16,7 @@ class MatterResource extends JsonResource
     {
         // In your model, status isn't in $fillable, but if it exists in DB:
         // Using a default of 'Pending' if status is null
-        $statusText = match ($this->status) {
-            1 => 'Active',
-            0 => 'Inactive',
-            default => 'Pending Review',
-        };
+        $controller = $this->whenLoaded('matterController');
 
         return [
             'id' => $this->id,
@@ -28,7 +24,7 @@ class MatterResource extends JsonResource
             'title' => $this->title,
             'type' => $this->type,
             'payload' => $this->payload, // Accessor in Model handles asset() URL
-            'status' => $statusText,
+            'status' => $controller ? $controller->status : 'Pending', // Default to 'Pending' if no controller or status
 
             // Financial Details (from Flutter implementation)
             'pricing' => [
@@ -37,7 +33,7 @@ class MatterResource extends JsonResource
                 'total_amount' => $this->total_amount,
             ],
 
-            'controller' => $this->whenLoaded('matterController'),
+            'controller' => $controller,
 
             'created_at' => $this->created_at ? $this->created_at->format('d M Y') : null,
         ];

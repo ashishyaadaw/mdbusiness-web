@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CityMenu extends Model
 {
     protected $table = 'city_menu';
-    protected $fillable = ['title', 'icon', 'status', 'type'];
+    protected $fillable = ['city_id', 'menu_id'];
 
     // In Menu.php
     public function city()
