@@ -17,4 +17,9 @@ class Menu extends Model
     {
         return $this->belongsTo(MenuCategories::class, 'menu_category_id');
     }
+        public function flag()
+    {
+        return $this->hasOne(Flag::class, 'id');
+        // Or whatever your foreign key structure is
+    }
 }

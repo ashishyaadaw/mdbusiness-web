@@ -12,6 +12,8 @@ Route::prefix('matters')->group(function () {
 
     Route::get('all-matters', [MatterController::class, 'getMatters']);
 
+    Route::get('admin/{menu}/{city}/all-matters', [MatterController::class, 'getMattersByMenuAndCityByAdmin']);
+    
     Route::get('{menu}/{city}/all-matters', [MatterController::class, 'getMattersByMenuAndCity']);
 
     Route::get('{user}/all-matters', [

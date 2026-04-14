@@ -15,11 +15,11 @@ return new class extends Migration
         // This will help us to easily manage the active/inactive status of city, menu and matter without deleting the records from the database.
         Schema::create('flags', function (Blueprint $table) {
             $table->id(); /** This is treated as id for all city,menu,menu_category,.... */
-            $table->boolean('cities')->default(null);
-            $table->boolean('menus')->default(null);
-            $table->boolean('menu_category')->default(null);
-            $table->boolean('city_menu')->default(null);
-            $table->boolean('city_menu_matter')->default(null);
+            $table->boolean('city')->default(0);
+            $table->boolean('menus')->default(0);
+            $table->boolean('menu_category')->default(0);
+            $table->boolean('city_menu')->default(0);
+            $table->boolean('city_menu_matter')->default(0);
 
             $table->timestamps();
         });
@@ -30,7 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('flags
-        ');
+        Schema::dropIfExists('flags');
     }
 };

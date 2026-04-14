@@ -22,8 +22,9 @@ class Flag extends Model
      * @var array
      */
     protected $fillable = [
+        'id', // Assuming you want to set this manually, otherwise remove it from fillable
         'city',
-        'menu',
+        'menus',
         'menu_category',
         'city_menu',
         'city_menu_matter',

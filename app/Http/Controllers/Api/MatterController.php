@@ -516,7 +516,7 @@ class MatterController extends Controller
             'title' => 'sometimes|string|max:255',
             'type' => 'sometimes|in:image,text',
             'payload' => 'sometimes|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -532,26 +532,30 @@ class MatterController extends Controller
         }
 
         // Upload new Image
-        if ($matters->type === 'image' && $request->hasFile('image')) {
+        if ($matters->type === 'image' 
+        // && $request->hasFile('image')
+        ) {
             // 1. Delete Old Image if exists
             // We use getRawOriginal to get the database path (uploads/ads/...), not the full URL
-            $oldImagePath = public_path($matters->getRawOriginal('payload'));
+            // $oldImagePath = public_path($matters->getRawOriginal('payload'));
 
-            if (File::exists($oldImagePath)) {
-                File::delete($oldImagePath);
-            }
+            // if (File::exists($oldImagePath)) {
+            //     File::delete($oldImagePath);
+            // }
 
-            // 2. Upload New Image
-            $file = $request->file('image');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $destinationPath = public_path('uploads/ads');
+            // // 2. Upload New Image
+            // $file = $request->file('image');
+            // $filename = time().'_'.$file->getClientOriginalName();
+            // $destinationPath = public_path('uploads/ads');
 
-            if (! File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
-            }
+            // if (! File::exists($destinationPath)) {
+            //     File::makeDirectory($destinationPath, 0755, true);
+            // }
 
-            $file->move($destinationPath, $filename);
-            $matters->forceFill(['payload' => 'uploads/ads/'.$filename]);
+            // $file->move($destinationPath, $filename);
+            // $matters->forceFill(['payload' => 'uploads/ads/'.$filename]);
+
+            $matters->forceFill(['payload' => $request->payload]);
         }
         // Update Text
         elseif ($matters->type === 'text' && $request->has('payload')) {
@@ -564,6 +568,7 @@ class MatterController extends Controller
 
         $matters->save();
 
+        
         return response()->json(
             [
                 'status' => true,
@@ -620,6 +625,42 @@ class MatterController extends Controller
     ->whereHas('matterController', function ($q) {
         $q->where('status', 'active');
     })
+    ->with(['matterDetails', 'matterController']) // Eager load for performance
+    ->latest();
+
+    // 3. Handle Pagination
+    $perPage = $request->input('per_page', 10);
+    $matters = $query->paginate($perPage);
+
+    // 4. Return standard response
+    return response()->json([
+        'status'       => true,
+        'count'        => $matters->count(),
+        'total'        => $matters->total(),
+        'current_page' => $matters->currentPage(),
+        'last_page'    => $matters->lastPage(),
+        'data'         => MatterResource::collection($matters),
+    ], 200);
+}
+ public function getMattersByMenuAndCityByAdmin(Request $request, Menu $menu, City $city)
+{
+    // 1. Validation
+    if (!$city->isActiveInFlags()) {
+        return response()->json(['message' => 'This specific city is inactive.'], 403);
+    }
+    
+
+    // 2. Build the Query
+    // We want Matters that belong to a specific CityMenu combination
+    $query = Matter::whereHas('cityMenuMatter', function ($q) use ($menu, $city) {
+        $q->whereHas('cityMenu', function ($subQ) use ($menu, $city) {
+            $subQ->where('city_id', $city->id)
+                 ->where('menu_id', $menu->id);
+        });
+    })
+    // ->whereHas('matterController', function ($q) {
+    //     $q->where('status', 'active');
+    // })
     ->with(['matterDetails', 'matterController']) // Eager load for performance
     ->latest();
 
@@ -983,6 +1024,7 @@ class MatterController extends Controller
             'type' => 'required|in:image,text',
             'payload' => 'required|string',
             'name' => 'required|string',
+            'status' => 'required|string',
             'is_premium' => 'nullable|boolean',
             'valid_until' => 'nullable|date|after:today',
         ]);

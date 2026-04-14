@@ -20,7 +20,7 @@ class MenuResource extends JsonResource
             'menu_category_id' => $this->menu_category_id,
              'category' => new MenuCategoryResource($this->whenLoaded('category')),
             'icon' => $this->icon,
-            'status' => $this->status ?? 'active',
+            'status' => $this->flag ? $this->flag->menus : true,
             'type' => $this->type,
             // 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];

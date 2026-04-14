@@ -22,4 +22,11 @@ class MenuCategories extends Model
         return $this->belongsToMany(City::class, 'city_menu_category')
             ->withTimestamps();
     }
+
+    // In MenuCategory.php
+    public function flag()
+    {
+        return $this->hasOne(Flag::class, 'id');
+        // Or whatever your foreign key structure is
+    }
 }
