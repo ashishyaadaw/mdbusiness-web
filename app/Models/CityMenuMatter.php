@@ -13,7 +13,7 @@ class CityMenuMatter extends Model
     // In Menu.php
     public function city()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(City::class, 'city_menu_id', 'id');
     }
 
     public function cities()
@@ -21,6 +21,6 @@ class CityMenuMatter extends Model
         return $this->belongsToMany(City::class);
     }
     public function cityMenu() {
-    return $this->belongsTo(CityMenu::class);
+    return $this->belongsTo(CityMenu::class, 'city_menu_id', 'id');
 }
 }

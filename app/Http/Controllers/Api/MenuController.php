@@ -290,11 +290,16 @@ class MenuController extends Controller
                 $menuCategory = MenuCategories::create([
                     'name' => $request->name,
                     'icon' => $request->icon,
-                    'desc' => $request->description,
+                    'desc' => $request->desc,
                 ]);
 
                 $menuCategory->cities()->attach($city->id); // Attach the city to the menu category
-                $menuCategory->flag()->create(['menu_category' => (int) $request->status]); // Create a flag for this menu category and set it to active
+                // $menuCategory->flag()->updateOrCreate(['menu_category' => (int) $request->status]); // Create a flag for this menu category and set it to active
+                $menuCategory->flag()->updateOrCreate(
+                    ['id' => (int) $menuCategory->id], // Attributes to find the record
+                    ['menu_category' => (int) $request->status] // Values to update/create
+                );
+
                 $menuCategory->load('flag'); // Eager load the flag relationship
 
                 return $menuCategory;

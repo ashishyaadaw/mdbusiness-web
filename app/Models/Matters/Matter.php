@@ -2,6 +2,7 @@
 
 namespace App\Models\Matters;
 
+use App\Models\CityMenu;
 use App\Models\CityMenuMatter;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,7 +68,7 @@ class Matter extends Model
     public function cityMenuMatter()
     {
         // This connects the Matter to the pivot table entries
-        return $this->hasMany(CityMenuMatter::class, 'matter_id');
+        return $this->hasMany(CityMenuMatter::class, 'matter_id', 'id');
     }
 
     

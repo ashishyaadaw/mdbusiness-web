@@ -517,6 +517,11 @@ class MatterController extends Controller
             'type' => 'sometimes|in:image,text',
             'payload' => 'sometimes|string',
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+            "is_premium" => 'sometimes|boolean',
+            "valid_until" => 'sometimes|date|after:today',
+            "status" => 'sometimes|string|in:active,inactive,hold,pending,rejected,block',
+
         ]);
 
         if ($validator->fails()) {
@@ -564,6 +569,15 @@ class MatterController extends Controller
 
         if ($request->has('title')) {
             $matters->title = $request->title;
+        }
+        if ($request->has('status')) {
+            $matters->controller()->update(['status' => $request->status]);
+        }
+        if ($request->has('is_premium') || $request->has('valid_until')) {
+            $matters->controller()->update([
+                'is_premium' => $request->is_premium,
+                'valid_until' => $request->valid_until
+            ]);
         }
 
         $matters->save();
@@ -664,6 +678,9 @@ class MatterController extends Controller
     ->with(['matterDetails', 'matterController']) // Eager load for performance
     ->latest();
 
+
+
+
     // 3. Handle Pagination
     $perPage = $request->input('per_page', 10);
     $matters = $query->paginate($perPage);
@@ -671,6 +688,8 @@ class MatterController extends Controller
     // 4. Return standard response
     return response()->json([
         'status'       => true,
+        'city'         => $city->name,
+        'menu'         => $menu->title,
         'count'        => $matters->count(),
         'total'        => $matters->total(),
         'current_page' => $matters->currentPage(),

@@ -34,6 +34,7 @@ class MatterResource extends JsonResource
             ],
 
             'controller' => $controller,
+            'cityMenuMatter' =>  $this->whenLoaded('cityMenuMatter') ?? "No city menu association",
 
             'created_at' => $this->created_at ? $this->created_at->format('d M Y') : null,
         ];
