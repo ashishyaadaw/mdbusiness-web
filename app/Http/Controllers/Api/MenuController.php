@@ -146,6 +146,32 @@ class MenuController extends Controller
 
         return MenuResource::collection($city->menus);
     }
+    public function getAllMenus(City $city)
+    {
+        // 2. Check if the city is active
+        if (! $city->isActiveInFlags()) {
+            return response()->json([
+                'message' => 'This specific city is inactive.',
+                'error_code' => 'CITY_INACTIVE',
+            ], 403);
+        }
+
+        // This is wild card method to get all menus for a city, regardless of category. It can be used for admin purposes or if you want to show all menus without filtering by category.
+
+        $menus = Menu::whereHas('flag', function ($query)  {
+            $query->where('menus', 1);
+        });
+
+        // 3. Eager load menus and return as a collection
+        // Using load() on the existing model instance is cleaner than $city->menus()->get()
+        // $city->load('menus');
+        return response()->json([
+            'message' => 'Menus retrieved successfully',
+            'data' => MenuResource::collection($menus->get()),
+        ], 200);
+
+        // return MenuResource::collection($menus);
+    }
 
     public function getMenusByCategory(City $city, MenuCategories $menuCategories)
     {

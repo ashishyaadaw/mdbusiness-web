@@ -1043,7 +1043,7 @@ class MatterController extends Controller
             'type' => 'required|in:image,text',
             'payload' => 'required|string',
             'name' => 'required|string',
-            'status' => 'required|string',
+            'status' => 'nullable|string',
             'is_premium' => 'nullable|boolean',
             'valid_until' => 'nullable|date|after:today',
         ]);
@@ -1073,7 +1073,7 @@ class MatterController extends Controller
                 $matter->matterController()->create([
                     'is_premium' => $request->is_premium ?? false,
                     'valid_until' => $request->valid_until ?? Date::now()->addDays(30), // Default to 30 days if not provided
-                    'status' => 'pending', // Default status
+                    'status' => $request->status ?? 'pending', // Default status
                 ]);
 
                 $cityMenu = CityMenu::firstOrCreate([
