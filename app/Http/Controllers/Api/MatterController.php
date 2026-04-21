@@ -189,12 +189,12 @@ class MatterController extends Controller
         }
     }
 
-    public function updateMatter(Request $request, Matter $matters)
+    public function updateMatter(Request $request, Matter $matter)
     {
         $user = Auth::user();
 
         // 1. Authorization: Ensure the user owns this ad
-        if ($matters->user_id !== $user->id) {
+        if ($matter->user_id !== $user->id) {
             return response()->json(
                 ['status' => false, 'message' => 'Unauthorized'],
                 403,
@@ -208,38 +208,38 @@ class MatterController extends Controller
             'payload' => 'required|string',
             // 'category' => 'nullable|string',
             // 'gender' => 'nullable|in:male,Male,Female,female,other',
-            'is_premium' => 'nullable|boolean',
-            'valid_until' => 'nullable|date|after:today',
+            'is_premium' => 'sometimes|boolean',
+            'valid_until' => 'sometimes|date|after:today',
         ]);
 
         if ($validator->fails()) {
             return response()->json(
-                ['status' => false, 'errors' => $validator->errors()],
+                ['status' => false, 'errors' => $validator->errors(),'message' => 'Validation failed. Please check your input.'],
                 422,
             );
         }
 
         try {
             // 3. Use a Transaction
-            DB::transaction(function () use ($request, $matters, $user) {
+            DB::transaction(function () use ($request, $matter, $user) {
                 // Update the main Matter record
-                $matters->update([
+                $matter->updateOrCreate([
                     'title' => $request->title,
                     // 'type' => $request->type,
                     'payload' => $request->payload,
                 ]);
 
                 // Update or Create MatterCreator (using updateOrCreate handles cases where the record might be missing)
-                $matters->adCreator()->updateOrCreate(
-                    ['ad_id' => $matters->id], // match criteria
-                    [
-                        'name' => $request->username ?? ($user->name ?? 'Mattermin'),
-                        'contact' => $request->contact,
-                        'alternate_contact' => $request->alternate_contact,
-                        'whatsapp' => $request->whatsapp,
-                        'email' => $request->email,
-                    ],
-                );
+                // $matters->adCreator()->updateOrCreate(
+                //     ['ad_id' => $matters->id], // match criteria
+                //     [
+                //         'name' => $request->username ?? ($user->name ?? 'Mattermin'),
+                //         'contact' => $request->contact,
+                //         'alternate_contact' => $request->alternate_contact,
+                //         'whatsapp' => $request->whatsapp,
+                //         'email' => $request->email,
+                //     ],
+                // );
 
                 // Update or Create MattersDetails
                 // $matters->adsDetails()->updateOrCreate(
@@ -251,8 +251,8 @@ class MatterController extends Controller
                 // );
 
                 // Update or Create MatterController
-                $matters->adController()->updateOrCreate(
-                    ['ad_id' => $matters->id],
+                $matter->controller()->updateOrCreate(
+                    ['matter_id' => $matter->id],
                     [
                         'status' => 'pending',
                         // 'is_premium' => $request->is_premium ?? false,
@@ -266,10 +266,8 @@ class MatterController extends Controller
                 [
                     'status' => true,
                     'message' => 'Matter updated successfully',
-                    'data' => $matters->load(
-                        'adCreator',
-                        'adsDetails',
-                        'adController',
+                    'data' => $matter->load(
+                        'controller',
                     ),
                 ],
                 200,
@@ -502,6 +500,7 @@ class MatterController extends Controller
         return response()->json(['status' => true, 'data' => $matters], 200);
     }
 
+
     public function update(Request $request, $id)
     {
         $matters = Matter::find($id);
@@ -591,6 +590,85 @@ class MatterController extends Controller
             ],
             200,
         );
+    }
+
+    public function activateMatterByUser(Matter $matter)
+    {
+        $user = Auth::user();
+
+        // 1. Authorization: Ensure the user owns this ad
+        if ($matter->user_id !== $user->id) {
+            return response()->json(
+                ['status' => false, 'message' => 'Unauthorized'],
+                403,
+            );
+        }
+
+        try {
+            $matter->controller()->updateOrCreate(
+                ['matter_id' => $matter->id],
+                ['status' => 'active'],
+            );
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Matter activated successfully',
+                    'data' => $matter->load('controller'),
+                ],
+                200,
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Failed to activate matter.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
+        }
+
+
+    }
+    public function inactivateMatterByUser(Matter $matter)
+    {
+        $user = Auth::user();
+
+        // 1. Authorization: Ensure the user owns this ad
+        if ($matter->user_id !== $user->id) {
+            return response()->json(
+                ['status' => false, 'message' => 'Unauthorized'],
+                403,
+            );
+        }
+
+        try {
+            $matter->controller()->updateOrCreate(
+                ['matter_id' => $matter->id],
+                ['status' => 'inactive'],
+            );
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Matter activated successfully',
+                    'data' => $matter->load('controller'),
+                ],
+                200,
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Failed to activate matter.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
+        }
+
+
     }
 
     public function destroy($id)

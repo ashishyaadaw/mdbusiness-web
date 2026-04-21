@@ -34,4 +34,20 @@ Route::prefix('matters')->group(function () {
         'update'
     ]);
 
+    Route::put('/user/update/{matter}', [
+        MatterController::class,
+        'updateMatter'
+    ])->middleware('auth:sanctum');
+
+    
+    Route::post('/{matter}/activate', [
+        MatterController::class,
+        'activateMatterByUser'
+    ])->middleware('auth:sanctum');
+    
+    Route::post('/{matter}/inactivate', [
+        MatterController::class,
+        'inactivateMatterByUser'
+    ])->middleware('auth:sanctum');
+
 });
