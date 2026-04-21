@@ -71,5 +71,11 @@ class Matter extends Model
         return $this->hasMany(CityMenuMatter::class, 'matter_id', 'id');
     }
 
+    public function cityMenus()
+    {
+        // This connects the Matter to CityMenu through the pivot table
+        return $this->belongsToMany(CityMenu::class, 'city_menu_matter', 'matter_id', 'city_menu_id');
+    }
+
     
 }

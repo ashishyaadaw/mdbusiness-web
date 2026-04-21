@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MatterResource;
 use App\Models\City;
 use App\Models\CityMenu;
+use App\Models\CityMenuMatter;
 use App\Models\Matters\Matter;
 use App\Models\Menu;
 use App\Models\User;
@@ -206,7 +207,12 @@ class MatterController extends Controller
             'title' => 'required|string|max:255',
             // 'type' => 'required|in:image,text',
             'payload' => 'required|string',
-            // 'category' => 'nullable|string',
+            'menu_id' => 'required|integer|exists:menus,id',
+            'city_id' => 'required|integer|exists:cities,id',
+            'website' => 'nullable|string|url',
+            'social_media' => 'nullable|string|url',
+            'phone' => 'nullable|string',
+            'whatsapp' => 'nullable|string',
             // 'gender' => 'nullable|in:male,Male,Female,female,other',
             'is_premium' => 'sometimes|boolean',
             'valid_until' => 'sometimes|date|after:today',
@@ -223,11 +229,30 @@ class MatterController extends Controller
             // 3. Use a Transaction
             DB::transaction(function () use ($request, $matter, $user) {
                 // Update the main Matter record
-                $matter->updateOrCreate([
+                $matter->update([
                     'title' => $request->title,
                     // 'type' => $request->type,
                     'payload' => $request->payload,
                 ]);
+
+                CityMenu::updateOrCreate(
+                    [
+                        'city_id' => $request->city_id,
+                        'menu_id' => $request->menu_id,
+                    ],
+                    []
+                );
+
+                 CityMenuMatter::updateOrCreate(
+                    [
+                        'matter_id' => $matter->id,
+                        'city_menu_id' => CityMenu::where('city_id', $request->city_id)
+                            ->where('menu_id', $request->menu_id)
+                            ->first()
+                            ->id,
+                    ],
+                    []
+                );
 
                 // Update or Create MatterCreator (using updateOrCreate handles cases where the record might be missing)
                 // $matters->adCreator()->updateOrCreate(
@@ -242,13 +267,16 @@ class MatterController extends Controller
                 // );
 
                 // Update or Create MattersDetails
-                // $matters->adsDetails()->updateOrCreate(
-                //     ['ad_id' => $matters->id],
-                //     [
-                //         // 'category' => $request->category ?? 'Other',
-                //         // 'gender' => $request->gender ?? 'other',
-                //     ]
-                // );
+                $matter->matterDetails()->updateOrCreate(
+                    ['matter_id' => $matter->id],
+                    [
+                        'whatsapp' => $request->whatsapp ?? null,
+                        'phone' => $request->phone ?? null,
+                        'website' => $request->website ?? null,
+                        'social_media' => $request->social_media ?? null,
+                        // 'gender' => $request->gender ?? 'other',
+                    ]
+                );
 
                 // Update or Create MatterController
                 $matter->controller()->updateOrCreate(
@@ -817,7 +845,20 @@ class MatterController extends Controller
         $user = Auth::user();
 
         // 2. Build the query
-        $query = Matter::with(['matterDetails', 'matterController'])
+        $query = Matter::with(['matterDetails', 'matterController','cityMenuMatter' => function ($q) {
+            // $q->with('cityMenu')->whereHas('cityMenu', function ($subQ) {
+            //     $subQ->whereHas('city', function ($cityQ) {
+            //         $cityQ->where('status', 'active');
+            //     })
+            //     ->whereHas('menu', function ($menuQ) {
+            //         $menuQ->where('status', 'active');
+            //     });
+            // });
+
+                $q->with('cityMenu.city', 'cityMenu.menu');
+                 
+            
+        }])
             ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {

@@ -22,7 +22,7 @@ Route::prefix('matters')->group(function () {
     ]);
     Route::get('/my-matters', [
         MatterController::class,
-        'getMyMatters',
+        'getMyMatters'
     ])->middleware('auth:sanctum');
 
     Route::delete('/{matter}', [

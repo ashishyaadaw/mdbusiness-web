@@ -17,6 +17,26 @@ class MatterResource extends JsonResource
         // In your model, status isn't in $fillable, but if it exists in DB:
         // Using a default of 'Pending' if status is null
         $controller = $this->whenLoaded('matterController');
+        // $menus = $this->whenLoaded('cityMenuMatter')
+        //     ->pluck('cityMenu.menu.title', 'cityMenu.menu_id');
+        // Output: [1 => "Electronics", 2 => "Fashion"]
+
+        // $menus = $this->whenLoaded('cityMenuMatter')->map(function ($cityMenuMatter) {
+        //     return [
+        //         // 'city_id' => $cityMenuMatter->cityMenu->city_id ?? null,
+        //         'menu_id' => $cityMenuMatter->cityMenu->menu_id ?? null,
+        //         // 'city' => $cityMenuMatter->cityMenu->city->name ?? 'N/A',
+        //         'menu' => $cityMenuMatter->cityMenu->menu->title ?? 'N/A',
+        //     ];
+        // });
+
+        $menus = [];
+        foreach ($this->whenLoaded('cityMenuMatter') as $item) {
+            $menus[] = [
+                'menu_id' => $item->cityMenu->menu_id ?? null,
+                'menu' => $item->cityMenu->menu->title ?? 'N/A',
+            ];
+        }
 
         return [
             'id' => $this->id,
@@ -32,9 +52,11 @@ class MatterResource extends JsonResource
                 'gst_amount' => $this->gst_amount,
                 'total_amount' => $this->total_amount,
             ],
+            'menus' => $menus,
+            "details" => $this->whenLoaded('matterDetails'),
 
             'controller' => $controller,
-            'cityMenuMatter' =>  $this->whenLoaded('cityMenuMatter') ?? "No city menu association",
+            // 'cityMenuMatter' =>  $this->whenLoaded('cityMenuMatter') ?? "No city menu association",
 
             'created_at' => $this->created_at ? $this->created_at->format('d M Y') : null,
         ];
