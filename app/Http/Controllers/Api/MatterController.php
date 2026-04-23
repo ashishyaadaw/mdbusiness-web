@@ -1163,6 +1163,11 @@ class MatterController extends Controller
             'payload' => 'required|string',
             'name' => 'required|string',
             'status' => 'nullable|string',
+             'website' => 'nullable|string|url',
+            'social_media' => 'nullable|string|url',
+            'phone' => 'nullable|string',
+            'alternate_contact' => 'nullable|string',
+            'whatsapp' => 'nullable|string',
             'is_premium' => 'nullable|boolean',
             'valid_until' => 'nullable|date|after:today',
         ]);
@@ -1184,10 +1189,15 @@ class MatterController extends Controller
                     'payload' => $request->payload,
                 ]);
 
-                $matter->matterDetails()->create([
-                    'phone' => $request->phone ?? null,
-                    'website' => $request->website ?? null,
-                ]);
+                   $matter->matterDetails()->create(
+                    [
+                        'whatsapp' => $request->whatsapp ?? null,
+                        'phone' => $request->phone ?? null,
+                        'alternate_contact' => $request->alternate_contact ?? null,
+                        'website' => $request->website ?? null,
+                        'social_media' => $request->social_media ?? null,
+                    ]
+                );
 
                 $matter->matterController()->create([
                     'is_premium' => $request->is_premium ?? false,
