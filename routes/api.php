@@ -54,6 +54,10 @@ Route::post('/notify', [NotificationController::class, 'notify']);
 
 
 
+// TODO: Admin routes for sending notifications to users
+// use ,'admin' middleware and prefix with 'admin' to restrict access to admins only
+
+Route::get('/admin/user/profiles', [AuthController::class, 'getProfiles']);
 
 // --- ADMIN ROUTES ---
 Route::middleware(['auth:sanctum', 'role:admin'])
@@ -65,7 +69,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])
         Route::get('/dashboard-stats', [AdminController::class, 'getStats']);
 
         // Get App User
-        Route::get('/user/profiles', [AuthController::class, 'getProfiles']);
+        // Route::get('/user/profiles', [AuthController::class, 'getProfiles']);
 
         // To get all profiles
         Route::post('/user/ads/profiles', [

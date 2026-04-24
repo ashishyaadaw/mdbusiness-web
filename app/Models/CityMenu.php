@@ -12,7 +12,7 @@ class CityMenu extends Model
     // In Menu.php
     public function city()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(City::class, 'city_id');
     }
 
     public function cities()
@@ -21,6 +21,6 @@ class CityMenu extends Model
     }
     public function menu()
     {
-        return $this->belongsTo(Menu::class);
+        return $this->belongsTo(Menu::class, 'menu_id');
     }
 }

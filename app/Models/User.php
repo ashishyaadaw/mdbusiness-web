@@ -69,6 +69,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class, 'user_id');
     }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
 
     public function matters()
     {

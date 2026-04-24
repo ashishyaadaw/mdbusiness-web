@@ -1,0 +1,38 @@
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->id();
+            // Link to the user
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
+            // Content
+            $table->string('title');
+            $table->text('body');
+            
+            // App Logic: 'type' tells the app what icon to show or what logic to run
+            $table->string('type')->default('general'); 
+            
+            // Metadata: Store IDs or extra info (e.g., ['order_id' => 45])
+            $table->json('data')->nullable();
+            
+            // Read/Unread tracking
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
+
+            // Index for faster history lookups
+            $table->index(['user_id', 'created_at']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('notifications');
+    }
+};

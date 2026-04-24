@@ -220,14 +220,14 @@ class MatterController extends Controller
 
         if ($validator->fails()) {
             return response()->json(
-                ['status' => false, 'errors' => $validator->errors(),'message' => 'Validation failed. Please check your input.'],
+                ['status' => false, 'errors' => $validator->errors(), 'message' => 'Validation failed. Please check your input.'],
                 422,
             );
         }
 
         try {
             // 3. Use a Transaction
-            DB::transaction(function () use ($request, $matter, $user) {
+            DB::transaction(function () use ($request, $matter) {
                 // Update the main Matter record
                 $matter->update([
                     'title' => $request->title,
@@ -243,7 +243,11 @@ class MatterController extends Controller
                     []
                 );
 
-                 CityMenuMatter::updateOrCreate(
+                // this will delete existing city menu association for this matter and create a new one based on the request
+                // Uncommnent the below line if you want to allow multiple city menu associations for a single matter
+                CityMenuMatter::where('matter_id', $matter->id)->delete();
+
+                CityMenuMatter::updateOrCreate(
                     [
                         'matter_id' => $matter->id,
                         'city_menu_id' => CityMenu::where('city_id', $request->city_id)
@@ -528,7 +532,6 @@ class MatterController extends Controller
         return response()->json(['status' => true, 'data' => $matters], 200);
     }
 
-
     public function update(Request $request, $id)
     {
         $matters = Matter::find($id);
@@ -545,9 +548,9 @@ class MatterController extends Controller
             'payload' => 'sometimes|string',
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
-            "is_premium" => 'sometimes|boolean',
-            "valid_until" => 'sometimes|date|after:today',
-            "status" => 'sometimes|string|in:active,inactive,hold,pending,rejected,block',
+            'is_premium' => 'sometimes|boolean',
+            'valid_until' => 'sometimes|date|after:today',
+            'status' => 'sometimes|string|in:active,inactive,hold,pending,rejected,block',
 
         ]);
 
@@ -564,8 +567,8 @@ class MatterController extends Controller
         }
 
         // Upload new Image
-        if ($matters->type === 'image' 
-        // && $request->hasFile('image')
+        if ($matters->type === 'image'
+            // && $request->hasFile('image')
         ) {
             // 1. Delete Old Image if exists
             // We use getRawOriginal to get the database path (uploads/ads/...), not the full URL
@@ -603,13 +606,12 @@ class MatterController extends Controller
         if ($request->has('is_premium') || $request->has('valid_until')) {
             $matters->controller()->update([
                 'is_premium' => $request->is_premium,
-                'valid_until' => $request->valid_until
+                'valid_until' => $request->valid_until,
             ]);
         }
 
         $matters->save();
 
-        
         return response()->json(
             [
                 'status' => true,
@@ -657,8 +659,8 @@ class MatterController extends Controller
             );
         }
 
-
     }
+
     public function inactivateMatterByUser(Matter $matter)
     {
         $user = Auth::user();
@@ -696,7 +698,6 @@ class MatterController extends Controller
             );
         }
 
-
     }
 
     public function destroy($id)
@@ -726,83 +727,79 @@ class MatterController extends Controller
         );
     }
 
- public function getMattersByMenuAndCity(Request $request, Menu $menu, City $city)
-{
-    // 1. Validation
-    if (!$city->isActiveInFlags()) {
-        return response()->json(['message' => 'This specific city is inactive.'], 403);
+    public function getMattersByMenuAndCity(Request $request, Menu $menu, City $city)
+    {
+        // 1. Validation
+        if (! $city->isActiveInFlags()) {
+            return response()->json(['message' => 'This specific city is inactive.'], 403);
+        }
+
+        // 2. Build the Query
+        // We want Matters that belong to a specific CityMenu combination
+        $query = Matter::whereHas('cityMenuMatter', function ($q) use ($menu, $city) {
+            $q->whereHas('cityMenu', function ($subQ) use ($menu, $city) {
+                $subQ->where('city_id', $city->id)
+                    ->where('menu_id', $menu->id);
+            });
+        })
+            ->whereHas('matterController', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->with(['matterDetails', 'matterController']) // Eager load for performance
+            ->latest();
+
+        // 3. Handle Pagination
+        $perPage = $request->input('per_page', 10);
+        $matters = $query->paginate($perPage);
+
+        // 4. Return standard response
+        return response()->json([
+            'status' => true,
+            'count' => $matters->count(),
+            'total' => $matters->total(),
+            'current_page' => $matters->currentPage(),
+            'last_page' => $matters->lastPage(),
+            'data' => MatterResource::collection($matters),
+        ], 200);
     }
-    
 
-    // 2. Build the Query
-    // We want Matters that belong to a specific CityMenu combination
-    $query = Matter::whereHas('cityMenuMatter', function ($q) use ($menu, $city) {
-        $q->whereHas('cityMenu', function ($subQ) use ($menu, $city) {
-            $subQ->where('city_id', $city->id)
-                 ->where('menu_id', $menu->id);
-        });
-    })
-    ->whereHas('matterController', function ($q) {
-        $q->where('status', 'active');
-    })
-    ->with(['matterDetails', 'matterController']) // Eager load for performance
-    ->latest();
+    public function getMattersByMenuAndCityByAdmin(Request $request, Menu $menu, City $city)
+    {
+        // 1. Validation
+        if (! $city->isActiveInFlags()) {
+            return response()->json(['message' => 'This specific city is inactive.'], 403);
+        }
 
-    // 3. Handle Pagination
-    $perPage = $request->input('per_page', 10);
-    $matters = $query->paginate($perPage);
+        // 2. Build the Query
+        // We want Matters that belong to a specific CityMenu combination
+        $query = Matter::whereHas('cityMenuMatter', function ($q) use ($menu, $city) {
+            $q->whereHas('cityMenu', function ($subQ) use ($menu, $city) {
+                $subQ->where('city_id', $city->id)
+                    ->where('menu_id', $menu->id);
+            });
+        })
+        // ->whereHas('matterController', function ($q) {
+        //     $q->where('status', 'active');
+        // })
+            ->with(['matterDetails', 'matterController']) // Eager load for performance
+            ->latest();
 
-    // 4. Return standard response
-    return response()->json([
-        'status'       => true,
-        'count'        => $matters->count(),
-        'total'        => $matters->total(),
-        'current_page' => $matters->currentPage(),
-        'last_page'    => $matters->lastPage(),
-        'data'         => MatterResource::collection($matters),
-    ], 200);
-}
- public function getMattersByMenuAndCityByAdmin(Request $request, Menu $menu, City $city)
-{
-    // 1. Validation
-    if (!$city->isActiveInFlags()) {
-        return response()->json(['message' => 'This specific city is inactive.'], 403);
+        // 3. Handle Pagination
+        $perPage = $request->input('per_page', 10);
+        $matters = $query->paginate($perPage);
+
+        // 4. Return standard response
+        return response()->json([
+            'status' => true,
+            'city' => $city->name,
+            'menu' => $menu->title,
+            'count' => $matters->count(),
+            'total' => $matters->total(),
+            'current_page' => $matters->currentPage(),
+            'last_page' => $matters->lastPage(),
+            'data' => MatterResource::collection($matters),
+        ], 200);
     }
-    
-
-    // 2. Build the Query
-    // We want Matters that belong to a specific CityMenu combination
-    $query = Matter::whereHas('cityMenuMatter', function ($q) use ($menu, $city) {
-        $q->whereHas('cityMenu', function ($subQ) use ($menu, $city) {
-            $subQ->where('city_id', $city->id)
-                 ->where('menu_id', $menu->id);
-        });
-    })
-    // ->whereHas('matterController', function ($q) {
-    //     $q->where('status', 'active');
-    // })
-    ->with(['matterDetails', 'matterController']) // Eager load for performance
-    ->latest();
-
-
-
-
-    // 3. Handle Pagination
-    $perPage = $request->input('per_page', 10);
-    $matters = $query->paginate($perPage);
-
-    // 4. Return standard response
-    return response()->json([
-        'status'       => true,
-        'city'         => $city->name,
-        'menu'         => $menu->title,
-        'count'        => $matters->count(),
-        'total'        => $matters->total(),
-        'current_page' => $matters->currentPage(),
-        'last_page'    => $matters->lastPage(),
-        'data'         => MatterResource::collection($matters),
-    ], 200);
-}
 
     public function getMattersByUser(Request $request, User $user)
     {
@@ -845,7 +842,7 @@ class MatterController extends Controller
         $user = Auth::user();
 
         // 2. Build the query
-        $query = Matter::with(['matterDetails', 'matterController','cityMenuMatter' => function ($q) {
+        $query = Matter::with(['matterDetails', 'matterController', 'cityMenuMatter' => function ($q) {
             // $q->with('cityMenu')->whereHas('cityMenu', function ($subQ) {
             //     $subQ->whereHas('city', function ($cityQ) {
             //         $cityQ->where('status', 'active');
@@ -855,9 +852,8 @@ class MatterController extends Controller
             //     });
             // });
 
-                $q->with('cityMenu.city', 'cityMenu.menu');
-                 
-            
+            $q->with('cityMenu.city', 'cityMenu.menu');
+
         }])
             ->where('user_id', $user->id)
             // Only show active controllers
@@ -1163,7 +1159,7 @@ class MatterController extends Controller
             'payload' => 'required|string',
             'name' => 'required|string',
             'status' => 'nullable|string',
-             'website' => 'nullable|string|url',
+            'website' => 'nullable|string|url',
             'social_media' => 'nullable|string|url',
             'phone' => 'nullable|string',
             'alternate_contact' => 'nullable|string',
@@ -1189,7 +1185,7 @@ class MatterController extends Controller
                     'payload' => $request->payload,
                 ]);
 
-                   $matter->matterDetails()->create(
+                $matter->matterDetails()->create(
                     [
                         'whatsapp' => $request->whatsapp ?? null,
                         'phone' => $request->phone ?? null,
@@ -1211,7 +1207,7 @@ class MatterController extends Controller
                 ]);
 
                 $matter->cityMenuMatter()->create([
-                    'city_menu_id' => $cityMenu->id
+                    'city_menu_id' => $cityMenu->id,
                 ]);
 
                 return $matter;
