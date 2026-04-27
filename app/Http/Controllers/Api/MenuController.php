@@ -19,9 +19,13 @@ class MenuController extends Controller
     // GET: api/menus
     public function index()
     {
-        // $menus = Menu::all();
-        $menus = Menu::with('category')->get();
+        // 1. Build the query, eager load the category, and apply sorting
+        $menus = Menu::with('category')
+            ->orderBy('sort_order', 'asc') // Primary sort
+            ->latest()                    // Secondary sort (created_at DESC)
+            ->get();                      // Execute the query
 
+        // 2. Return the sorted collection via the Resource
         return MenuResource::collection($menus);
     }
 
@@ -74,6 +78,8 @@ class MenuController extends Controller
     // GET: api/menus/{id}
     public function show(Menu $menu)
     {
+        $menu->orderBy('sort_order', 'asc')->latest();
+
         return new MenuResource($menu);
     }
 
@@ -132,7 +138,7 @@ class MenuController extends Controller
     // 1. Get menus for a specific city
     public function getMenus(City $city)
     {
-        // 2. Check if the city is active
+        // 1. Check if the city is active
         if (! $city->isActiveInFlags()) {
             return response()->json([
                 'message' => 'This specific city is inactive.',
@@ -140,15 +146,19 @@ class MenuController extends Controller
             ], 403);
         }
 
-        // 3. Eager load menus and return as a collection
-        // Using load() on the existing model instance is cleaner than $city->menus()->get()
-        $city->load('menus');
+        // 2. Eager load with constraints
+        $city->load(['menus' => function ($query) {
+            $query->orderBy('sort_order', 'asc')
+                ->latest(); // This is the secondary sort (created_at desc)
+        }]);
 
+        // 3. Return the loaded collection
         return MenuResource::collection($city->menus);
     }
+
     public function getAllMenus(City $city)
     {
-        // 2. Check if the city is active
+        // 1. Check if the city is active
         if (! $city->isActiveInFlags()) {
             return response()->json([
                 'message' => 'This specific city is inactive.',
@@ -156,21 +166,20 @@ class MenuController extends Controller
             ], 403);
         }
 
-        // This is wild card method to get all menus for a city, regardless of category. It can be used for admin purposes or if you want to show all menus without filtering by category.
+        // 2. Fetch menus belonging to this city with flags and ordering
+        $menus = Menu::where('city_id', $city->id) // Filter by the specific city
+            ->whereHas('flag', function ($query) {
+                $query->where('menus', 1);
+            })
+            ->orderBy('sort_order', 'asc')   // First priority: custom order
+            ->orderBy('created_at', 'desc')  // Second priority: newest first
+            ->get();
 
-        $menus = Menu::whereHas('flag', function ($query)  {
-            $query->where('menus', 1);
-        });
-
-        // 3. Eager load menus and return as a collection
-        // Using load() on the existing model instance is cleaner than $city->menus()->get()
-        // $city->load('menus');
+        // 3. Return the response
         return response()->json([
             'message' => 'Menus retrieved successfully',
-            'data' => MenuResource::collection($menus->get()),
+            'data' => MenuResource::collection($menus),
         ], 200);
-
-        // return MenuResource::collection($menus);
     }
 
     public function getMenusByCategory(City $city, MenuCategories $menuCategories)
@@ -191,6 +200,7 @@ class MenuController extends Controller
         // $city->load('menus');
 
         $menus->load('category');
+        $menus->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc');
 
         return MenuResource::collection($menus);
     }
@@ -207,7 +217,7 @@ class MenuController extends Controller
         }
         // $city->load('menuCategories');
         $city->load(['menuCategories' => function ($query) {
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc');
         }]);
 
         return MenuCategoryResource::collection($city->menuCategories);
@@ -229,7 +239,7 @@ class MenuController extends Controller
             // TODO: Add False in array
 
             // check if the request has a 'status' filter and apply it to the query
-            if ($request->has('status') && in_array($request->input('status'), [true, false], true)) {
+            if ($request->has('status') && in_array($request->input('status'), [true, false, 0, 1], true)) {
                 $query->whereHas('flag', function ($flagQuery) use ($request) {
                     $flagQuery->where('menu_category', $request->input('status')); // Assuming 'menu_category' is the boolean field in the flags table
                 });
@@ -239,7 +249,7 @@ class MenuController extends Controller
                 $query->where('type', $request->input('type'));
             }
 
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc');
         }]);
 
         $menu_categories = $city->menuCategories;

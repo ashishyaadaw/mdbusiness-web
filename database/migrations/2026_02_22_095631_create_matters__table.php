@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->enum('type', ['image', 'text']);
             $table->text('payload'); 
+            $table->integer('sort_order')->default(0);
             $table->timestamps();
         });
 

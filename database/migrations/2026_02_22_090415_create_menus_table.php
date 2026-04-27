@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('icon')->nullable();
             $table->string('desc')->nullable();
+            $table->integer('sort_order')->default(0);
             $table->timestamps();
         });
 
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('icon')->nullable();
             $table->string('desc')->nullable();
+            $table->integer('sort_order')->default(0);
             $table->enum('type', ['ad', 'actual'])->default('actual');
             $table->timestamps();
         });
