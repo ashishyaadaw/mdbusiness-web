@@ -166,9 +166,8 @@ class MenuController extends Controller
             ], 403);
         }
 
-        // 2. Fetch menus belonging to this city with flags and ordering
-        $menus = Menu::where('city_id', $city->id) // Filter by the specific city
-            ->whereHas('flag', function ($query) {
+        $menus = $city->menus()
+        ->whereHas('flag', function ($query) {
                 $query->where('menus', 1);
             })
             ->orderBy('sort_order', 'asc')   // First priority: custom order
