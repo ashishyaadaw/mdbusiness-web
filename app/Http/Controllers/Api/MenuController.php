@@ -184,7 +184,7 @@ class MenuController extends Controller
 
     public function getMenusByCategory(City $city, MenuCategories $menuCategories)
     {
-        // 2. Check if the city is active
+        // 1. Check if the city is active
         if (! $city->isActiveInFlags()) {
             return response()->json([
                 'message' => 'This specific city is inactive.',
@@ -192,15 +192,23 @@ class MenuController extends Controller
             ], 403);
         }
 
-        // 3. Eager load menus and return as a collection
-        // Using load() on the existing model instance is cleaner than $city->menus()->get()
+        // 2. Query the pivot/relationship table with constraints
+        // We use whereHas to ensure the category belongs to the city,
+        // then retrieve the menus with specific ordering.
+        $categoryPivot = $city->menuCategories()
+            ->where('menu_categories_id', $menuCategories->id)
+            ->first();
 
-        $cityMenuCategories = $city->menuCategories()->where('menu_categories_id', $menuCategories->id)->first();
-        $menus = $cityMenuCategories ? $cityMenuCategories->menus : collect();
-        // $city->load('menus');
+        if (! $categoryPivot) {
+            return MenuResource::collection(collect());
+        }
 
-        $menus->load('category');
-        $menus->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc');
+        // 3. Get menus via the relationship with ordering and eager loading
+        $menus = $categoryPivot->menus()
+            ->with('category') // Eager load to prevent N+1
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return MenuResource::collection($menus);
     }

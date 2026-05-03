@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MenuCategories extends Model
 {
-    protected $fillable = ['name', 'icon', 'desc'];
+    protected $fillable = ['name', 'icon','sort_order', 'desc'];
 
     protected $table = 'menu_category';
 
