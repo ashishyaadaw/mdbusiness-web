@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\MenuController;
 use Illuminate\Support\Facades\Route;
 
+// Creation on menu default to cityId 1
 Route::apiResource('menus', MenuController::class);
 
 // List menus for a city

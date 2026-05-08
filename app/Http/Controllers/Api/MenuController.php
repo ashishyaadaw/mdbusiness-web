@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuCategoryResource;
 use App\Http\Resources\MenuResource;
 use App\Models\City;
+use App\Models\CityMenu;
 use App\Models\Flag;
 use App\Models\Menu;
 use App\Models\MenuCategories;
@@ -59,6 +60,10 @@ class MenuController extends Controller
                 Flag::updateOrCreate(
                     ['id' => $menu->id],
                     ['menus' => (int) $request->status ?? 1] // Casts true to 1 and false to 0, defaults to 1 if not provided
+                );
+                //3.  This to create pivot with city_menu
+                CityMenu::create(
+                    ['city_id' => 1, 'menu_id' => $menu->id]
                 );
 
                 return response()->json([
@@ -167,7 +172,7 @@ class MenuController extends Controller
         }
 
         $menus = $city->menus()
-        ->whereHas('flag', function ($query) {
+            ->whereHas('flag', function ($query) {
                 $query->where('menus', 1);
             })
             ->orderBy('sort_order', 'asc')   // First priority: custom order
