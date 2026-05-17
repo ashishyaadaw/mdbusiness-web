@@ -801,6 +801,25 @@ class MatterController extends Controller
         ], 200);
     }
 
+      public function getAllPendingMatters(Request $request)
+{
+    // Start with the query builder, NOT ::all()
+    $menus = Matter::query()
+        ->whereHas('matterController', function ($query) {
+            $query->where('status', 'pending');
+        })  
+        ->with(['matterDetails', 'matterController']) // Eager load for performance 
+        ->orderBy('sort_order', 'asc')   // First priority: custom order
+        ->orderBy('created_at', 'desc')  // Second priority: newest first
+        ->get();                         // Execute the query at the very end
+
+    // Return the response
+    return response()->json([
+        'message' => 'Menus retrieved successfully',
+        'data' => MatterResource::collection($menus),
+    ], 200);
+}
+
     public function getMattersByUser(Request $request, User $user)
     {
         // 1. Check if the user is active (reuse your existing logic)

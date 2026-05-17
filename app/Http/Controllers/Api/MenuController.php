@@ -8,13 +8,14 @@ use App\Http\Resources\MenuResource;
 use App\Models\City;
 use App\Models\CityMenu;
 use App\Models\Flag;
+use App\Models\Matters\Matter;
 use App\Models\Menu;
 use App\Models\MenuCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use App\Services\MenuSortService;
 class MenuController extends Controller
 {
     // GET: api/menus
@@ -95,6 +96,8 @@ class MenuController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'icon' => 'nullable|string|url',
+            'sort_order' => 'nullable|integer|min:0',            
+            'direction'        => 'nullable|in:up,down,top,bottom',
             'menu_category_id' => 'sometimes|required|exists:menu_category,id',
             'type' => 'sometimes|required|in:ad,actual',
             'status' => 'sometimes|boolean', // Added status to validation
@@ -104,11 +107,19 @@ class MenuController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+
         try {
             return DB::transaction(function () use ($request, $menu) {
 
+            // Call the Helper/Service logic
+            if ($request->filled('direction')) {
+                MenuSortService::reorder($menu, $request->direction);
+            }
+
+     
                 // 1. Update Menu excluding 'status'
-                $menu->update($request->except('status'));
+                 $menu->update($request->except(['status', 'direction']));
+                //  $menu->update($request->all());
 
                 // 2. Update Flag only if 'status' was actually provided in the request
                 if ($request->has('status')) {
