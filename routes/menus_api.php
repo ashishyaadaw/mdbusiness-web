@@ -10,7 +10,6 @@ Route::apiResource('menus', MenuController::class);
 Route::get('menus/{city}/all-menus', [MenuController::class, 'getMenus']);
 
 Route::get('menus/{city}/all-menus2', [MenuController::class, 'getAllMenus']);
-Route::get('menus/all-menus/pending', [MenuController::class, 'getAllPendingMenus']);
 
 Route::get('menus/{city}/{menuCategories}/all-menus', [MenuController::class, 'getMenusByCategory']);
 
