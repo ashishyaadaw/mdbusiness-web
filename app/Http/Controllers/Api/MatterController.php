@@ -547,7 +547,12 @@ class MatterController extends Controller
             'type' => 'sometimes|in:image,text',
             'payload' => 'sometimes|string',
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-
+             'name' => 'required|string',
+            'website' => 'nullable|string',
+            'social_media' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'alternate_contact' => 'nullable|string',
+            'whatsapp' => 'nullable|string',
             'is_premium' => 'sometimes|boolean',
             'valid_until' => 'sometimes|date|after:today',
             'status' => 'sometimes|string|in:active,inactive,hold,pending,rejected,block',
@@ -602,6 +607,21 @@ class MatterController extends Controller
         }
         if ($request->has('status')) {
             $matters->controller()->update(['status' => $request->status]);
+        }
+        if ($request->has('name')) {
+            $matters->details()->update(['name' => $request->name]);
+        }
+        if ($request->has('website')) {
+            $matters->details()->update(['website' => $request->website]);
+        }
+        if ($request->has('social_media')) {
+            $matters->details()->update(['social_media' => $request->social_media]);
+        }
+        if ($request->has('phone')) {
+            $matters->details()->update(['phone' => $request->phone]);
+        }
+        if ($request->has('whatsapp')) {
+             $matters->details()->update(['whatsapp' => $request->whatsapp]);
         }
         if ($request->has('is_premium') || $request->has('valid_until')) {
             $matters->controller()->update([
@@ -1206,6 +1226,7 @@ class MatterController extends Controller
 
                 $matter->matterDetails()->create(
                     [
+                        'name' => $request->name ?? null,
                         'whatsapp' => $request->whatsapp ?? null,
                         'phone' => $request->phone ?? null,
                         'alternate_contact' => $request->alternate_contact ?? null,
