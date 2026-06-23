@@ -828,7 +828,7 @@ class MatterController extends Controller
         ->whereHas('matterController', function ($query) {
             $query->where('status', 'pending');
         })  
-        ->with(['matterDetails', 'matterController']) // Eager load for performance 
+        ->with(['matterDetails', 'matterController','cityMenuMatter']) // Eager load for performance 
         ->orderBy('sort_order', 'asc')   // First priority: custom order
         ->orderBy('created_at', 'desc')  // Second priority: newest first
         ->get();                         // Execute the query at the very end

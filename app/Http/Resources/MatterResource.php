@@ -32,9 +32,11 @@ class MatterResource extends JsonResource
 
         $menus = [];
         foreach ($this->whenLoaded('cityMenuMatter') as $item) {
-            $menus[] = [
+            $menus = [
                 'menu_id' => $item->cityMenu->menu_id ?? null,
                 'menu' => $item->cityMenu->menu->title ?? 'N/A',
+                'title' => $item->cityMenu->menu->title ?? 'N/A',
+                'name' => $item->cityMenu->menu->title ?? 'N/A',
             ];
         }
 
