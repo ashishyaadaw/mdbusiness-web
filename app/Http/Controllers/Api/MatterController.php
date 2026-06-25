@@ -801,7 +801,7 @@ class MatterController extends Controller
         // ->whereHas('matterController', function ($q) {
         //     $q->where('status', 'active');
         // })
-            ->with(['matterDetails', 'matterController']) // Eager load for performance
+            ->with(['matterDetails', 'matterController','cityMenuMatter']) // Eager load for performance
             ->latest();
 
         // 3. Handle Pagination
