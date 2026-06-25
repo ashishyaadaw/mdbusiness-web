@@ -20,6 +20,6 @@ Route::post('menus/{city}/all-menu-categories', [MenuController::class, 'getMenu
 
 
 Route::put('menus/categories/{menuCategories}/update', [MenuController::class, 'updateMenuCategory']);
-Route::delete('menus/categories/{menuCategories}/delete', [MenuController::class, 'deleteMenuCategory']);
+// Route::delete('menus/categories/{menuCategories}/delete', [MenuController::class, 'deleteMenuCategory']);
 
 Route::post('menus/category/{city}/create', [MenuController::class, 'addMenuCategory']);

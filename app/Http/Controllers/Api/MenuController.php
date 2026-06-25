@@ -146,9 +146,9 @@ class MenuController extends Controller
     // DELETE: api/menus/{id}
     public function destroy(Menu $menu)
     {
-        $menu->delete();
+        // $menu->delete();
 
-        return response()->json(['message' => 'Menu deleted successfully'], 200);
+        return response()->json(['message' => 'Menu deletion is off by admimn'], 200);
     }
 
     // 1. Get menus for a specific city
