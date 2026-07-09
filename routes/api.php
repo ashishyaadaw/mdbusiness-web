@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ImageUploadController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PhoneVerificationController;
 use App\Http\Controllers\Api\PromoAdsController;
@@ -96,7 +97,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])
         Route::apiResource('ads', PromoAdsController::class);
     });
 
-    
+Route::post('/uploadimage', [ImageUploadController::class, 'store'])->name('upload.educational.image');    
 Route::get('/promoAds/{ad_id}', [PromoAdsController::class, 'show']);
 // --- STAFF ROUTES ---
 Route::middleware(['auth:sanctum', 'role:admin,staff'])
