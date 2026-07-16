@@ -11,6 +11,7 @@ Route::prefix('matters')->group(function () {
     Route::post('create/{city}/{menu}', [MatterController::class, 'createWithCityAndMenu']);
 
     Route::get('all-matters', [MatterController::class, 'getMatters']);
+    Route::get('all-matters-by-tags', [MatterController::class, 'getMattersByTags']);
 
     Route::get('admin/{menu}/{city}/all-matters', [MatterController::class, 'getMattersByMenuAndCityByAdmin']);
     Route::get('admin/pending/all-matters', [MatterController::class, 'getAllPendingMatters']);

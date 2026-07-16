@@ -1087,10 +1087,36 @@ class MatterController extends Controller
             $q->whereIn('status', ['active']);
         });
 
-        // Execute query
+        // Execute query 
         $matters = $query->get();
 
         return MatterResource::collection($matters);
+    }
+    public function getMattersByTags(Request $request)
+    {
+        // Start the query builder
+        $query = Matter::with([
+            'matterDetails',
+            'matterController',
+            'cityMenuMatter',
+        ])->latest();
+
+        $query->whereHas('matterController', function ($q) {
+            $q->whereIn('status', ['active']);
+        });
+
+        // Execute query 
+        $perPage = $request->input('per_page', 10);
+        $matters = $query->paginate($perPage);
+
+        return response()->json([
+            'status' => true,
+            'count' => $matters->count(),
+            'total' => $matters->total(),
+            'current_page' => $matters->currentPage(),
+            'last_page' => $matters->lastPage(),
+            'data' => MatterResource::collection($matters),
+        ], 200);
     }
 
     public function create(Request $request)
