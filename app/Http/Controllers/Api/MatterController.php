@@ -549,6 +549,7 @@ class MatterController extends Controller
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
              'name' => 'required|string',
             'website' => 'nullable|string',
+            'tags' => 'nullable|string',
             'social_media' => 'nullable|string',
             'phone' => 'nullable|string',
             'alternate_contact' => 'nullable|string',
@@ -613,6 +614,9 @@ class MatterController extends Controller
         }
         if ($request->has('website')) {
             $matters->details()->update(['website' => $request->website]);
+        }
+        if ($request->has('tags')) {
+            $matters->details()->update(['tags' => $request->tags]);
         }
         if ($request->has('social_media')) {
             $matters->details()->update(['social_media' => $request->social_media]);
@@ -1094,21 +1098,37 @@ class MatterController extends Controller
     }
     public function getMattersByTags(Request $request)
     {
-        // Start the query builder
+        // DB::enableQueryLog();
+        // Fallback block ensuring query strings match (tags, tag, or query)
+        $searchTerm = $request->query('tags') ?? $request->query('tag') ?? $request->query('query');
+        
+        // Start building query with required structural relationships
         $query = Matter::with([
-            'matterDetails',
             'matterController',
             'cityMenuMatter',
         ])->latest();
-
+    
+        // Enforce active status limit on the controller relation
         $query->whereHas('matterController', function ($q) {
             $q->whereIn('status', ['active']);
         });
-
-        // Execute query 
+    
+        // Handle search term filtering cleanly
+        if (!empty(trim($searchTerm))) {
+            // Change 'matterDetails' to 'matterDetail' below if your model relationship is singular!
+            $query->withWhereHas('matterDetails', function ($q) use ($searchTerm) {
+                $q->where('tags', 'like', '%' . trim($searchTerm) . '%');
+            });
+        } else {
+            // If no tag is searched, still load the relationship data cleanly
+            $query->with(['matterDetails']);
+        }
+    
+        // Execute paginated collection
         $perPage = $request->input('per_page', 10);
         $matters = $query->paginate($perPage);
-
+        // DB::getQueryLog();
+    
         return response()->json([
             'status' => true,
             'count' => $matters->count(),
@@ -1133,6 +1153,8 @@ class MatterController extends Controller
             'contact' => 'nullable|string',
             'whatsapp' => 'nullable|string',
             'alternate_contact' => 'nullable|string',
+            'website' => 'nullable|string',
+            'tags' => 'nullable|string',
             'gstin' => 'nullable|string',
             'duration_days' => 'nullable|integer|min:1',
             'base_amount' => 'nullable|numeric|min:0',
@@ -1164,6 +1186,7 @@ class MatterController extends Controller
                 $matter->matterDetails()->create([
                     'phone' => $request->phone ?? null,
                     'website' => $request->website ?? null,
+                    'tags' => $request->tags ?? null,
                 ]);
 
                 $matter->matterPricing()->create([
@@ -1225,6 +1248,7 @@ class MatterController extends Controller
             'name' => 'required|string',
             'status' => 'nullable|string',
             'website' => 'nullable|string',
+            'tags' => 'nullable|string',
             'social_media' => 'nullable|string',
             'phone' => 'nullable|string',
             'alternate_contact' => 'nullable|string',
@@ -1257,6 +1281,7 @@ class MatterController extends Controller
                         'phone' => $request->phone ?? null,
                         'alternate_contact' => $request->alternate_contact ?? null,
                         'website' => $request->website ?? null,
+                        'tags' => $request->tags ?? null,
                         'social_media' => $request->social_media ?? null,
                     ]
                 );

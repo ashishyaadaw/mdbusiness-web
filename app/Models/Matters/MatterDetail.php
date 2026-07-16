@@ -17,6 +17,7 @@ class MatterDetail extends Model
         'whatsapp',
         'alternate_contact',
         'website',
+        'tags',
         'social_media',
         'gstin',
     ];
