@@ -24,7 +24,8 @@ class MatterController extends Controller
     {
         // Move with() before get()
         $matters = Matter::with('matterDetail', 'matterController')
-            ->latest()
+            ->orderBy('sort_order', 'asc')   
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json(['status' => true, 'data' => $matters], 200);
@@ -769,8 +770,10 @@ class MatterController extends Controller
             ->whereHas('matterController', function ($q) {
                 $q->where('status', 'active');
             })
-            ->with(['matterDetails', 'matterController']) // Eager load for performance
-            ->latest();
+            ->with(['matterDetails', 'matterController']);
+
+        $query->orderBy('sort_order', 'asc')   
+              ->orderBy('created_at', 'desc'); 
 
         // 3. Handle Pagination
         $perPage = $request->input('per_page', 10);
@@ -803,10 +806,12 @@ class MatterController extends Controller
             });
         })
         // ->whereHas('matterController', function ($q) {
-        //     $q->where('status', 'active');
+        //     $q->where('status', 'active')
+            //   ->orderBy('is_premium', 'desc');
         // })
             ->with(['matterDetails', 'matterController','cityMenuMatter']) // Eager load for performance
-            ->latest();
+            ->orderBy('sort_order', 'asc')   
+              ->orderBy('created_at', 'desc'); ;
 
         // 3. Handle Pagination
         $perPage = $request->input('per_page', 10);
@@ -830,7 +835,8 @@ class MatterController extends Controller
     // Start with the query builder, NOT ::all()
     $menus = Matter::query()
         ->whereHas('matterController', function ($query) {
-            $query->where('status', 'pending');
+            $query->where('status', 'pending')
+              ->orderBy('is_premium', 'desc');
         })  
         ->with(['matterDetails', 'matterController','cityMenuMatter']) // Eager load for performance 
         ->orderBy('sort_order', 'asc')   // First priority: custom order
@@ -856,9 +862,11 @@ class MatterController extends Controller
             ->where('user_id', $user->id)
             // Only show active controllers
             // ->whereHas('matterController', function ($q) {
-            //     $q->where('status', 'active');
+            //     $q->where('status', 'active')
+            //   ->orderBy('is_premium', 'desc');
             // })
-            ->latest();
+            ->orderBy('sort_order', 'asc')
+              ->orderBy('created_at', 'desc');
 
         // 3. Handle Pagination
         $perPage = $request->input('per_page', 10);
@@ -903,7 +911,8 @@ class MatterController extends Controller
             // ->whereHas('matterController', function ($q) {
             //     $q->where('status', 'active');
             // })
-            ->latest();
+            ->orderBy('sort_order', 'asc')
+              ->orderBy('created_at', 'desc');
 
         // 3. Handle Pagination
         $perPage = $request->input('per_page', 10);
@@ -946,7 +955,7 @@ class MatterController extends Controller
             'adCreator',
             'adController',
             'adFeatured',
-        ])->latest();
+        ])->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc');
 
         // 2. Filter by Category and Gender
         if (($category && strtolower($category) !== 'all') || ! empty($gender)) {
@@ -1043,7 +1052,7 @@ class MatterController extends Controller
             'adsDetails',
             'adCreator',
             'adController',
-        ])->latest();
+        ])->orderBy('sort_order', 'asc')->orderBy('created_at', 'desc');
 
         $status = strtolower($request->status);
 
@@ -1085,11 +1094,14 @@ class MatterController extends Controller
         $query = Matter::with([
             'matterDetails',
             'matterController',
-        ])->latest();
+        ]);
 
         $query->whereHas('matterController', function ($q) {
-            $q->whereIn('status', ['active']);
+            $q->whereIn('status', ['active'])
+              ->orderBy('is_premium', 'desc');
         });
+        $query->orderBy('sort_order', 'asc')   
+              ->orderBy('created_at', 'desc'); 
 
         // Execute query 
         $matters = $query->get();
@@ -1106,11 +1118,12 @@ class MatterController extends Controller
         $query = Matter::with([
             'matterController',
             'cityMenuMatter',
-        ])->latest();
+        ]);
     
         // Enforce active status limit on the controller relation
         $query->whereHas('matterController', function ($q) {
-            $q->whereIn('status', ['active']);
+            $q->whereIn('status', ['active'])
+              ->orderBy('is_premium', 'desc');
         });
     
         // Handle search term filtering cleanly
@@ -1123,7 +1136,10 @@ class MatterController extends Controller
             // If no tag is searched, still load the relationship data cleanly
             $query->with(['matterDetails']);
         }
-    
+
+        $query->orderBy('sort_order', 'asc')   
+              ->orderBy('created_at', 'desc'); 
+     
         // Execute paginated collection
         $perPage = $request->input('per_page', 10);
         $matters = $query->paginate($perPage);
@@ -1377,7 +1393,8 @@ class MatterController extends Controller
 
         $matters = Matter::with(['adsDetails', 'adCreator', 'adController'])
             ->where('user_id', $user->id)
-            ->latest()
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         // Laravel's Paginate object already puts the items inside a 'data' key
