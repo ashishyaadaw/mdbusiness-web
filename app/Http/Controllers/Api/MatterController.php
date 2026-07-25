@@ -773,7 +773,7 @@ class MatterController extends Controller
             ->latest();
 
         // 3. Handle Pagination
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 100);
         $matters = $query->paginate($perPage);
 
         // 4. Return standard response
