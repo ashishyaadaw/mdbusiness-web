@@ -43,6 +43,7 @@ class MatterResource extends JsonResource
             'user_id' => $this->user_id,
             'title' => $this->title,
             'type' => $this->type,
+            'sort_order' => $this->sort_order,
             'payload' => $this->payload, // Accessor in Model handles asset() URL
             'status' => $controller ? $controller->status : 'Pending', // Default to 'Pending' if no controller or status
 

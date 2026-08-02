@@ -18,7 +18,7 @@ class Matter extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id',  'title', 'type', 'payload'];
+    protected $fillable = ['user_id',  'title', 'type', 'payload','sort_order'];
 
     // protected $hidden = ['created_at', 'updated_at'];
 

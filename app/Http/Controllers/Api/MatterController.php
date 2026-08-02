@@ -1413,4 +1413,53 @@ class MatterController extends Controller
             200,
         );
     }
+    /**
+     * Update sort order for matters in bulk.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+public function reorder(Request $request)
+{
+    // 1. Validate structural payload shape
+    $validated = $request->validate([
+        'matters' => 'required|array',
+        'matters.*.id' => 'required|integer',
+        'matters.*.sort_order' => 'required|integer|min:0',
+    ]);
+
+    $items = collect($validated['matters']);
+
+    // THIS WILL ONLY VALIDATE SQL QUERY NOT BE UPDATED OR INSERTED
+    $userId = $request->user()->id ?? 1; // or auth()->id()
+
+    $now = now();
+    // 3. Execution: Bulk update in 1 single query using Upsert
+    try {
+        // Prepare rows for upsert
+        $values = $items->map(fn ($item) => [
+            'id' => $item['id'],
+            'title' => $item['title'] ?? "", // Optional: Include title if needed
+            'payload' => $item['payload'] ?? "", // Optional: Include title if needed
+            'user_id' => $userId, // REQUIRED: Prevents SQL Error 1364
+            'sort_order' => $item['sort_order'],
+            'updated_at' => $now, // REQUIRED: Prevents SQL Error 1364
+        ])->toArray();
+
+        // Perform batch update in ONE single SQL execution
+        Matter::upsert($values, ['id'], ['sort_order', 'updated_at']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Matter order updated successfully.',
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update matter order.',
+            'error' => config('app.debug') ? $e->getMessage() : 'Server Error',
+        ], 500);
+    }
+}
 }

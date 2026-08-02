@@ -23,7 +23,7 @@ class MenuController extends Controller
     {
         // 1. Build the query, eager load the category, and apply sorting
         $menus = Menu::with('category')
-            ->orderBy('sort_order', 'asc') // Primary sort
+            // ->orderBy('sort_order', 'asc') // Primary sort
             ->latest()                    // Secondary sort (created_at DESC)
             ->get();                      // Execute the query
 

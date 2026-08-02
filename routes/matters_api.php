@@ -52,4 +52,7 @@ Route::prefix('matters')->group(function () {
         'inactivateMatterByUser'
     ])->middleware('auth:sanctum');
 
+    Route::post('/reorder', [MatterController::class, 'reorder-auth'])->middleware('auth:sanctum');
+    Route::post('/reorder', [MatterController::class, 'reorder']);
+
 });
