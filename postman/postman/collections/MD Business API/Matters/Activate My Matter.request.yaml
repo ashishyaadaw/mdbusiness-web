@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/matters/:matter/activate"
+method: POST
+pathVariables:
+  matter: "1"
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 13000

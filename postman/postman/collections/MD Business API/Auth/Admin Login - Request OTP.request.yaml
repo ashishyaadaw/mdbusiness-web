@@ -1,0 +1,14 @@
+$kind: http-request
+description: Phone must already belong to a user with role=admin, or user lookup/creation happens via AuthService.
+url: "{{base_url}}/admin/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "phone": "9999999999",
+      "full_name": "Admin"
+    }
+order: 3000

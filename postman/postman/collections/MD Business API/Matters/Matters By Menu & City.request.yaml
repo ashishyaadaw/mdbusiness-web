@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/matters/:menu/:city/all-matters"
+method: GET
+pathVariables:
+  menu: "1"
+  city: "1"
+order: 7000

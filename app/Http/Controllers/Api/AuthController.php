@@ -34,6 +34,19 @@ class AuthController extends Controller
 
     private const OTP_EXPIRE_MINUTES = 5;
 
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(
+            [
+                'status' => true,
+                'message' => 'Logged out successfully.',
+            ],
+            200,
+        );
+    }
+
     /**
      * Smart Login: Handles both Registration (Auto) and Login via OTP.
      */

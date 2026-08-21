@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/matters/all-matters-by-tags?tags=electrician&per_page=10"
+method: GET
+queryParams:
+  tags: electrician
+  per_page: "10"
+order: 4000

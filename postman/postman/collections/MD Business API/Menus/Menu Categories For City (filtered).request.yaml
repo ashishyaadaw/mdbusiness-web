@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/menus/:city/all-menu-categories"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  city: "1"
+body:
+  type: text
+  content: |-
+    {
+      "status": 1,
+      "type": "actual"
+    }
+order: 10000

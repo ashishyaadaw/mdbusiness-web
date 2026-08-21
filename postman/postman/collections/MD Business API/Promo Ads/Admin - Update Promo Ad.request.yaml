@@ -1,0 +1,20 @@
+$kind: http-request
+description: "Note: the :ad route parameter is matched positionally against the controller's $ad_id parameter (a custom ad_id string), not the numeric primary key."
+url: "{{base_url}}/admin/ads/:ad"
+method: PUT
+headers:
+  Content-Type: application/json
+pathVariables:
+  ad: "1"
+body:
+  type: text
+  content: |-
+    {
+      "title": "Sale updated",
+      "body": "Up to 60% off"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+order: 5000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/cities/:city/menus"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  city: "1"
+body:
+  type: text
+  content: |-
+    {
+      "menu_id": 1
+    }
+order: 7000

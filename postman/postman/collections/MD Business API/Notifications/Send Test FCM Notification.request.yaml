@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/notify"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "fcm_token": "device-fcm-token"
+    }
+order: 1000

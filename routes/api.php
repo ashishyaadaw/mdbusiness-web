@@ -1,112 +1,25 @@
 <?php
 
-use App\Http\Controllers\Api\AdController;
-use App\Http\Controllers\Api\AdminController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ImageUploadController;
-use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\PhoneVerificationController;
-use App\Http\Controllers\Api\PromoAdsController;
-use App\Http\Controllers\Api\StaffController;
-use App\Http\Controllers\Api\TransactionController;
-use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| This file is loaded by the framework via bootstrap/app.php, which already
+| assigns the "api" middleware group and the "/api" URI prefix to everything
+| registered here. Routes are split by domain under routes/api/ and simply
+| required below to keep this file short and each domain easy to find.
 |
 */
 
-// Public routes for authentication
-Route::post('/login/smart', [AuthController::class, 'smartLogin']);
-Route::post('/admin/login', [AuthController::class, 'checkerAppLogin']);
-Route::post('/user/profile/exists', [AuthController::class, 'userExists']);
-
-// Protected routes (require authentication)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/user/profile', [AuthController::class, 'getProfile']);
-    Route::put('/user/profile', [AuthController::class, 'updateProfile']);
-    // You can add more protected routes here (e.g., search, connect, etc.)
-
-    Route::post('ads', [AdController::class, 'createNewAds']);
-    Route::put('ad/{ad}', [AdController::class, 'updateAd']);
-    Route::put('ad/{ad}/status', [AdController::class, 'changeAdStatus']);
-    Route::delete('ad/{ad}', [AdController::class, 'deleteAd']);
-    Route::get('ads', [AdController::class, 'myAds']);
-
-    Route::get('/user/transactions', [TransactionController::class, 'index']);
-    Route::post('/user/transactions', [TransactionController::class, 'store']);
-});
-
-// Phone Verification
-Route::post('/otp/send', [PhoneVerificationController::class, 'sendPhoneOtp']);
-Route::post('/otp/verify', [
-    PhoneVerificationController::class,
-    'verifyPhoneOtp',
-]);
-// Notify App User
-Route::post('/notify', [NotificationController::class, 'notify']);
-
-
-
-// TODO: Admin routes for sending notifications to users
-// use ,'admin' middleware and prefix with 'admin' to restrict access to admins only
-
-Route::get('/admin/user/profiles', [AuthController::class, 'getProfiles']);
-
-// --- ADMIN ROUTES ---
-Route::middleware(['auth:sanctum', 'role:admin'])
-    ->prefix('admin')
-    ->group(function () {
-        
-
-        // Add other admin-only tasks
-        Route::get('/dashboard-stats', [AdminController::class, 'getStats']);
-
-        // Get App User
-        // Route::get('/user/profiles', [AuthController::class, 'getProfiles']);
-
-        // To get all profiles
-        Route::post('/user/ads/profiles', [
-            AdController::class,
-            'getAdsProfiles',
-        ]);
-        Route::put('/user/ad/{ad}/status', [
-            AdController::class,
-            'updateAdProfileStatus',
-        ]);
-
-        // Public Test Route
-        Route::get('/hi', function () {
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => 'API is working',
-                    'data' => null,
-                ],
-                200,
-            );
-        });
-
-        Route::apiResource('ads', PromoAdsController::class);
-    });
-
-Route::post('/uploadimage', [ImageUploadController::class, 'store'])->name('upload.educational.image');    
-Route::get('/promoAds/{ad_id}', [PromoAdsController::class, 'show']);
-// --- STAFF ROUTES ---
-Route::middleware(['auth:sanctum', 'role:admin,staff'])
-    ->prefix('staff')
-    ->group(function () {
-        // Staff can view things, maybe update ads, but not delete everything
-        Route::get('/reports', [StaffController::class, 'index']);
-        Route::put('/verify-user/{user}', [
-            StaffController::class,
-            'verifyUser',
-        ]);
-    });
+require __DIR__.'/api/auth.php';
+require __DIR__.'/api/otp.php';
+require __DIR__.'/api/notifications.php';
+require __DIR__.'/api/transactions.php';
+require __DIR__.'/api/uploads.php';
+require __DIR__.'/api/promo-ads.php';
+require __DIR__.'/api/admin.php';
+require __DIR__.'/api/staff.php';
+require __DIR__.'/api/cities.php';
+require __DIR__.'/api/menus.php';
+require __DIR__.'/api/matters.php';

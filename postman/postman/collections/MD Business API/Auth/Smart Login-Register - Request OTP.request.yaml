@@ -1,0 +1,21 @@
+$kind: http-request
+name: Smart Login/Register - Request OTP
+description: If the phone doesn't exist yet, this auto-registers the user and sends an OTP. Omit `otp` to trigger send; include it to verify.
+url: "{{base_url}}/login/smart"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "phone": "6306366766",
+      "full_name": "Test User",
+      "fcm_key": "",
+      "otp":"6882"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: 630|sba9TmKyJo3XIgCAUep8w558nm8X6LCu6IAtGVPZ2e9e7c03
+order: 1000

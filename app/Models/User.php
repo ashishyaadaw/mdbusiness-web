@@ -20,6 +20,11 @@ class User extends Authenticatable
         'username',
         'phone',
         'password',
+        'is_verified',
+    ];
+
+    protected $casts = [
+        'is_verified' => 'boolean',
     ];
 
     /**

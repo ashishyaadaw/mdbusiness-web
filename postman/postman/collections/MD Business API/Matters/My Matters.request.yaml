@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{base_url}}/matters/my-matters"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 9000

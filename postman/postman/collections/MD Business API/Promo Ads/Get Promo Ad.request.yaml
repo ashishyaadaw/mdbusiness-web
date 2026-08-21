@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/promoAds/:ad_id"
+method: GET
+pathVariables:
+  ad_id: home_banner_1
+order: 1000

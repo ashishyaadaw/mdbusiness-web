@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/menus/:menu"
+method: GET
+pathVariables:
+  menu: "1"
+order: 3000

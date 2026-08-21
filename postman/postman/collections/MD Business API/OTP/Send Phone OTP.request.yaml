@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/otp/send"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "phone": "9999999999",
+      "username": "testuser"
+    }
+order: 1000

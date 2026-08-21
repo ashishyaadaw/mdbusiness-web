@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/matters/:user/all-matters"
+method: GET
+pathVariables:
+  user: "1"
+order: 8000

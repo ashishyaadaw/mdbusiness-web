@@ -1110,41 +1110,38 @@ class MatterController extends Controller
     }
     public function getMattersByTags(Request $request)
     {
-        // DB::enableQueryLog();
         // Fallback block ensuring query strings match (tags, tag, or query)
-        $searchTerm = $request->query('tags') ?? $request->query('tag') ?? $request->query('query');
-        
-        // Start building query with required structural relationships
-        $query = Matter::with([
-            'matterController',
-            'cityMenuMatter',
-        ]);
-    
-        // Enforce active status limit on the controller relation
-        $query->whereHas('matterController', function ($q) {
-            $q->whereIn('status', ['active'])
-              ->orderBy('is_premium', 'desc');
-        });
-    
+        $searchTerm = trim((string) ($request->query('tags') ?? $request->query('tag') ?? $request->query('query')));
+
+        // Join (rather than whereHas) so we can order by is_premium below —
+        // whereHas only builds an EXISTS subquery, its ordering never reaches
+        // the outer result set.
+        $query = Matter::query()
+            ->select('matters.*')
+            ->join('matter_controller', 'matter_controller.matter_id', '=', 'matters.id')
+            ->where('matter_controller.status', 'active')
+            ->with(['matterController', 'cityMenuMatter']);
+
         // Handle search term filtering cleanly
-        if (!empty(trim($searchTerm))) {
+        if ($searchTerm !== '') {
             // Change 'matterDetails' to 'matterDetail' below if your model relationship is singular!
             $query->withWhereHas('matterDetails', function ($q) use ($searchTerm) {
-                $q->where('tags', 'like', '%' . trim($searchTerm) . '%');
+                $q->where('tags', 'like', '%'.$searchTerm.'%');
             });
         } else {
             // If no tag is searched, still load the relationship data cleanly
             $query->with(['matterDetails']);
         }
 
-        $query->orderBy('sort_order', 'asc')   
-              ->orderBy('created_at', 'desc'); 
-     
+        // Premium listings first, then newest first — applies whether or not
+        // a tag filter was supplied.
+        $query->orderByDesc('matter_controller.is_premium')
+            ->orderByDesc('matters.created_at');
+
         // Execute paginated collection
         $perPage = $request->input('per_page', 10);
         $matters = $query->paginate($perPage);
-        // DB::getQueryLog();
-    
+
         return response()->json([
             'status' => true,
             'count' => $matters->count(),

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/menus/category/:city/create"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  city: "1"
+body:
+  type: text
+  content: |-
+    {
+      "name": "Home Services",
+      "icon": "https://example.com/icon.png",
+      "desc": "All home service providers",
+      "status": true
+    }
+order: 12000

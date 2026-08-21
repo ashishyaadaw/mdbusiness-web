@@ -15,7 +15,7 @@ Route::prefix('matters')->group(function () {
 
     Route::get('admin/{menu}/{city}/all-matters', [MatterController::class, 'getMattersByMenuAndCityByAdmin']);
     Route::get('admin/pending/all-matters', [MatterController::class, 'getAllPendingMatters']);
-    
+
     Route::get('{menu}/{city}/all-matters', [MatterController::class, 'getMattersByMenuAndCity']);
 
     Route::get('{user}/all-matters', [
@@ -24,35 +24,35 @@ Route::prefix('matters')->group(function () {
     ]);
     Route::get('/my-matters', [
         MatterController::class,
-        'getMyMatters'
+        'getMyMatters',
     ])->middleware('auth:sanctum');
 
     Route::delete('/{matter}', [
         MatterController::class,
-        'destroyMyMatter'
+        'destroyMyMatter',
     ]);
     Route::put('/{matter}', [
         MatterController::class,
-        'update'
+        'update',
     ]);
 
     Route::put('/user/update/{matter}', [
         MatterController::class,
-        'updateMatter'
+        'updateMatter',
     ])->middleware('auth:sanctum');
 
-    
     Route::post('/{matter}/activate', [
         MatterController::class,
-        'activateMatterByUser'
+        'activateMatterByUser',
     ])->middleware('auth:sanctum');
-    
+
     Route::post('/{matter}/inactivate', [
         MatterController::class,
-        'inactivateMatterByUser'
+        'inactivateMatterByUser',
     ])->middleware('auth:sanctum');
 
-    Route::post('/reorder', [MatterController::class, 'reorder-auth'])->middleware('auth:sanctum');
-    Route::post('/reorder', [MatterController::class, 'reorder']);
-
+    // NOTE: previously registered twice, with the first copy pointing at a
+    // non-existent 'reorder-auth' method, which made this route always
+    // fatal-error before ever reaching the real 'reorder' implementation.
+    Route::post('/reorder', [MatterController::class, 'reorder'])->middleware('auth:sanctum');
 });

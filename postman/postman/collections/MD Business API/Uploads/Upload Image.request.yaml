@@ -1,0 +1,11 @@
+$kind: http-request
+description: jpeg/png/jpg/gif/svg, max 2MB. Server re-compresses to <=300KB JPEG.
+url: "{{base_url}}/uploadimage"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: image
+      src: []
+order: 1000

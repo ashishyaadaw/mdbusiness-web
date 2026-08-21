@@ -1,0 +1,7 @@
+$kind: http-request
+description: Currently a no-op response — deletion is disabled server-side.
+url: "{{base_url}}/menus/:menu"
+method: DELETE
+pathVariables:
+  menu: "1"
+order: 5000

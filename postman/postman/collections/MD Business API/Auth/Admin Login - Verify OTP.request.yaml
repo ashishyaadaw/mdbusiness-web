@@ -1,0 +1,23 @@
+$kind: http-request
+description: Saves access_token into the `admin_token` collection variable on success. Use this token for the Admin/Staff/Promo Ads folders.
+url: "{{base_url}}/admin/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "phone": "9999999999",
+      "otp": "1234",
+      "full_name": "Admin"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      if (pm.response.code === 200) {
+          const json = pm.response.json();
+          if (json.access_token) { pm.collectionVariables.set('admin_token', json.access_token); }
+      }
+    language: text/javascript
+order: 4000

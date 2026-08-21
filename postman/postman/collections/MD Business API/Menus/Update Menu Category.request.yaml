@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/menus/categories/:menuCategories/update"
+method: PUT
+headers:
+  Content-Type: application/json
+pathVariables:
+  menuCategories: "1"
+body:
+  type: text
+  content: |-
+    {
+      "name": "Home Services",
+      "icon": "wrench",
+      "desc": "All home service providers",
+      "status": true
+    }
+order: 11000

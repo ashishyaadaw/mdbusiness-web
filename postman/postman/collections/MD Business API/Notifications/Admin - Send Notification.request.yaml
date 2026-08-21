@@ -1,0 +1,21 @@
+$kind: http-request
+description: "Omit user_id to broadcast to all users. NOTE: only requires auth:sanctum today, not role:admin."
+url: "{{base_url}}/admin/notifications/send"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "user_id": 1,
+      "title": "Hello",
+      "body": "This is a notification",
+      "type": "general",
+      "data": {}
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+order: 6000

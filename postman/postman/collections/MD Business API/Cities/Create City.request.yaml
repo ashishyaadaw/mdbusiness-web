@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/cities"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Jaipur",
+      "state_code": "RJ",
+      "country_code": "IN",
+      "is_active": true
+    }
+order: 2000

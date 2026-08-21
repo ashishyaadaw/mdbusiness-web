@@ -1,0 +1,7 @@
+$kind: http-request
+description: "NOTE: not actually protected today despite the 'admin' path segment — no auth middleware is applied."
+url: "{{base_url}}/admin/user/profiles?page=1"
+method: GET
+queryParams:
+  page: "1"
+order: 6000

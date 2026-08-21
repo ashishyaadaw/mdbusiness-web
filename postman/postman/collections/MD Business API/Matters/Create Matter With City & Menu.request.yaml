@@ -1,0 +1,28 @@
+$kind: http-request
+description: Works even without auth (falls back to user_id 1 if unauthenticated).
+url: "{{base_url}}/matters/create/:city/:menu"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  city: "1"
+  menu: "1"
+body:
+  type: text
+  content: |-
+    {
+      "title": "Rajesh Electricals",
+      "type": "text",
+      "payload": "24x7 electrician services",
+      "name": "Rajesh Kumar",
+      "status": "pending",
+      "website": "",
+      "tags": "electrician, repair",
+      "social_media": "",
+      "phone": "9999999999",
+      "alternate_contact": "",
+      "whatsapp": "9999999999",
+      "is_premium": false,
+      "valid_until": "2026-12-31"
+    }
+order: 2000

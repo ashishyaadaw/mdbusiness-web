@@ -1,0 +1,17 @@
+$kind: http-request
+name: Check If User Exists
+url: "{{base_url}}/user/profile/exists"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "phone": "9999999999"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: 622|uUnUZaC8SPyfbwAUQPnX43hnowUbi5eIWbdd5khcd12c7cf9
+order: 5000

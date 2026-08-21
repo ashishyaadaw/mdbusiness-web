@@ -1,0 +1,26 @@
+$kind: http-request
+url: "{{base_url}}/matters/:matter"
+method: PUT
+headers:
+  Content-Type: application/json
+pathVariables:
+  matter: "1"
+body:
+  type: text
+  content: |-
+    {
+      "title": "Rajesh Electricals",
+      "type": "text",
+      "payload": "24x7 electrician services, now with AC repair",
+      "name": "Rajesh Kumar",
+      "website": "",
+      "tags": "electrician, repair, ac",
+      "social_media": "",
+      "phone": "9999999999",
+      "alternate_contact": "",
+      "whatsapp": "9999999999",
+      "is_premium": false,
+      "valid_until": "2026-12-31",
+      "status": "active"
+    }
+order: 11000

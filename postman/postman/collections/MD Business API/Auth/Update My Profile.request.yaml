@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/user/profile"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "full_name": "Test User",
+      "preferred_lang": "en",
+      "email": "test@example.com"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 9000

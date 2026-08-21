@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/matters/reorder"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "matters": [
+        { "id": 1, "sort_order": 0 },
+        { "id": 2, "sort_order": 1 }
+      ]
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 15000

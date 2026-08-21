@@ -8,6 +8,22 @@ use Illuminate\Http\Request;
 
 class PromoAdsController extends Controller
 {
+    // LIST (used by the admin apiResource route)
+    public function index()
+    {
+        $ads = PromoAd::latest()->paginate(15);
+
+        return response()->json([
+            'status' => true,
+            'data' => $ads->items(),
+            'pagination' => [
+                'current_page' => $ads->currentPage(),
+                'last_page' => $ads->lastPage(),
+                'total' => $ads->total(),
+            ],
+        ]);
+    }
+
     public function show($ad_id)
     {
         $ad = PromoAd::where('ad_id', $ad_id)

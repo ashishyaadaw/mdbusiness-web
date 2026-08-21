@@ -1,0 +1,27 @@
+$kind: http-request
+url: "{{base_url}}/matters/user/update/:matter"
+method: PUT
+headers:
+  Content-Type: application/json
+pathVariables:
+  matter: "1"
+body:
+  type: text
+  content: |-
+    {
+      "title": "Rajesh Electricals",
+      "payload": "24x7 electrician services",
+      "menu_id": 1,
+      "city_id": 1,
+      "website": "",
+      "social_media": "",
+      "phone": "9999999999",
+      "whatsapp": "9999999999",
+      "is_premium": false,
+      "valid_until": "2026-12-31"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 12000

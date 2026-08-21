@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/admin/ads/:ad"
+method: GET
+pathVariables:
+  ad: "1"
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+order: 4000

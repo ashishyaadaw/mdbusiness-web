@@ -1,0 +1,18 @@
+$kind: http-request
+description: New menus default to city_id 1.
+url: "{{base_url}}/menus"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "title": "Electricians",
+      "description": "Find local electricians",
+      "icon": "https://example.com/icon.png",
+      "menu_category_id": 1,
+      "type": "actual",
+      "status": true
+    }
+order: 2000

@@ -1,0 +1,22 @@
+$kind: http-request
+description: "`direction` is one of up/down/top/bottom and re-sorts relative to siblings."
+url: "{{base_url}}/menus/:menu"
+method: PUT
+headers:
+  Content-Type: application/json
+pathVariables:
+  menu: "1"
+body:
+  type: text
+  content: |-
+    {
+      "title": "Electricians",
+      "description": "Find local electricians",
+      "icon": "https://example.com/icon.png",
+      "sort_order": 1,
+      "direction": "up",
+      "menu_category_id": 1,
+      "type": "actual",
+      "status": true
+    }
+order: 4000

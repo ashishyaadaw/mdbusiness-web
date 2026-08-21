@@ -1,0 +1,11 @@
+# Use this workspace to collaborate
+workspace:
+  id: f154795e-6d4c-488f-8190-4bf3bd5ab7b2
+
+localResources:
+  collections:
+    - ../mdbusiness-api.postman_collection.json
+
+cloudResources:
+  collections:
+    ../postman/collections/MD Business API: 746d1eb1-11df-4bc5-85ff-bee9145f207f

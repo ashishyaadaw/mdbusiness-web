@@ -1,0 +1,34 @@
+$kind: http-request
+name: Create Matter
+url: "{{base_url}}/matters/create"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "title": "Rajesh Electricals",
+      "type": "image",
+      "payload": "https://wallpaperbat.com/img/1697246-cute-phone-wallpaper-templates-online.jpg,https://wallpaperbat.com/img/1697246-cute-phone-wallpaper-templates-online.jpg",
+      "name": "Rajesh Kumar",
+      "category": "Electrician",
+      "contact": "9999999999",
+      "whatsapp": "9999999999",
+      "alternate_contact": "",
+      "website": "",
+      "tags": "electrician, repair",
+      "gstin": "",
+      "duration_days": 30,
+      "base_amount": 100,
+      "discount_amount": 0,
+      "processing_fee": 25,
+      "gst_amount": 18,
+      "total_amount": 143,
+      "is_premium": false
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 1000

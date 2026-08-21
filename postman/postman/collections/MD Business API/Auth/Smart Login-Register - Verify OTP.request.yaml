@@ -1,0 +1,25 @@
+$kind: http-request
+name: Smart Login/Register - Verify OTP
+description: Saves access_token into the `token` collection variable on success.
+url: "{{base_url}}/login/smart"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "phone": "9999999999",
+      "otp": "1234",
+      "full_name": "Test User",
+      "fcm_key": ""
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      if (pm.response.code === 200) {
+          const json = pm.response.json();
+          if (json.access_token) { pm.collectionVariables.set('token', json.access_token); }
+      }
+    language: text/javascript
+order: 2000

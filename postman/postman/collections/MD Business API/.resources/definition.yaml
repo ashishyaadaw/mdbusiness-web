@@ -1,0 +1,6 @@
+$kind: collection
+description: Auto-generated from routes/api/* on 2026-08-21. Folders mirror the route files. Set `base_url` to your running instance (defaults to http://localhost:8000/api). Run the two OTP-verify requests in Auth after a successful OTP send/verify to auto-capture `token` and `admin_token` from the response.
+variables:
+  base_url: http://localhost:8000/api
+  token: ""
+  admin_token: ""

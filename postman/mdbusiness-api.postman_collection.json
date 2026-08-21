@@ -1,0 +1,604 @@
+{
+  "info": {
+    "name": "MD Business API",
+    "description": "Auto-generated from routes/api/* on 2026-08-21. Folders mirror the route files. Set `base_url` to your running instance (defaults to http://localhost:8000/api). Run the two OTP-verify requests in Auth after a successful OTP send/verify to auto-capture `token` and `admin_token` from the response.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "admin_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Smart Login/Register - Request OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\",\n  \"full_name\": \"Test User\",\n  \"fcm_key\": \"\"\n}" },
+            "url": { "raw": "{{base_url}}/login/smart", "host": ["{{base_url}}"], "path": ["login", "smart"] },
+            "description": "If the phone doesn't exist yet, this auto-registers the user and sends an OTP. Omit `otp` to trigger send; include it to verify."
+          }
+        },
+        {
+          "name": "Smart Login/Register - Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.access_token) { pm.collectionVariables.set('token', json.access_token); }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\",\n  \"otp\": \"1234\",\n  \"full_name\": \"Test User\",\n  \"fcm_key\": \"\"\n}" },
+            "url": { "raw": "{{base_url}}/login/smart", "host": ["{{base_url}}"], "path": ["login", "smart"] },
+            "description": "Saves access_token into the `token` collection variable on success."
+          }
+        },
+        {
+          "name": "Admin Login - Request OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\",\n  \"full_name\": \"Admin\"\n}" },
+            "url": { "raw": "{{base_url}}/admin/login", "host": ["{{base_url}}"], "path": ["admin", "login"] },
+            "description": "Phone must already belong to a user with role=admin, or user lookup/creation happens via AuthService."
+          }
+        },
+        {
+          "name": "Admin Login - Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.access_token) { pm.collectionVariables.set('admin_token', json.access_token); }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\",\n  \"otp\": \"1234\",\n  \"full_name\": \"Admin\"\n}" },
+            "url": { "raw": "{{base_url}}/admin/login", "host": ["{{base_url}}"], "path": ["admin", "login"] },
+            "description": "Saves access_token into the `admin_token` collection variable on success. Use this token for the Admin/Staff/Promo Ads folders."
+          }
+        },
+        {
+          "name": "Check If User Exists",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\"\n}" },
+            "url": { "raw": "{{base_url}}/user/profile/exists", "host": ["{{base_url}}"], "path": ["user", "profile", "exists"] }
+          }
+        },
+        {
+          "name": "List All User Profiles (unauthenticated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/admin/user/profiles?page=1", "host": ["{{base_url}}"], "path": ["admin", "user", "profiles"], "query": [{ "key": "page", "value": "1" }] },
+            "description": "NOTE: not actually protected today despite the 'admin' path segment — no auth middleware is applied."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/user/profile", "host": ["{{base_url}}"], "path": ["user", "profile"] }
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"full_name\": \"Test User\",\n  \"preferred_lang\": \"en\",\n  \"email\": \"test@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/user/profile", "host": ["{{base_url}}"], "path": ["user", "profile"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "OTP",
+      "item": [
+        {
+          "name": "Send Phone OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\",\n  \"username\": \"testuser\"\n}" },
+            "url": { "raw": "{{base_url}}/otp/send", "host": ["{{base_url}}"], "path": ["otp", "send"] }
+          }
+        },
+        {
+          "name": "Verify Phone OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"9999999999\",\n  \"otp\": \"1234\"\n}" },
+            "url": { "raw": "{{base_url}}/otp/verify", "host": ["{{base_url}}"], "path": ["otp", "verify"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Send Test FCM Notification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fcm_token\": \"device-fcm-token\"\n}" },
+            "url": { "raw": "{{base_url}}/notify", "host": ["{{base_url}}"], "path": ["notify"] }
+          }
+        },
+        {
+          "name": "Update My FCM Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"fcm_key\": \"device-fcm-token\"\n}" },
+            "url": { "raw": "{{base_url}}/notifications/token", "host": ["{{base_url}}"], "path": ["notifications", "token"] }
+          }
+        },
+        {
+          "name": "My Notification History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/notifications", "host": ["{{base_url}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "Mark Notification As Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/notifications/:id/read", "host": ["{{base_url}}"], "path": ["notifications", ":id", "read"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Mark All Notifications As Read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/notifications/read-all", "host": ["{{base_url}}"], "path": ["notifications", "read-all"] }
+          }
+        },
+        {
+          "name": "Admin - Send Notification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": 1,\n  \"title\": \"Hello\",\n  \"body\": \"This is a notification\",\n  \"type\": \"general\",\n  \"data\": {}\n}" },
+            "url": { "raw": "{{base_url}}/admin/notifications/send", "host": ["{{base_url}}"], "path": ["admin", "notifications", "send"] },
+            "description": "Omit user_id to broadcast to all users. NOTE: only requires auth:sanctum today, not role:admin."
+          }
+        },
+        {
+          "name": "Admin - Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/notifications/:id", "host": ["{{base_url}}"], "path": ["admin", "notifications", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Admin - Clear User Notifications",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/notifications/user/:userId", "host": ["{{base_url}}"], "path": ["admin", "notifications", "user", ":userId"], "variable": [{ "key": "userId", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "My Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/user/transactions", "host": ["{{base_url}}"], "path": ["user", "transactions"] }
+          }
+        },
+        {
+          "name": "Record Transaction",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"txnId\": \"TXN123456\",\n  \"title\": \"Matter listing fee\",\n  \"amount\": 199.00,\n  \"date\": \"2026-08-21\",\n  \"status\": \"success\",\n  \"paymentMethod\": \"upi\"\n}" },
+            "url": { "raw": "{{base_url}}/user/transactions", "host": ["{{base_url}}"], "path": ["user", "transactions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Uploads",
+      "item": [
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [{ "key": "image", "type": "file", "src": [] }] },
+            "url": { "raw": "{{base_url}}/uploadimage", "host": ["{{base_url}}"], "path": ["uploadimage"] },
+            "description": "jpeg/png/jpg/gif/svg, max 2MB. Server re-compresses to <=300KB JPEG."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Promo Ads",
+      "item": [
+        {
+          "name": "Get Promo Ad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/promoAds/:ad_id", "host": ["{{base_url}}"], "path": ["promoAds", ":ad_id"], "variable": [{ "key": "ad_id", "value": "home_banner_1" }] }
+          }
+        },
+        {
+          "name": "Admin - List Promo Ads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/ads", "host": ["{{base_url}}"], "path": ["admin", "ads"] }
+          }
+        },
+        {
+          "name": "Admin - Create Promo Ad",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"ad_id\": \"home_banner_1\",\n  \"type\": \"banner\",\n  \"title\": \"Sale!\",\n  \"body\": \"Up to 50% off\",\n  \"images\": [\"https://example.com/banner.jpg\"],\n  \"action_text\": \"Shop Now\",\n  \"target_url\": \"https://example.com/sale\"\n}" },
+            "url": { "raw": "{{base_url}}/admin/ads", "host": ["{{base_url}}"], "path": ["admin", "ads"] }
+          }
+        },
+        {
+          "name": "Admin - Get Promo Ad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/ads/:ad", "host": ["{{base_url}}"], "path": ["admin", "ads", ":ad"], "variable": [{ "key": "ad", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Admin - Update Promo Ad",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Sale updated\",\n  \"body\": \"Up to 60% off\"\n}" },
+            "url": { "raw": "{{base_url}}/admin/ads/:ad", "host": ["{{base_url}}"], "path": ["admin", "ads", ":ad"], "variable": [{ "key": "ad", "value": "1" }] },
+            "description": "Note: the :ad route parameter is matched positionally against the controller's $ad_id parameter (a custom ad_id string), not the numeric primary key."
+          }
+        },
+        {
+          "name": "Admin - Delete Promo Ad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/ads/:ad", "host": ["{{base_url}}"], "path": ["admin", "ads", ":ad"], "variable": [{ "key": "ad", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/dashboard-stats", "host": ["{{base_url}}"], "path": ["admin", "dashboard-stats"] }
+          }
+        },
+        {
+          "name": "Connectivity Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/admin/hi", "host": ["{{base_url}}"], "path": ["admin", "hi"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff",
+      "item": [
+        {
+          "name": "Pending Matter Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/staff/reports", "host": ["{{base_url}}"], "path": ["staff", "reports"] }
+          }
+        },
+        {
+          "name": "Verify User",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] },
+            "url": { "raw": "{{base_url}}/staff/verify-user/:user", "host": ["{{base_url}}"], "path": ["staff", "verify-user", ":user"], "variable": [{ "key": "user", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cities",
+      "item": [
+        {
+          "name": "List Cities",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/cities", "host": ["{{base_url}}"], "path": ["cities"] } }
+        },
+        {
+          "name": "Create City",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Jaipur\",\n  \"state_code\": \"RJ\",\n  \"country_code\": \"IN\",\n  \"is_active\": true\n}" },
+            "url": { "raw": "{{base_url}}/cities", "host": ["{{base_url}}"], "path": ["cities"] }
+          }
+        },
+        {
+          "name": "Get City",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/cities/:city", "host": ["{{base_url}}"], "path": ["cities", ":city"], "variable": [{ "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Update City",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Jaipur\",\n  \"state_code\": \"RJ\",\n  \"country_code\": \"IN\",\n  \"is_active\": true\n}" },
+            "url": { "raw": "{{base_url}}/cities/:city", "host": ["{{base_url}}"], "path": ["cities", ":city"], "variable": [{ "key": "city", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Delete City",
+          "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/cities/:city", "host": ["{{base_url}}"], "path": ["cities", ":city"], "variable": [{ "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Menus For City",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/cities/:city/menus", "host": ["{{base_url}}"], "path": ["cities", ":city", "menus"], "variable": [{ "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Attach Menu To City",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"menu_id\": 1\n}" },
+            "url": { "raw": "{{base_url}}/cities/:city/menus", "host": ["{{base_url}}"], "path": ["cities", ":city", "menus"], "variable": [{ "key": "city", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menus",
+      "item": [
+        {
+          "name": "List Menus",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/menus", "host": ["{{base_url}}"], "path": ["menus"] } }
+        },
+        {
+          "name": "Create Menu",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Electricians\",\n  \"description\": \"Find local electricians\",\n  \"icon\": \"https://example.com/icon.png\",\n  \"menu_category_id\": 1,\n  \"type\": \"actual\",\n  \"status\": true\n}" },
+            "url": { "raw": "{{base_url}}/menus", "host": ["{{base_url}}"], "path": ["menus"] },
+            "description": "New menus default to city_id 1."
+          }
+        },
+        {
+          "name": "Get Menu",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/menus/:menu", "host": ["{{base_url}}"], "path": ["menus", ":menu"], "variable": [{ "key": "menu", "value": "1" }] } }
+        },
+        {
+          "name": "Update Menu",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Electricians\",\n  \"description\": \"Find local electricians\",\n  \"icon\": \"https://example.com/icon.png\",\n  \"sort_order\": 1,\n  \"direction\": \"up\",\n  \"menu_category_id\": 1,\n  \"type\": \"actual\",\n  \"status\": true\n}" },
+            "url": { "raw": "{{base_url}}/menus/:menu", "host": ["{{base_url}}"], "path": ["menus", ":menu"], "variable": [{ "key": "menu", "value": "1" }] },
+            "description": "`direction` is one of up/down/top/bottom and re-sorts relative to siblings."
+          }
+        },
+        {
+          "name": "Delete Menu",
+          "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/menus/:menu", "host": ["{{base_url}}"], "path": ["menus", ":menu"], "variable": [{ "key": "menu", "value": "1" }] }, "description": "Currently a no-op response — deletion is disabled server-side." }
+        },
+        {
+          "name": "All Menus For City",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/menus/:city/all-menus", "host": ["{{base_url}}"], "path": ["menus", ":city", "all-menus"], "variable": [{ "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "All Menus For City (v2, active-flagged only)",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/menus/:city/all-menus2", "host": ["{{base_url}}"], "path": ["menus", ":city", "all-menus2"], "variable": [{ "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Menus By Category For City",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/menus/:city/:menuCategories/all-menus", "host": ["{{base_url}}"], "path": ["menus", ":city", ":menuCategories", "all-menus"], "variable": [{ "key": "city", "value": "1" }, { "key": "menuCategories", "value": "1" }] } }
+        },
+        {
+          "name": "Menu Categories For City",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/menus/:city/all-menu-categories", "host": ["{{base_url}}"], "path": ["menus", ":city", "all-menu-categories"], "variable": [{ "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Menu Categories For City (filtered)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": 1,\n  \"type\": \"actual\"\n}" },
+            "url": { "raw": "{{base_url}}/menus/:city/all-menu-categories", "host": ["{{base_url}}"], "path": ["menus", ":city", "all-menu-categories"], "variable": [{ "key": "city", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Update Menu Category",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Home Services\",\n  \"icon\": \"wrench\",\n  \"desc\": \"All home service providers\",\n  \"status\": true\n}" },
+            "url": { "raw": "{{base_url}}/menus/categories/:menuCategories/update", "host": ["{{base_url}}"], "path": ["menus", "categories", ":menuCategories", "update"], "variable": [{ "key": "menuCategories", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Create Menu Category For City",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Home Services\",\n  \"icon\": \"https://example.com/icon.png\",\n  \"desc\": \"All home service providers\",\n  \"status\": true\n}" },
+            "url": { "raw": "{{base_url}}/menus/category/:city/create", "host": ["{{base_url}}"], "path": ["menus", "category", ":city", "create"], "variable": [{ "key": "city", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matters",
+      "item": [
+        {
+          "name": "Create Matter",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Rajesh Electricals\",\n  \"type\": \"text\",\n  \"payload\": \"24x7 electrician services\",\n  \"name\": \"Rajesh Kumar\",\n  \"category\": \"Electrician\",\n  \"contact\": \"9999999999\",\n  \"whatsapp\": \"9999999999\",\n  \"alternate_contact\": \"\",\n  \"website\": \"\",\n  \"tags\": \"electrician, repair\",\n  \"gstin\": \"\",\n  \"duration_days\": 30,\n  \"base_amount\": 100,\n  \"discount_amount\": 0,\n  \"processing_fee\": 25,\n  \"gst_amount\": 18,\n  \"total_amount\": 143,\n  \"is_premium\": false\n}" },
+            "url": { "raw": "{{base_url}}/matters/create", "host": ["{{base_url}}"], "path": ["matters", "create"] }
+          }
+        },
+        {
+          "name": "Create Matter With City & Menu",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Rajesh Electricals\",\n  \"type\": \"text\",\n  \"payload\": \"24x7 electrician services\",\n  \"name\": \"Rajesh Kumar\",\n  \"status\": \"pending\",\n  \"website\": \"\",\n  \"tags\": \"electrician, repair\",\n  \"social_media\": \"\",\n  \"phone\": \"9999999999\",\n  \"alternate_contact\": \"\",\n  \"whatsapp\": \"9999999999\",\n  \"is_premium\": false,\n  \"valid_until\": \"2026-12-31\"\n}" },
+            "url": { "raw": "{{base_url}}/matters/create/:city/:menu", "host": ["{{base_url}}"], "path": ["matters", "create", ":city", ":menu"], "variable": [{ "key": "city", "value": "1" }, { "key": "menu", "value": "1" }] },
+            "description": "Works even without auth (falls back to user_id 1 if unauthenticated)."
+          }
+        },
+        {
+          "name": "All Matters",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/matters/all-matters", "host": ["{{base_url}}"], "path": ["matters", "all-matters"] } }
+        },
+        {
+          "name": "All Matters By Tags",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/matters/all-matters-by-tags?tags=electrician&per_page=10", "host": ["{{base_url}}"], "path": ["matters", "all-matters-by-tags"], "query": [{ "key": "tags", "value": "electrician" }, { "key": "per_page", "value": "10" }] } }
+        },
+        {
+          "name": "Admin - All Pending Matters",
+          "request": { "method": "GET", "header": [], "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] }, "url": { "raw": "{{base_url}}/matters/admin/pending/all-matters", "host": ["{{base_url}}"], "path": ["matters", "admin", "pending", "all-matters"] } }
+        },
+        {
+          "name": "Admin - Matters By Menu & City",
+          "request": { "method": "GET", "header": [], "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] }, "url": { "raw": "{{base_url}}/matters/admin/:menu/:city/all-matters", "host": ["{{base_url}}"], "path": ["matters", "admin", ":menu", ":city", "all-matters"], "variable": [{ "key": "menu", "value": "1" }, { "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Matters By Menu & City",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/matters/:menu/:city/all-matters", "host": ["{{base_url}}"], "path": ["matters", ":menu", ":city", "all-matters"], "variable": [{ "key": "menu", "value": "1" }, { "key": "city", "value": "1" }] } }
+        },
+        {
+          "name": "Matters By User",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/matters/:user/all-matters", "host": ["{{base_url}}"], "path": ["matters", ":user", "all-matters"], "variable": [{ "key": "user", "value": "1" }] } }
+        },
+        {
+          "name": "My Matters",
+          "request": { "method": "GET", "header": [], "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": { "raw": "{{base_url}}/matters/my-matters", "host": ["{{base_url}}"], "path": ["matters", "my-matters"] } }
+        },
+        {
+          "name": "Delete My Matter",
+          "request": { "method": "DELETE", "header": [], "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": { "raw": "{{base_url}}/matters/:matter", "host": ["{{base_url}}"], "path": ["matters", ":matter"], "variable": [{ "key": "matter", "value": "1" }] } }
+        },
+        {
+          "name": "Update Matter (admin-style)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Rajesh Electricals\",\n  \"type\": \"text\",\n  \"payload\": \"24x7 electrician services, now with AC repair\",\n  \"name\": \"Rajesh Kumar\",\n  \"website\": \"\",\n  \"tags\": \"electrician, repair, ac\",\n  \"social_media\": \"\",\n  \"phone\": \"9999999999\",\n  \"alternate_contact\": \"\",\n  \"whatsapp\": \"9999999999\",\n  \"is_premium\": false,\n  \"valid_until\": \"2026-12-31\",\n  \"status\": \"active\"\n}" },
+            "url": { "raw": "{{base_url}}/matters/:matter", "host": ["{{base_url}}"], "path": ["matters", ":matter"], "variable": [{ "key": "matter", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Update My Matter",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Rajesh Electricals\",\n  \"payload\": \"24x7 electrician services\",\n  \"menu_id\": 1,\n  \"city_id\": 1,\n  \"website\": \"\",\n  \"social_media\": \"\",\n  \"phone\": \"9999999999\",\n  \"whatsapp\": \"9999999999\",\n  \"is_premium\": false,\n  \"valid_until\": \"2026-12-31\"\n}" },
+            "url": { "raw": "{{base_url}}/matters/user/update/:matter", "host": ["{{base_url}}"], "path": ["matters", "user", "update", ":matter"], "variable": [{ "key": "matter", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Activate My Matter",
+          "request": { "method": "POST", "header": [], "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": { "raw": "{{base_url}}/matters/:matter/activate", "host": ["{{base_url}}"], "path": ["matters", ":matter", "activate"], "variable": [{ "key": "matter", "value": "1" }] } }
+        },
+        {
+          "name": "Inactivate My Matter",
+          "request": { "method": "POST", "header": [], "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }, "url": { "raw": "{{base_url}}/matters/:matter/inactivate", "host": ["{{base_url}}"], "path": ["matters", ":matter", "inactivate"], "variable": [{ "key": "matter", "value": "1" }] } }
+        },
+        {
+          "name": "Reorder My Matters",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"matters\": [\n    { \"id\": 1, \"sort_order\": 0 },\n    { \"id\": 2, \"sort_order\": 1 }\n  ]\n}" },
+            "url": { "raw": "{{base_url}}/matters/reorder", "host": ["{{base_url}}"], "path": ["matters", "reorder"] }
+          }
+        }
+      ]
+    }
+  ]
+}

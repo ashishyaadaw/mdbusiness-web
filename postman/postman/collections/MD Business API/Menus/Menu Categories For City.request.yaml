@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/menus/:city/all-menu-categories"
+method: GET
+pathVariables:
+  city: "1"
+order: 9000

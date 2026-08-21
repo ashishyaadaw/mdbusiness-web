@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{base_url}}/admin/ads"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "ad_id": "home_banner_1",
+      "type": "banner",
+      "title": "Sale!",
+      "body": "Up to 50% off",
+      "images": ["https://example.com/banner.jpg"],
+      "action_text": "Shop Now",
+      "target_url": "https://example.com/sale"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+order: 3000
