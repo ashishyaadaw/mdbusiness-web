@@ -2,19 +2,17 @@
 
 namespace App\Events;
 
+use App\Models\Matters\Matter;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewMatrimonialProfileAdded
+class NewMatterSubmittedForReview
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public $user,
-        public $status = 'pending'
-    ) {
-        $this->user = $user;
-        $this->status = $status;
-    }
+        public Matter $matter,
+        public bool $isEdit = false
+    ) {}
 }

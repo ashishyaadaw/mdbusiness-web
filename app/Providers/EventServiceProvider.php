@@ -3,10 +3,14 @@
 namespace App\Providers;
 
 use App\Events\Login;
+use App\Events\MatterDeletedByUser;
 use App\Events\MatrimonialProfileStatusChange;
 use App\Events\NewMatrimonialProfileAdded;
+use App\Events\NewMatterSubmittedForReview;
 use App\Events\OtpGenerated;
 use App\Events\UserProfileViewed;
+use App\Listeners\NotifyStaffOfMatterDeletion;
+use App\Listeners\NotifyStaffOfPendingMatter;
 use App\Listeners\SendLoginAlert;
 use App\Listeners\SendMatrimonialProfileApprovedAlert;
 use App\Listeners\SendNewMatrimonialProfileAddedAlert;
@@ -41,6 +45,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         NewMatrimonialProfileAdded::class => [
             SendNewMatrimonialProfileAddedAlert::class,
+        ],
+        NewMatterSubmittedForReview::class => [
+            NotifyStaffOfPendingMatter::class,
+        ],
+        MatterDeletedByUser::class => [
+            NotifyStaffOfMatterDeletion::class,
         ],
     ];
 

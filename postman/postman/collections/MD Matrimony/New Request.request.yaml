@@ -1,0 +1,5 @@
+$kind: http-request
+name: New Request
+url: http://10.131.25.215:8000/api/uploadImage
+method: POST
+order: 1787796394331

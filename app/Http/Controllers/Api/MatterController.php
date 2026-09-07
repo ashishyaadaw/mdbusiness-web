@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\MatterDeletedByUser;
 use App\Events\MatrimonialProfileStatusChange;
+use App\Events\NewMatrimonialProfileAdded;
+use App\Events\NewMatterSubmittedForReview;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MatterResource;
 use App\Models\City;
@@ -210,10 +213,14 @@ class MatterController extends Controller
             'payload' => 'required|string',
             'menu_id' => 'required|integer|exists:menus,id',
             'city_id' => 'required|integer|exists:cities,id',
+            'name' => 'nullable|string|max:255',
             'website' => 'nullable|string|url',
             'social_media' => 'nullable|string|url',
             'phone' => 'nullable|string',
             'whatsapp' => 'nullable|string',
+            'alternate_contact' => 'nullable|string',
+            'tags' => 'nullable|string',
+            'gstin' => 'nullable|string',
             // 'gender' => 'nullable|in:male,Male,Female,female,other',
             'is_premium' => 'sometimes|boolean',
             'valid_until' => 'sometimes|date|after:today',
@@ -275,10 +282,14 @@ class MatterController extends Controller
                 $matter->matterDetails()->updateOrCreate(
                     ['matter_id' => $matter->id],
                     [
+                        'name' => $request->name ?? null,
                         'whatsapp' => $request->whatsapp ?? null,
                         'phone' => $request->phone ?? null,
+                        'alternate_contact' => $request->alternate_contact ?? null,
                         'website' => $request->website ?? null,
                         'social_media' => $request->social_media ?? null,
+                        'tags' => $request->tags ?? null,
+                        'gstin' => $request->gstin ?? null,
                         // 'gender' => $request->gender ?? 'other',
                     ]
                 );
@@ -294,6 +305,8 @@ class MatterController extends Controller
                 );
             });
 
+            event(new NewMatterSubmittedForReview($matter, true));
+
             // 4. Return the updated ad with relationships
             return response()->json(
                 [
@@ -301,6 +314,7 @@ class MatterController extends Controller
                     'message' => 'Matter updated successfully',
                     'data' => $matter->load(
                         'controller',
+                        'matterDetails',
                     ),
                 ],
                 200,
@@ -659,11 +673,28 @@ class MatterController extends Controller
             );
         }
 
+        // 2. Status Guard: A post can only be toggled back to active if it was
+        // already approved before (active/inactive). pending/rejected/hold/block
+        // must go through an admin review first — a user cannot self-approve.
+        $currentStatus = $matter->controller->status ?? null;
+
+        if (! in_array($currentStatus, ['active', 'inactive'])) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "Matter cannot be activated because current status is '{$currentStatus}'. It must be approved by an admin first.",
+                ],
+                422,
+            );
+        }
+
         try {
             $matter->controller()->updateOrCreate(
                 ['matter_id' => $matter->id],
                 ['status' => 'active'],
             );
+
+            event(new MatrimonialProfileStatusChange($user, 'active'));
 
             return response()->json(
                 [
@@ -698,11 +729,27 @@ class MatterController extends Controller
             );
         }
 
+        // 2. Status Guard: mirrors activateMatterByUser() — only a previously
+        // approved post can be toggled, so this never bypasses admin review.
+        $currentStatus = $matter->controller->status ?? null;
+
+        if (! in_array($currentStatus, ['active', 'inactive'])) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "Matter cannot be changed because current status is '{$currentStatus}'. It must be approved by an admin first.",
+                ],
+                422,
+            );
+        }
+
         try {
             $matter->controller()->updateOrCreate(
                 ['matter_id' => $matter->id],
                 ['status' => 'inactive'],
             );
+
+            event(new MatrimonialProfileStatusChange($user, 'inactive'));
 
             return response()->json(
                 [
@@ -935,6 +982,8 @@ class MatterController extends Controller
         // if ($matter->user_id !== Auth::id()) {
         //     return response()->json(['status' => false, 'message' => 'Unauthorized.'], 403);
         // }
+
+        event(new MatterDeletedByUser($matter->id, $matter->title, $matter->matterCreator));
 
         $matter->delete();
 
@@ -1222,6 +1271,9 @@ class MatterController extends Controller
                 return $matter;
             });
 
+            event(new NewMatrimonialProfileAdded($user, 'pending'));
+            event(new NewMatterSubmittedForReview($matter, false));
+
             // 3. Load relationships and return
             return response()->json(
                 [
@@ -1229,7 +1281,7 @@ class MatterController extends Controller
                     'message' => 'Matter created successfully',
                     'data' => $matter->load(
                         'matterCreator',
-                        'matterDetail',
+                        'matterDetails',
                         'matterPricing',
                         'matterController',
                     ),
@@ -1316,6 +1368,11 @@ class MatterController extends Controller
 
                 return $matter;
             });
+
+            if ($user) {
+                event(new NewMatrimonialProfileAdded($user, 'pending'));
+            }
+            event(new NewMatterSubmittedForReview($matter, false));
 
             // 3. Load relationships and return
             return response()->json(

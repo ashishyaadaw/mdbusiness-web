@@ -39,7 +39,8 @@ class PhoneVerificationService
         );
 
         // Send SMS
-        $sent = $this->sendSmsApi($phone, $otp, $username);
+        // $sent = $this->sendSmsApi($phone, $otp, $username);
+        $sent = $this->sendSmsOTPApiWithAppSignKey($phone, $otp, $username);
 
         if (! $sent) {
             throw new \Exception('Failed to send SMS via provider.');
@@ -94,6 +95,39 @@ class PhoneVerificationService
                 'sender_id' => $senderId,
                 'message' => '201904',
                 'variables_values' => $username.'|'.$otp.'|',
+                'flash' => 0,
+                'numbers' => $phone,
+            ]);
+
+            return $response->successful();
+        } catch (\Exception $e) {
+            Log::error('SMS Sending Failed: '.$e->getMessage());
+
+            return false;
+        }
+    } 
+    public function sendSmsOTPApiWithAppSignKey($phone, $otp, $appsignkey)
+    {
+        $apiUrl = env('SMS_API_URL');
+        $apiKey = env('SMS_API_KEY');
+        $senderId = env('SMS_SENDER_ID');
+
+        if (! $apiUrl || ! $apiKey || ! $senderId) {
+            Log::error('SMS API credentials are not set in .env file.');
+
+            return false;
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post($apiUrl, [
+                'route' => 'dlt',
+                'sender_id' => $senderId,
+                'message' => '223720',
+                'variables_values' => $otp.'|'.$appsignkey.'|',
                 'flash' => 0,
                 'numbers' => $phone,
             ]);

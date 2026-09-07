@@ -24,3 +24,6 @@ Route::prefix('advertise')->name('advertise.')->group(function () {
 });
 
 Route::view('/contact', 'pages.contact')->name('contact');
+
+// Admin/Staff back-office dashboard
+require __DIR__.'/web/admin.php';

@@ -26,11 +26,13 @@ class MatterController extends Model
         'is_premium',
         'status',
         'valid_until',
+        'expiry_notified_at',
     ];
 
     protected $casts = [
         'is_premium' => 'boolean', // This automatically converts true/"true" to 1 and false/"false" to 0
         'valid_until' => 'timestamp',   // Good practice for your date field too
+        'expiry_notified_at' => 'datetime',
     ];
 
     protected $hidden = [

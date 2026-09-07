@@ -142,6 +142,7 @@ class AuthController extends Controller
             'phone' => 'required|string|min:10',
             'otp' => 'nullable|string|min:4|max:6',
             'full_name' => 'nullable|string|min:3|max:40',
+            'app_sign_key' => 'nullable|string|min:3|max:40',
             'fcm_key' => 'nullable|string',
         ]);
 
@@ -171,7 +172,10 @@ class AuthController extends Controller
                 ]);
             }
 
-            return $this->sendOTPWithName($user->id);
+            if(! $request->filled('app_sign_key')) {
+                return $this->sendOTPWithName($user->id);
+            }
+            return $this->sendOTPWithAppSignKey($user->id, $request->app_sign_key);
         }
 
         // ==========================================
@@ -518,6 +522,66 @@ class AuthController extends Controller
                 $user->phone,
                 $otp,
                 $fullName,
+            );
+
+            return response()->json(
+                [
+                    'message' => 'OTP sent successfully.',
+                ],
+                200,
+            );
+        } catch (\Exception $e) {
+            // Always log errors so you can debug production issues
+            // \Log::error("OTP failure for user {$userId}: " . $e->getMessage());
+
+            return response()->json(
+                [
+                    'message' => 'Failed to send OTP. Please try again later.',
+                ],
+                500,
+            );
+        }
+    }
+
+        private function sendOTPWithAppSignKey($userId, $appSignKey)
+    {
+        // 1. Find user or fail early to avoid null pointer exceptions
+        $user = User::findOrFail($userId);
+        $user->load('userProfile');
+
+        // 2. Cooldown Logic: Use a more readable check
+        // $lastUpdate = Carbon::parse($user->updated_at);
+        // $expiryTime = $lastUpdate->addSeconds(self::OTP_COOLDOWN_SECONDS);
+
+        // if ($expiryTime->isFuture()) {
+        //     return response()->json(
+        //         [
+        //             'message' => 'Please wait before requesting a new OTP.',
+        //             'resend_in' => now()->diffInSeconds($expiryTime),
+        //         ],
+        //         429,
+        //     );
+        // }
+
+        // 3. Generate and Store
+        // NOTE: Avoid using 'remember_token'. Better to use a dedicated 'otp' column
+        // or a separate 'verifications' table.
+        $otp = (string) random_int(1000, 9999);
+
+        $user
+            ->forceFill([
+                'remember_token' => Hash::make($otp), // See security note below
+                'updated_at' => now(),
+            ])
+            ->save();
+
+        // 4. Send with Error Handling
+        try {
+
+            $this->verificationService->sendSmsOTPApiWithAppSignKey(
+                $user->phone,
+                $otp,
+                $appSignKey,
             );
 
             return response()->json(
