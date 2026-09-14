@@ -9,7 +9,7 @@ class PageController extends Controller
     public function index()
     {
         return view('pages.home', [
-            'showSearch' => true, // Set to false to hide it
+            'showSearch' => false, // Set to false to hide it
             'title' => 'Home',
         ]);
     }

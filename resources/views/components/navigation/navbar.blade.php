@@ -16,13 +16,28 @@
             </div>
 
             <div class="flex items-center space-x-4">
+                <a href="{{ route('browse.index') }}"
+                    class="hidden md:flex items-center text-blue-600 border border-blue-200 px-3 py-1 rounded-md text-sm font-semibold hover:bg-blue-50">
+                    <i data-lucide="compass" class="w-4 h-4 mr-2"></i>
+                    Browse
+                </a>
                 <button
                     class="hidden md:flex items-center text-blue-600 border border-blue-200 px-3 py-1 rounded-md text-sm font-semibold hover:bg-blue-50">
                     <i data-lucide="megaphone" class="w-4 h-4 mr-2"></i>
                     Advertise
                 </button>
-                <button class="text-gray-600"><i data-lucide="bell" class="w-6 h-6"></i></button>
-                <button class="text-gray-400"><i data-lucide="user-circle-2" class="w-8 h-8"></i></button>
+                @auth
+                    <a href="{{ route('account.notifications.index') }}" class="text-gray-600">
+                        <i data-lucide="bell" class="w-6 h-6"></i>
+                    </a>
+                    <a href="{{ route('account.dashboard') }}" class="text-gray-600" title="My Account">
+                        <i data-lucide="user-circle-2" class="w-8 h-8"></i>
+                    </a>
+                @else
+                    <a href="{{ route('account.login') }}" class="text-gray-400">
+                        <i data-lucide="user-circle-2" class="w-8 h-8"></i>
+                    </a>
+                @endauth
             </div>
         </div>
 
