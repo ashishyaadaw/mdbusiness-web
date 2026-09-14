@@ -27,3 +27,6 @@ Route::view('/contact', 'pages.contact')->name('contact');
 
 // Admin/Staff back-office dashboard
 require __DIR__.'/web/admin.php';
+
+// Consumer web area (public browsing + account/listing management)
+require __DIR__.'/web/account.php';

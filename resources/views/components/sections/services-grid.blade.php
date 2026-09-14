@@ -1,80 +1,94 @@
 @php
-    // Structured data: name, icon, route name, and the specific parameter
-    $categories = [
-        ['name' => 'B2B', 'icon' => 'handshake', 'route' => 'services.show', 'slug' => 'b2b'],
-        ['name' => 'Doctors', 'icon' => 'briefcase-medical', 'route' => 'services.show', 'slug' => 'doctors'],
-        ['name' => 'Travel', 'icon' => 'plane', 'route' => 'services.show', 'slug' => 'travel'],
-        ['name' => 'Car Hire', 'icon' => 'car', 'route' => 'services.show', 'slug' => 'car-hire'],
-        ['name' => 'Beauty', 'icon' => 'sparkles', 'route' => 'services.show', 'slug' => 'beauty'],
-        ['name' => 'Wedding', 'icon' => 'users', 'route' => 'services.show', 'slug' => 'wedding'],
-        ['name' => 'Gyms', 'icon' => 'dumbbell', 'route' => 'services.show', 'slug' => 'gyms'],
-        ['name' => 'Education', 'icon' => 'graduation-cap', 'route' => 'services.show', 'slug' => 'education'],
-        ['name' => 'Packers', 'icon' => 'truck', 'route' => 'services.show', 'slug' => 'packers'],
-        ['name' => 'Repairs', 'icon' => 'wrench', 'route' => 'services.show', 'slug' => 'repairs'],
-        ['name' => 'Rentals', 'icon' => 'key', 'route' => 'services.show', 'slug' => 'rentals'],
-        ['name' => 'Loans', 'icon' => 'banknote', 'route' => 'services.show', 'slug' => 'loans'],
-        ['name' => 'Real Estate', 'icon' => 'house', 'route' => 'services.show', 'slug' => 'real-estate'],
-        ['name' => 'PG/Hostel', 'icon' => 'bed', 'route' => 'services.show', 'slug' => 'pg-hostel'],
-    ];
+    // Real Categories (MenuCategories), each with its real Menus — grouped
+    // under the actual Category they belong to, not shown as a flat list.
+    $categories = \App\Models\MenuCategories::whereHas('flag', fn ($q) => $q->where('menu_category', 1))
+        ->with(['menus' => function ($q) {
+            $q->whereHas('flag', fn ($f) => $f->where('menus', 1))
+                ->orderBy('sort_order');
+        }])
+        ->orderBy('sort_order')
+        ->get()
+        ->filter(fn ($category) => $category->menus->isNotEmpty());
+
+    // A small category (few menus) fits fully on one row as a static
+    // wrapped grid; a large one gets a scrollable carousel instead so it
+    // doesn't dominate the page — each size renders differently on purpose.
+    $carouselThreshold = 6;
 @endphp
 
-<div class="w-full bg-white px-4 py-6 border-b border-gray-100">
-    <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-y-8 gap-x-2 md:gap-x-4">
+@if ($categories->isNotEmpty())
+    <div class="w-full bg-white px-4 py-6 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto space-y-8">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-extrabold text-gray-900">Popular Categories</h2>
+                <a href="{{ route('browse.index') }}" class="text-sm font-semibold text-blue-600 hover:underline">Browse all</a>
+            </div>
 
-            @foreach ($categories as $index => $category)
-                <a href="{{ route($category['route'], $category['slug']) }}"
-                    class="flex flex-col items-center group transition-all duration-200
-                         {{ $index >= 7 ? 'hidden sm:flex' : 'flex' }} 
-                         {{ $index >= 11 ? 'md:hidden lg:flex' : 'md:flex' }}">
-
-                    <div
-                        class="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-2xl 
-                                bg-blue-50/50 group-hover:bg-blue-600 group-hover:shadow-lg 
-                                group-hover:shadow-blue-200 transition-all duration-300 group-active:scale-90">
-                        <i data-lucide="{{ $category['icon'] }}"
-                            class="w-6 h-6 md:w-7 md:h-7 text-blue-600 group-hover:text-white transition-colors"></i>
+            @foreach ($categories as $category)
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-6 h-6 rounded-md overflow-hidden shrink-0 bg-blue-50 flex items-center justify-center">
+                            @if ($category->icon)
+                                <img src="{{ $category->icon }}" alt="" class="w-full h-full object-cover">
+                            @else
+                                <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-blue-600"></i>
+                            @endif
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ $category->name }}</h3>
                     </div>
 
-                    <span
-                        class="mt-2 text-[10px] md:text-xs font-medium text-gray-500 group-hover:text-gray-900 text-center leading-tight">
-                        {{ $category['name'] }}
-                    </span>
-                </a>
-            @endforeach
+                    @if ($category->menus->count() <= $carouselThreshold)
+                        {{-- Small category: everything fits, so just wrap it in a static grid --}}
+                        <div class="flex flex-wrap gap-4">
+                            @foreach ($category->menus as $menu)
+                                @include('components.sections.partials.menu-tile', ['menu' => $menu])
+                            @endforeach
+                        </div>
+                    @else
+                        {{-- Large category: too many to show at once, so scroll it as a carousel --}}
+                        <div id="category-carousel-{{ $category->id }}" class="splide" aria-label="{{ $category->name }} categories">
+                            <div class="splide__track">
+                                <ul class="splide__list">
+                                    @foreach ($category->menus as $menu)
+                                        <li class="splide__slide">
+                                            @include('components.sections.partials.menu-tile', ['menu' => $menu])
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            <div class="splide__arrows"></div>
+                        </div>
 
-            {{-- Dynamic "All" button triggers a modal or expands --}}
-            <button onclick="toggleAllServices()" class="flex flex-col items-center group lg:hidden">
-                <div
-                    class="w-12 h-12 md:w-14 md:h-14 bg-gray-100 rounded-2xl flex items-center justify-center
-                            transition-all group-hover:bg-gray-200 group-active:scale-95 shadow-sm">
-                    <i data-lucide="layout-grid" class="w-6 h-6 text-gray-600"></i>
+                        @push('script')
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    if (typeof Splide !== 'undefined') {
+                                        new Splide('#category-carousel-{{ $category->id }}', {
+                                            type: 'slide',
+                                            perPage: 7,
+                                            perMove: 2,
+                                            gap: '1rem',
+                                            pagination: false,
+                                            arrows: true,
+                                            breakpoints: {
+                                                1024: {
+                                                    perPage: 6
+                                                },
+                                                768: {
+                                                    perPage: 5
+                                                },
+                                                480: {
+                                                    perPage: 3
+                                                },
+                                            },
+                                        }).mount();
+                                    }
+                                });
+                            </script>
+                        @endpush
+                    @endif
                 </div>
-                <span class="mt-2 text-[10px] md:text-xs font-bold text-gray-800">More</span>
-            </button>
+            @endforeach
         </div>
     </div>
-</div>
-
-<style>
-    /* Helper to manage mobile visibility purely via CSS if preferred */
-    @media (max-width: 639px) {
-        .display-mobile-hidden {
-            display: none;
-        }
-    }
-</style>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        lucide.createIcons();
-
-        function toggleAllServices() {
-            // Select all elements that were hidden by default on mobile
-            const hiddenItems = document.querySelectorAll('.hidden.sm\\:flex');
-            hiddenItems.forEach(item => {
-                item.classList.toggle('hidden');
-            });
-        }
-    });
-</script>
+@endif

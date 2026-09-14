@@ -17,6 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => CheckRole::class,
         ]);
+
+        // Admin/staff guests are sent to the admin login page; everyone else
+        // hitting a protected consumer web page (my-matters, profile, etc.)
+        // is sent to the regular account login instead.
+        $middleware->redirectGuestsTo(fn ($request) => $request->is('admin*')
+            ? route('login')
+            : route('account.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

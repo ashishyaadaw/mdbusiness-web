@@ -1,6 +1,6 @@
 @extends('layouts.app', [
     'title' => 'Home',
-    'isSearchBar' => true,
+    'isSearchBar' => false,
     'bodyClass' => 'bg-slate-50',
     'activeMenu' => 'services',
 ])
@@ -8,7 +8,6 @@
 @section('content')
     <x-sections.hero />
     <x-sections.services-grid />
-    {{-- <x-sections.foreign-jobs /> --}}
-    <x-sections.near-by-jobs />
-    <x-sections.medium-grid />
+    <x-sections.cities-grid />
+    <x-sections.featured-listings />
 @endsection
