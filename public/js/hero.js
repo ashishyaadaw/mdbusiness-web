@@ -15,6 +15,10 @@ $(document).ready(function () {
 $(document).ready(function () {
     const $video = $("#bg-video");
 
+    if ($video.length === 0) {
+        return;
+    }
+
     // When the video is ready to play, fade it in
     $video.on("canplaythrough", function () {
         $(this).removeClass("opacity-0").addClass("opacity-100");

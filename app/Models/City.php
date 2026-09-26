@@ -8,21 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class City extends Model
 {
-    protected $fillable = ['name', 'state_code', 'country_code', 'is_active'];
+    // Matches the real `cities` schema (id, state_id, name, city_code, sort_order).
+    // The previous list here (state_code/country_code/is_active) named columns
+    // that don't exist on this table — active status lives in the shared
+    // `flags` table via flag()/isActiveInFlags() instead.
+    protected $fillable = ['name', 'state_id', 'city_code', 'sort_order'];
 
     public function scopeSearch($query, $term)
     {
         return $query->where('name', 'like', "%{$term}%");
     }
 
-    /**
-     * Get the global 'city' active flag from the flags table.
-     * Use an Attribute (Accessor) for easy access: $city->is_active_flag
-     */
-    public function getIsActiveFlagAttribute()
+    public function scopeOrdered($query)
     {
-        // Fetches the first record from flags and returns the 'city' boolean
-        return Flag::value('city');
+        return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
     }
 
     public function menus()

@@ -6,7 +6,7 @@
 ])
 
 @section('content')
-    <x-sections.hero />
+    <x-sections.hero :slides="$heroSlides ?? collect()" :cards="$homeServiceCards ?? collect()" />
     <x-sections.services-grid />
     <x-sections.cities-grid />
     <x-sections.featured-listings />

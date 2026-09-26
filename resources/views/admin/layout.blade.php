@@ -6,7 +6,7 @@
     <title>{{ $title ?? 'Dashboard' }} | MD Business Admin</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="/assets/favicon-32x32.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -28,6 +28,36 @@
                class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.matters.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
                 <i class="fa-solid fa-list-check w-4"></i> Posts / Matters
             </a>
+            <a href="{{ route('admin.home.index') }}"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.home.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
+                <i class="fa-solid fa-images w-4"></i> Homepage
+            </a>
+
+            <div class="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wider text-gray-500">Catalog</div>
+            <a href="{{ route('admin.menu-categories.index') }}"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.menu-categories.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
+                <i class="fa-solid fa-folder-tree w-4"></i> Menu Categories
+            </a>
+            <a href="{{ route('admin.menus.index') }}"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.menus.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
+                <i class="fa-solid fa-bars w-4"></i> Menus
+            </a>
+
+            <div class="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wider text-gray-500">Locations</div>
+            <a href="{{ route('admin.cities.index') }}"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.cities.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
+                <i class="fa-solid fa-city w-4"></i> Cities
+            </a>
+            <a href="{{ route('admin.states.index') }}"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.states.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
+                <i class="fa-solid fa-map w-4"></i> States
+            </a>
+            <a href="{{ route('admin.countries.index') }}"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.countries.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
+                <i class="fa-solid fa-earth-americas w-4"></i> Countries
+            </a>
+
+            <div class="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wider text-gray-500">Accounts</div>
             <a href="{{ route('admin.users.index') }}"
                class="flex items-center gap-2 px-3 py-2 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-indigo-600 text-white' : 'hover:bg-gray-800' }}">
                 <i class="fa-solid fa-users w-4"></i> Users

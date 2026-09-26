@@ -8,6 +8,11 @@ class Menu extends Model
 {
     protected $fillable = ['title', 'menu_category_id', 'icon','desc', 'sort_order','status', 'type'];
 
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('id');
+    }
+
     // In Menu.php
     public function cities()
     {

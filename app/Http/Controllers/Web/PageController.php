@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\HeroSlide;
+use App\Models\HomeServiceCard;
 
 class PageController extends Controller
 {
@@ -11,6 +13,8 @@ class PageController extends Controller
         return view('pages.home', [
             'showSearch' => false, // Set to false to hide it
             'title' => 'Home',
+            'heroSlides' => HeroSlide::active()->ordered()->get(),
+            'homeServiceCards' => HomeServiceCard::active()->ordered()->get(),
         ]);
     }
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | MD Business</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-900 min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl p-8">

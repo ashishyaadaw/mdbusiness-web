@@ -12,6 +12,11 @@ class MenuCategories extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('id');
+    }
+
     public function menus()
     {
         return $this->hasMany(Menu::class, 'menu_category_id');

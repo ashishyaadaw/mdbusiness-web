@@ -1,6 +1,6 @@
 @php
     $cities = \App\Models\City::whereHas('flag', fn ($q) => $q->where('city', true))
-        ->orderBy('name')
+        ->ordered()
         ->get();
 @endphp
 

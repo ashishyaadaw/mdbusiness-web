@@ -39,7 +39,7 @@ class Flag extends Model
      */
     protected $casts = [
         'city' => 'boolean',
-        'menu' => 'boolean',
+        'menus' => 'boolean',
         'menu_category' => 'boolean',
         'city_menu' => 'boolean',
         'city_menu_matter' => 'boolean',
