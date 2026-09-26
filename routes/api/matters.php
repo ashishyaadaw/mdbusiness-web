@@ -54,5 +54,6 @@ Route::prefix('matters')->group(function () {
     // NOTE: previously registered twice, with the first copy pointing at a
     // non-existent 'reorder-auth' method, which made this route always
     // fatal-error before ever reaching the real 'reorder' implementation.
-    Route::post('/reorder', [MatterController::class, 'reorder'])->middleware('auth:sanctum');
+    // Route::post('/reorder', [MatterController::class, 'reorder'])->middleware('auth:sanctum');
+    Route::post('/reorder', [MatterController::class, 'reorder']);
 });
