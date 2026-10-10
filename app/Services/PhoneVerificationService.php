@@ -24,7 +24,7 @@ class PhoneVerificationService
         return ['allowed' => true];
     }
 
-    public function createAndSendOtp($phone, $username)
+    public function createAndSendOtp($phone, $username, $appSignKey = null)
     {
         $otp = rand(1000, 9999);
         $expiresAt = Carbon::now()->addMinutes(5);
@@ -40,7 +40,7 @@ class PhoneVerificationService
 
         // Send SMS
         // $sent = $this->sendSmsApi($phone, $otp, $username);
-        $sent = $this->sendSmsOTPApiWithAppSignKey($phone, $otp, $username);
+        $sent = $this->sendSmsOTPApiWithAppSignKey($phone, $otp, $appSignKey);
 
         if (! $sent) {
             throw new \Exception('Failed to send SMS via provider.');
@@ -73,7 +73,23 @@ class PhoneVerificationService
     /**
      * Handles the external API call
      */
-    public function sendSmsApi($phone, $otp, $username)
+    /**
+     * The DLT template (SMS_MESSAGE_ID) is now:
+     *   Your verification code is {#NUM#}. Do not share this code with anyone.
+     *   {#VAR#}-ONE ADVERTISERS
+     * so the variables must be "otp|app_sign_key". $username is no longer
+     * part of the message; kept so existing callers don't change.
+     */
+    public function sendSmsApi($phone, $otp, $username = null)
+    {
+        return $this->sendSmsOTPApiWithAppSignKey($phone, $otp, null);
+    }
+
+    /**
+     * Old name-first template ("name|otp"); unused while SMS_MESSAGE_ID points
+     * at the OTP + app sign key template.
+     */
+    private function sendSmsApiWithName($phone, $otp, $username)
     {
         $apiUrl = env('SMS_API_URL');
         $apiKey = env('SMS_API_KEY');
@@ -107,8 +123,14 @@ class PhoneVerificationService
             return false;
         }
     } 
-    public function sendSmsOTPApiWithAppSignKey($phone, $otp, $appsignkey)
+    /**
+     * $appsignkey is the Android app's 11-character SMS Retriever hash, which
+     * lets the app autofill the OTP. Falls back to SMS_APP_SIGN_KEY (the Play
+     * Store build's hash) when the client doesn't send one.
+     */
+    public function sendSmsOTPApiWithAppSignKey($phone, $otp, $appsignkey = null)
     {
+        $appsignkey = $appsignkey ?: env('SMS_APP_SIGN_KEY', '');
         $apiUrl = env('SMS_API_URL');
         $apiKey = env('SMS_API_KEY');
         $senderId = env('SMS_SENDER_ID');

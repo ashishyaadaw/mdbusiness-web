@@ -33,12 +33,16 @@ class PhoneVerificationController extends Controller
 
         // 2. Attempt to create and send
         try {
-            $otp = $this->verificationService->createAndSendOtp($phone, $username);
+            $otp = $this->verificationService->createAndSendOtp(
+                $phone,
+                $username,
+                $request->input('app_sign_key'),
+            );
 
             return response()->json([
                 'message' => 'OTP sent successfully.',
                 'resend_in' => 60,
-                'testing_otp' => $otp, // Remove in production
+                // 'testing_otp' => $otp, // Remove in production
             ], 200);
 
         } catch (\Exception $e) {

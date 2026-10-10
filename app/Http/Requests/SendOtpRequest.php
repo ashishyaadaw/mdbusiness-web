@@ -16,6 +16,7 @@ class SendOtpRequest extends FormRequest
         return [
             'phone' => 'required|string|min:10',
             'username' => 'nullable|string',
+            'app_sign_key' => 'nullable|string|max:40',
         ];
     }
 }
