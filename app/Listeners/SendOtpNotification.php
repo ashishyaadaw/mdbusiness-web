@@ -24,8 +24,9 @@ class SendOtpNotification
             $apiUrl = env('SMS_API_URL');
             $apiKey = env('SMS_API_KEY');
             $senderId = env('SMS_SENDER_ID');
+            $messageId = env('SMS_MESSAGE_ID');
 
-            if (! $apiUrl || ! $apiKey || ! $senderId) {
+            if (! $apiUrl || ! $apiKey || ! $senderId || ! $messageId) {
                 // Log an error if credentials are not set
                 Log::error('SMS API credentials are not set in .env file.');
 
@@ -40,7 +41,7 @@ class SendOtpNotification
             ])->post($apiUrl, [
                 'route' => 'dlt',
                 'sender_id' => $senderId,
-                'message' => '201904', // This looks like a template ID
+                'message' => $messageId, // This looks like a template ID
                 'variables_values' => ''.$username.'|'.$otp.'|',
                 'schedule_time' => null,
                 'flash' => 0,
