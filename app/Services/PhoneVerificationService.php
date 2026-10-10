@@ -78,8 +78,9 @@ class PhoneVerificationService
         $apiUrl = env('SMS_API_URL');
         $apiKey = env('SMS_API_KEY');
         $senderId = env('SMS_SENDER_ID');
+        $messageId = env('SMS_MESSAGE_ID');
 
-        if (! $apiUrl || ! $apiKey || ! $senderId) {
+        if (! $apiUrl || ! $apiKey || ! $senderId || ! $messageId) {
             Log::error('SMS API credentials are not set in .env file.');
 
             return false;
@@ -93,7 +94,7 @@ class PhoneVerificationService
             ])->post($apiUrl, [
                 'route' => 'dlt',
                 'sender_id' => $senderId,
-                'message' => '201904',
+                'message' => $messageId,
                 'variables_values' => $username.'|'.$otp.'|',
                 'flash' => 0,
                 'numbers' => $phone,
@@ -111,8 +112,9 @@ class PhoneVerificationService
         $apiUrl = env('SMS_API_URL');
         $apiKey = env('SMS_API_KEY');
         $senderId = env('SMS_SENDER_ID');
+        $messageId = env('SMS_MESSAGE_ID');
 
-        if (! $apiUrl || ! $apiKey || ! $senderId) {
+        if (! $apiUrl || ! $apiKey || ! $senderId || ! $messageId) {
             Log::error('SMS API credentials are not set in .env file.');
 
             return false;
@@ -126,7 +128,7 @@ class PhoneVerificationService
             ])->post($apiUrl, [
                 'route' => 'dlt',
                 'sender_id' => $senderId,
-                'message' => '223720',
+                'message' => $messageId,
                 'variables_values' => $otp.'|'.$appsignkey.'|',
                 'flash' => 0,
                 'numbers' => $phone,
