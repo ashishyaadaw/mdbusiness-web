@@ -23,7 +23,7 @@ class HomeContentSeeder extends Seeder
                 'heading' => 'Download our Mobile App',
                 'subheading' => 'Get the best job alerts and business services on the go.',
                 'button_text' => 'Get it on Google Play',
-                'button_url' => 'https://play.google.com',
+                'button_url' => route('app.open'),
                 'sort_order' => 0,
                 'is_active' => true,
             ]);

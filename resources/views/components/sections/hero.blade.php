@@ -67,7 +67,7 @@
                 </h2>
                 <p class="text-slate-500 text-sm mt-2 mb-6">Get the best job alerts and business services on the go.</p>
 
-                <a href="#" class="inline-block transition-transform hover:scale-105 active:scale-95">
+                <a href="{{ route('app.open') }}" class="inline-block transition-transform hover:scale-105 active:scale-95">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
                         alt="Get it on Google Play" class="h-10 md:h-12">
                 </a>
