@@ -2,8 +2,27 @@
 
 use App\Http\Controllers\Web\AccountDeletionController;
 use App\Http\Controllers\Web\AdvertiseController;
+use App\Http\Controllers\Web\AppLinkController;
 use App\Http\Controllers\Web\PageController;
 use Illuminate\Support\Facades\Route;
+
+// App links: https://mdbusiness.in/app/... opens the MD Business app when
+// installed, otherwise the store. See config/applinks.php.
+// Stateless: no session/cookies needed, and every link click would
+// otherwise create a session row.
+Route::withoutMiddleware([
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+])->group(function () {
+    Route::get('/.well-known/assetlinks.json', [AppLinkController::class, 'assetLinks']);
+    Route::get('/.well-known/apple-app-site-association', [AppLinkController::class, 'appleAppSiteAssociation']);
+    Route::get('/app/{path?}', [AppLinkController::class, 'open'])
+        ->where('path', '.*')
+        ->name('app.open');
+});
 
 // Main Landing
 Route::get('/', [PageController::class, 'index'])->name('home');

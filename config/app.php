@@ -39,7 +39,9 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    // Never show stack traces on production, even if APP_DEBUG is left on:
+    // they expose server paths and code.
+    'debug' => (bool) env('APP_DEBUG', false) && env('APP_ENV', 'production') !== 'production',
 
     /*
     |--------------------------------------------------------------------------
