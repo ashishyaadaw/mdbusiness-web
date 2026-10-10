@@ -15,7 +15,7 @@ class StateController extends Controller
             ->withCount('cities')
             ->when($request->filled('country'), fn ($q) => $q->where('country_id', $request->integer('country')))
             ->orderBy('name')
-            ->paginate(30)
+            ->paginate(50)
             ->withQueryString();
 
         $countries = Country::orderBy('name')->get();

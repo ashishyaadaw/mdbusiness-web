@@ -21,7 +21,7 @@ class UserController extends Controller
             })
             ->when($request->filled('role'), fn ($query) => $query->where('role', $request->string('role')))
             ->latest()
-            ->paginate(20)
+            ->paginate(50)
             ->withQueryString();
 
         return view('admin.users.index', compact('users'));
@@ -34,7 +34,7 @@ class UserController extends Controller
         $matters = $user->matters()
             ->with('controller')
             ->latest()
-            ->paginate(10);
+            ->paginate(50);
 
         return view('admin.users.show', compact('user', 'matters'));
     }

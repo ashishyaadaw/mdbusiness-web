@@ -22,7 +22,7 @@ class MenuController extends Controller
             ->when($request->filled('category'), fn ($q) => $q->where('menu_category_id', $request->integer('category')))
             ->when($request->filled('search'), fn ($q) => $q->where('title', 'like', '%'.$request->string('search').'%'))
             ->ordered()
-            ->paginate(30)
+            ->paginate(50)
             ->withQueryString();
 
         $categories = MenuCategories::orderBy('name')->get();

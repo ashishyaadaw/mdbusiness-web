@@ -16,7 +16,7 @@ class CityController extends Controller
             ->when($request->filled('state'), fn ($q) => $q->where('state_id', $request->integer('state')))
             ->when($request->filled('search'), fn ($q) => $q->search($request->string('search')))
             ->ordered()
-            ->paginate(30)
+            ->paginate(50)
             ->withQueryString();
 
         $states = State::with('country')->orderBy('name')->get();

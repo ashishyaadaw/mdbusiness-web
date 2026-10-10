@@ -27,7 +27,7 @@ class MatterController extends Controller
             ->with(['matterCreator', 'controller', 'cityMenus.city', 'cityMenus.menu'])
             ->orderBy('sort_order')
             ->orderBy('created_at', 'desc')
-            ->paginate(20)
+            ->paginate(50)
             ->withQueryString();
 
         $cities = City::orderBy('name')->get();
